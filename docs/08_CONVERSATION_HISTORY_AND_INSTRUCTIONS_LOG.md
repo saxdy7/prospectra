@@ -17,8 +17,8 @@ This log maintains a chronological record of all user prompts, design analyses, 
     - *Screenshot 5*: Campaigns sequencer screen with Sequences, Email accounts, Blocklist.
   - Specified requirement for renting to local businesses and setting up an architecture plan.
 - **Actions Taken**:
-  - Created [`CLAY_CLONE_KNOWLEDGE_BASE.md`](file:///c:/Users/mamid/Desktop/HUB/Clay%20Clone/CLAY_CLONE_KNOWLEDGE_BASE.md).
-  - Scaffolded React + TypeScript + Vite project and created [`src/index.css`](file:///c:/Users/mamid/Desktop/HUB/Clay%20Clone/src/index.css).
+  - Created [`CLAY_CLONE_KNOWLEDGE_BASE.md`](../CLAY_CLONE_KNOWLEDGE_BASE.md).
+  - Scaffolded React + TypeScript + Vite project and created [`src/index.css`](../src/index.css).
 
 ### Turn 2: Second Batch of Screenshots (Clay Suite 6–10)
 - **User Input**:
@@ -40,9 +40,9 @@ This log maintains a chronological record of all user prompts, design analyses, 
     - *Screenshots 14 & 15*: Voice Agent Prompt Studio & Slide-Out Telephony/Webcall Testing Drawer.
   - Requested merging **both platforms (Clay + Smallest.ai)** into an all-in-one super-platform for hackathons, client scraping, job hunting, and automated outreach.
 - **Actions Taken**:
-  - Created [`HYBRID_PLATFORM_ARCHITECTURE.md`](file:///c:/Users/mamid/Desktop/HUB/Clay%20Clone/HYBRID_PLATFORM_ARCHITECTURE.md).
-  - Built the interactive 3D Voice Orb in [`src/components/voice/VoiceOrb.tsx`](file:///c:/Users/mamid/Desktop/HUB/Clay%20Clone/src/components/voice/VoiceOrb.tsx).
-  - Created realistic mock datasets in [`src/data/mockData.ts`](file:///c:/Users/mamid/Desktop/HUB/Clay%20Clone/src/data/mockData.ts).
+  - Created [`HYBRID_PLATFORM_ARCHITECTURE.md`](../HYBRID_PLATFORM_ARCHITECTURE.md).
+  - Built the interactive 3D Voice Orb in [`src/components/voice/VoiceOrb.tsx`](../src/components/voice/VoiceOrb.tsx).
+  - Created realistic mock datasets in [`src/data/mockData.ts`](../src/data/mockData.ts).
 
 ### Turn 4: Final Batch of Screenshots (Smallest.ai Suite 16–25)
 - **User Input**:
@@ -58,5 +58,5 @@ This log maintains a chronological record of all user prompts, design analyses, 
     - *Screenshot 24*: Voice Cloning Studio (`/app/voice-cloning`).
     - *Screenshot 25*: Webhooks Hub (`/app/webhooks`).
 - **Actions Taken**:
-  - Created [`MASTER_PLATFORM_SPECIFICATION.md`](file:///c:/Users/mamid/Desktop/HUB/Clay%20Clone/MASTER_PLATFORM_SPECIFICATION.md).
+  - Created [`MASTER_PLATFORM_SPECIFICATION.md`](../MASTER_PLATFORM_SPECIFICATION.md).
   - Generated the complete multi-file documentation suite (`docs/01_...` through `docs/08_...`).
