@@ -74,7 +74,10 @@
 }
 
 html, body {
-  height: 100%;
+  /* min-height, not height: a fixed 100% pins the document box to the
+     viewport, which stops scroll-position measurement from resolving against
+     the real content height. #root already guarantees full-viewport fill. */
+  min-height: 100%;
   background-color: var(--color-canvas);
   color: var(--color-ink);
   font-family: var(--font-family);

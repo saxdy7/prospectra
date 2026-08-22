@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import clsx from 'clsx';
 import {
@@ -12,8 +12,10 @@ import {
   ExternalLink,
   Phone,
   Megaphone,
-  Users
+  Users,
+  ArrowLeft
 } from 'lucide-react';
+import { Landing } from './landing/Landing';
 import { VoiceOrb } from './components/voice/VoiceOrb';
 import {
   INITIAL_LOCAL_BUSINESSES,
@@ -25,6 +27,9 @@ import type { VoiceAgent } from './data/mockData';
 /* ==========================================================================
    Navigation
    ========================================================================== */
+
+/** The two top-level surfaces: the marketing site and the product itself. */
+type Surface = 'landing' | 'app';
 
 type ViewId = 'home' | 'businesses' | 'jobs' | 'voice';
 
@@ -68,10 +73,12 @@ const ACTION_CARDS: { title: string; body: string; color: string; target: ViewId
 
 function Sidebar({
   active,
-  onNavigate
+  onNavigate,
+  onExit
 }: {
   active: ViewId;
   onNavigate: (view: ViewId) => void;
+  onExit: () => void;
 }) {
   return (
     <nav
@@ -86,17 +93,36 @@ function Sidebar({
         gap: 'var(--space-lg)'
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>
-        <div
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-xs)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>
+          <div
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 'var(--radius-sm)',
+              background: 'linear-gradient(145deg, #8aa8ff, #004fff)'
+            }}
+          />
+          <span className="text-title-sm">Prospectra</span>
+        </div>
+        <button
+          onClick={onExit}
+          className="text-body-sm"
           style={{
-            width: 28,
-            height: 28,
-            borderRadius: 'var(--radius-sm)',
-            background:
-              'linear-gradient(135deg, var(--color-brand-ochre), var(--color-brand-pink))'
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '4px 0',
+            border: 'none',
+            background: 'none',
+            color: 'var(--color-muted)',
+            cursor: 'pointer',
+            fontFamily: 'var(--font-family)'
           }}
-        />
-        <span className="text-title-sm">Clay Clone</span>
+        >
+          <ArrowLeft size={14} />
+          Back to site
+        </button>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -733,11 +759,21 @@ function VoiceView() {
    ========================================================================== */
 
 export function App() {
+  const [surface, setSurface] = useState<Surface>('landing');
   const [view, setView] = useState<ViewId>('home');
+
+  /* Each surface owns its own scroll position; entering one starts at the top. */
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [surface]);
+
+  if (surface === 'landing') {
+    return <Landing onLaunch={() => setSurface('app')} />;
+  }
 
   return (
     <div style={{ display: 'flex', flex: 1, minHeight: '100vh' }}>
-      <Sidebar active={view} onNavigate={setView} />
+      <Sidebar active={view} onNavigate={setView} onExit={() => setSurface('landing')} />
       <main
         style={{
           flex: 1,
