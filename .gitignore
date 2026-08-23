@@ -1,9 +1,11 @@
 # Dependencies
 node_modules/
 
-# Build output
-dist/
-dist-ssr/
+# Next.js build output
+.next/
+out/
+build/
+next-env.d.ts
 *.local
 *.tsbuildinfo
 

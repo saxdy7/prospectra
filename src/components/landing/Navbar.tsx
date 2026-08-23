@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { BRAND } from './brand';
@@ -7,8 +9,7 @@ import { gsap, prefersReducedMotion } from './motion';
 const LINKS = [
   { id: 'home', label: 'Home' },
   { id: 'features', label: 'Features' },
-  { id: 'how', label: 'How It Works' },
-  { id: 'proof', label: 'Results' },
+  { id: 'pricing', label: 'Pricing' },
   { id: 'faq', label: 'FAQ' }
 ];
 
@@ -17,7 +18,7 @@ export function Navbar({ onLaunch }: { onLaunch: () => void }) {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState('home');
 
-  /* Solidify the bar once the hero starts scrolling away. */
+  /* Solidify the pill once the hero starts scrolling away. */
   useEffect(() => {
     const onScroll = () => setStuck(window.scrollY > 24);
     onScroll();
@@ -62,17 +63,24 @@ export function Navbar({ onLaunch }: { onLaunch: () => void }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
-  /* Entrance — the bar drops in once, on load. */
+  /* Entrance — the pill drops in once, on load. */
   useEffect(() => {
     if (prefersReducedMotion()) return;
     const ctx = gsap.context(() => {
-      gsap.from('.lp-nav__inner > *', {
-        y: -18,
+      gsap.from('.lp-nav__inner', {
+        y: -24,
         opacity: 0,
         duration: 0.8,
-        stagger: 0.08,
         ease: 'power3.out',
         delay: 0.1
+      });
+      gsap.from('.lp-nav__inner > *', {
+        y: -10,
+        opacity: 0,
+        duration: 0.6,
+        stagger: 0.06,
+        ease: 'power3.out',
+        delay: 0.28
       });
     });
     return () => ctx.revert();
@@ -89,7 +97,7 @@ export function Navbar({ onLaunch }: { onLaunch: () => void }) {
   return (
     <>
       <header className={`lp-nav ${stuck ? 'lp-nav--stuck' : ''}`}>
-        <div className="lp-shell lp-nav__inner">
+        <div className="lp-nav__inner">
           <a
             className="lp-logo"
             href="#home"

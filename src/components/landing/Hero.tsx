@@ -1,18 +1,22 @@
+'use client';
+
 import type { CSSProperties } from 'react';
 import { Sparkles, Search, Zap, Check, Phone } from 'lucide-react';
 import { BRAND } from './brand';
-import { Button, Glass, GradientField, Pill } from './primitives';
+import { Button, Glass, GradientField } from './primitives';
 import { useGsap, gsap, EASE } from './motion';
 
-/** Headline split into words so GSAP can stagger them individually. */
+/** Headline split into words so GSAP can stagger them individually.
+ *  Accented words set in italic, mirroring the reference's mixed roman /
+ *  italic display setting. */
 const HEADLINE = [
   { text: 'Find', accent: false },
   { text: 'Leads', accent: false },
   { text: '&', accent: false },
-  { text: 'Close', accent: false },
+  { text: 'Close', accent: true },
   { text: 'Them', accent: true },
-  { text: 'On', accent: true },
-  { text: 'Autopilot', accent: true }
+  { text: 'On', accent: false },
+  { text: 'Autopilot', accent: false }
 ];
 
 export function Hero({ onLaunch }: { onLaunch: () => void }) {
@@ -24,6 +28,16 @@ export function Hero({ onLaunch }: { onLaunch: () => void }) {
       );
       return;
     }
+
+    /* The dot field and bloom resolve in behind the copy on load. */
+    gsap.from('.lp-halftone', { opacity: 0, duration: 1.6, ease: 'power2.out' });
+    gsap.from('.lp-hero__bloom', {
+      opacity: 0,
+      scaleY: 0.6,
+      duration: 1.8,
+      ease: 'power3.out',
+      transformOrigin: '50% 100%'
+    });
 
     const tl = gsap.timeline({ defaults: { ease: EASE } });
 
@@ -102,19 +116,55 @@ export function Hero({ onLaunch }: { onLaunch: () => void }) {
         scrub: 1
       }
     });
+
+    /* The horizon bloom breathes continuously — scale only, so it stays
+       anchored to the foot of the hero. */
+    gsap.to('.lp-hero__bloom', {
+      scaleY: 1.14,
+      opacity: 0.86,
+      duration: 7,
+      ease: 'sine.inOut',
+      repeat: -1,
+      yoyo: true,
+      transformOrigin: '50% 100%'
+    });
+
+    /* Dot field parallaxes a touch slower than the page, giving the
+       halftone depth against the copy in front of it. */
+    gsap.to('.lp-halftone', {
+      yPercent: 8,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.lp-hero',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 0.8
+      }
+    });
   }, []);
 
   return (
     <section className="lp-hero" id="home" ref={scope}>
-      <GradientField />
-      <div className="lp-hero__rakes" />
+      <GradientField style={{ opacity: 0.55 }} />
+
+      {/* Halftone dot field — three grids of increasing dot size, each
+          masked to a different band, so the dots read as growing and
+          brightening toward the bloom at the foot of the hero. */}
+      <div className="lp-halftone" aria-hidden="true">
+        <span className="lp-halftone__layer lp-halftone__layer--fine" />
+        <span className="lp-halftone__layer lp-halftone__layer--mid" />
+        <span className="lp-halftone__layer lp-halftone__layer--bloom" />
+      </div>
+
+      <span className="lp-hero__bloom" aria-hidden="true" />
 
       <div className="lp-shell">
         <div className="lp-hero__copy">
           <span className="lp-hero__pill">
-            <Pill dot>
-              {BRAND.eyebrow} <strong>{BRAND.name}</strong>
-            </Pill>
+            <span className="lp-hero__eyebrow">
+              <span className="lp-hero__eyebrow-mark" aria-hidden="true" />
+              New: multilingual voice agents are live
+            </span>
           </span>
 
           <h1 className="lp-display lp-hero__headline lp-balance" style={{ maxWidth: '15ch' }}>
@@ -124,7 +174,7 @@ export function Hero({ onLaunch }: { onLaunch: () => void }) {
                 style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'top' }}
               >
                 <span className="lp-word">{w.accent ? <em>{w.text}</em> : w.text}</span>
-                {i < HEADLINE.length - 1 && ' '}
+                {i < HEADLINE.length - 1 && ' '}
               </span>
             ))}
           </h1>

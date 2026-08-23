@@ -1,6 +1,9 @@
+'use client';
+
+import { Mail, Globe, MessageCircle } from 'lucide-react';
 import { BRAND } from './brand';
 import { Button, GradientField, Logomark, Pill } from './primitives';
-import { useGsap, revealOnScroll } from './motion';
+import { useGsap, revealOnScroll, gsap } from './motion';
 
 const COLUMNS = [
   {
@@ -17,9 +20,35 @@ const COLUMNS = [
   }
 ];
 
+/* lucide-react no longer ships trademarked platform logos, so the footer
+   uses generic contact glyphs rather than mislabeling them as specific
+   social networks the product doesn't actually have accounts on yet. */
+const SOCIALS = [
+  { icon: Mail, label: 'Email', href: '#home' },
+  { icon: Globe, label: 'Community', href: '#home' },
+  { icon: MessageCircle, label: 'Updates', href: '#home' }
+];
+
 export function Footer({ onLaunch }: { onLaunch: () => void }) {
   const scope = useGsap(({ scope: el, reduced }) => {
     revealOnScroll(el.querySelectorAll('.lp-reveal'), { trigger: el, reduced });
+
+    if (reduced) return;
+
+    /* Ambient breathing glow — a slow, infinite pulse + drift so the
+       footer's background reads as alive rather than a static image. */
+    const glow = el.querySelector('.lp-footer__glow');
+    if (!glow) return;
+
+    gsap.to(glow, {
+      scale: 1.18,
+      opacity: 0.62,
+      x: 26,
+      duration: 9,
+      ease: 'sine.inOut',
+      repeat: -1,
+      yoyo: true
+    });
   }, []);
 
   return (
@@ -65,9 +94,13 @@ export function Footer({ onLaunch }: { onLaunch: () => void }) {
 
       {/* ---------------- Footer ---------------- */}
       <div className="lp-footer">
-        <div className="lp-shell">
+        <div className="lp-footer__grade" aria-hidden="true">
+          <span className="lp-footer__glow" />
+        </div>
+
+        <div className="lp-shell lp-footer__top">
           <div className="lp-footer__grid lp-reveal">
-            <div className="lp-footer__col">
+            <div className="lp-footer__col lp-footer__col--brand">
               <a className="lp-logo" href="#home" style={{ marginBottom: 14 }}>
                 <Logomark />
                 {BRAND.name}
@@ -77,8 +110,16 @@ export function Footer({ onLaunch }: { onLaunch: () => void }) {
                 className="lp-body"
                 style={{ fontSize: 'var(--lp-t-sm)', maxWidth: '34ch', marginTop: 12 }}
               >
-                {BRAND.tagline}
+                For teams that want full access to every feature — live sourcing, waterfall
+                enrichment, and voice agents that call the list for you.
               </p>
+              <div className="lp-footer__socials">
+                {SOCIALS.map(({ icon: Icon, label, href }) => (
+                  <a key={label} href={href} aria-label={label} className="lp-footer__social">
+                    <Icon size={16} strokeWidth={1.8} />
+                  </a>
+                ))}
+              </div>
             </div>
 
             {COLUMNS.map((col) => (
@@ -112,6 +153,11 @@ export function Footer({ onLaunch }: { onLaunch: () => void }) {
               </a>
             </span>
           </div>
+        </div>
+
+        {/* Giant bleed wordmark, cropped at both edges. */}
+        <div className="lp-footer__mark" aria-hidden="true">
+          {BRAND.name}
         </div>
       </div>
     </footer>

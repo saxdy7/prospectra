@@ -1,7 +1,8 @@
-import { useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Lenis from 'lenis';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -122,6 +123,32 @@ export function countUp(
     onUpdate: () => render(counter.v),
     scrollTrigger: { trigger: el, start: 'top 88%', once: true }
   });
+}
+
+/**
+ * Site-wide smooth scroll. Lenis owns the raf loop (driven through GSAP's
+ * ticker, not its own, so ScrollTrigger and Lenis never fall a frame out of
+ * sync) and reports every scroll tick back to ScrollTrigger.
+ *
+ * Skipped entirely under reduced motion — a smoothed, inertial scroll is
+ * exactly the kind of motion that setting exists to opt out of.
+ */
+export function useLenis() {
+  useEffect(() => {
+    if (prefersReducedMotion()) return;
+
+    const lenis = new Lenis({ autoRaf: false, lerp: 0.11, wheelMultiplier: 1 });
+    lenis.on('scroll', ScrollTrigger.update);
+
+    const update = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(update);
+    gsap.ticker.lagSmoothing(0);
+
+    return () => {
+      gsap.ticker.remove(update);
+      lenis.destroy();
+    };
+  }, []);
 }
 
 export { gsap, ScrollTrigger };

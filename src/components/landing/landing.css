@@ -1,0 +1,3006 @@
+/* ==========================================================================
+   Prospectra — Landing page design system
+   Everything is scoped under .lp so it cannot leak into Tailwind/shadcn
+   utility classes used elsewhere in the app.
+   ========================================================================== */
+
+.lp {
+  /* --- Ink & surface ------------------------------------------------------ */
+  --lp-void: #01030f;
+  --lp-deep: #030720;
+  --lp-navy: #04102f;
+  --lp-paper: #f4f6fd;
+  --lp-paper-soft: #e9edfa;
+
+  /* --- The blue ramp, lifted from the Figma gradient stops ---------------- */
+  --lp-blue-core: #285fff;
+  --lp-blue-deep: #004fff;
+  --lp-blue-mid: #8aa8ff;
+  --lp-blue-pale: #b6c9ff;
+  --lp-blue-lift: #4d7bff;
+
+  /* --- Text --------------------------------------------------------------- */
+  --lp-text: #ffffff;
+  --lp-text-soft: rgba(255, 255, 255, 0.66);
+  --lp-text-faint: rgba(255, 255, 255, 0.42);
+  --lp-ink: #070b1c;
+  --lp-ink-soft: #4a5473;
+  --lp-ink-faint: #7b849e;
+
+  /* --- Lines & glass ------------------------------------------------------ */
+  --lp-line: rgba(255, 255, 255, 0.1);
+  --lp-line-strong: rgba(255, 255, 255, 0.18);
+  --lp-line-ink: rgba(7, 11, 28, 0.08);
+  --lp-glass: rgba(255, 255, 255, 0.06);
+  --lp-glass-strong: rgba(255, 255, 255, 0.1);
+
+  /* --- Type families --------------------------------------------------------
+     Point at the self-hosted next/font variables set on <html> in the root
+     layout, falling back to the same stack if a font ever fails to load. */
+  --lp-display: var(--font-plus-jakarta), 'Plus Jakarta Sans', 'Inter', -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --lp-body: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
+
+  /* --- Fluid type scale ---------------------------------------------------
+     A 1.25 ratio at the small end that opens to 1.32 at display sizes, so
+     headlines gain presence on wide screens without the body text bloating.
+     Every step is clamp()ed against viewport width — no breakpoint jumps.   */
+  --lp-t-micro: 0.75rem;      /* 12px  — eyebrow / label */
+  --lp-t-caption: 0.8125rem;  /* 13px  — meta, captions  */
+  --lp-t-sm: clamp(0.875rem, 0.85rem + 0.12vw, 0.9375rem);
+  --lp-t-base: clamp(0.9375rem, 0.9rem + 0.2vw, 1.0625rem);
+  --lp-t-lead: clamp(1.0625rem, 1rem + 0.32vw, 1.25rem);
+  --lp-t-h4: clamp(1.125rem, 1.05rem + 0.35vw, 1.375rem);
+  --lp-t-h3: clamp(1.375rem, 1.2rem + 0.75vw, 1.875rem);
+  --lp-t-h2: clamp(2rem, 1.5rem + 2.2vw, 3.5rem);
+  --lp-t-h1: clamp(2.75rem, 1.6rem + 4.9vw, 6.25rem);
+
+  /* --- Tracking -----------------------------------------------------------
+     Optical rule: the larger the type, the tighter it sets. Micro labels go
+     the other way and open up, because uppercase at 12px needs the air.     */
+  --lp-track-display: -0.045em;
+  --lp-track-h2: -0.035em;
+  --lp-track-h3: -0.02em;
+  --lp-track-body: -0.006em;
+  --lp-track-micro: 0.14em;
+
+  /* --- Leading ------------------------------------------------------------
+     Inversely proportional to size, per the same optical rule.              */
+  --lp-lead-display: 0.94;
+  --lp-lead-h2: 1.04;
+  --lp-lead-h3: 1.2;
+  --lp-lead-body: 1.65;
+
+  /* --- Measure — body copy never exceeds a comfortable line length -------- */
+  --lp-measure: 64ch;
+  --lp-measure-tight: 48ch;
+
+  /* --- Rhythm ------------------------------------------------------------- */
+  --lp-gutter: clamp(1.25rem, 4vw, 2.5rem);
+  --lp-shell: 1200px;
+  --lp-section: clamp(5rem, 10vw, 9rem);
+
+  --lp-r-sm: 10px;
+  --lp-r-md: 14px;
+  --lp-r-lg: 20px;
+  --lp-r-xl: 28px;
+  --lp-r-pill: 999px;
+
+  --lp-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  font-family: var(--lp-body);
+  color: var(--lp-text);
+  background: var(--lp-void);
+  font-size: var(--lp-t-base);
+  line-height: var(--lp-lead-body);
+  letter-spacing: var(--lp-track-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+.lp *,
+.lp *::before,
+.lp *::after {
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   Typography primitives
+   ========================================================================== */
+
+.lp-display {
+  font-family: var(--lp-display);
+  font-size: var(--lp-t-h1);
+  font-weight: 800;
+  line-height: var(--lp-lead-display);
+  letter-spacing: var(--lp-track-display);
+  margin: 0;
+  /* Pulls the first line's left bearing flush with the grid. */
+  text-indent: -0.04em;
+}
+
+.lp-h2 {
+  font-family: var(--lp-display);
+  font-size: var(--lp-t-h2);
+  font-weight: 800;
+  line-height: var(--lp-lead-h2);
+  letter-spacing: var(--lp-track-h2);
+  margin: 0;
+  text-indent: -0.03em;
+}
+
+.lp-h3 {
+  font-family: var(--lp-display);
+  font-size: var(--lp-t-h3);
+  font-weight: 700;
+  line-height: var(--lp-lead-h3);
+  letter-spacing: var(--lp-track-h3);
+  margin: 0;
+}
+
+.lp-h4 {
+  font-family: var(--lp-display);
+  font-size: var(--lp-t-h4);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+.lp-lead {
+  font-size: var(--lp-t-lead);
+  line-height: 1.6;
+  color: var(--lp-text-soft);
+  max-width: var(--lp-measure);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.lp-body {
+  font-size: var(--lp-t-base);
+  line-height: var(--lp-lead-body);
+  color: var(--lp-text-soft);
+  max-width: var(--lp-measure);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.lp-micro {
+  font-size: var(--lp-t-micro);
+  font-weight: 600;
+  letter-spacing: var(--lp-track-micro);
+  text-transform: uppercase;
+  line-height: 1;
+  margin: 0;
+}
+
+/* Balanced headline wrapping — stops orphan words on two/three line heads. */
+.lp-balance {
+  text-wrap: balance;
+}
+
+/* Tabular figures for anything that counts or aligns in a column. */
+.lp-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* Light-on-dark inversion for the paper sections. */
+.lp-on-paper {
+  color: var(--lp-ink);
+}
+.lp-on-paper .lp-lead,
+.lp-on-paper .lp-body {
+  color: var(--lp-ink-soft);
+}
+
+/* ==========================================================================
+   The gradient field — "grading"
+   Faithful port of the Figma recipe in the reference:
+     4 stacked linear gradients (#285FFF→#8AA8FF, #285FFF→#B6C9FF,
+     #285FFF→#004FFF, black) → layer blur 85 → layer blur 50 → mono noise 20%.
+   Nested blur wrappers reproduce the two stacked blur passes exactly.
+   ========================================================================== */
+
+.lp-grade {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Outer pass — the second Figma layer blur (uniform 50). */
+.lp-grade__pass {
+  position: absolute;
+  inset: -18%;
+  filter: blur(50px);
+}
+
+/* Inner pass — the first Figma layer blur (uniform 85). */
+.lp-grade__stack {
+  position: absolute;
+  inset: 0;
+  filter: blur(85px);
+}
+
+.lp-grade__band {
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+}
+
+/* Stop pair 1 — #285FFF → #8AA8FF */
+.lp-grade__band--a {
+  left: 6%;
+  top: 4%;
+  width: 62%;
+  height: 72%;
+  background: linear-gradient(155deg, var(--lp-blue-core) 0%, var(--lp-blue-mid) 100%);
+  opacity: 0.85;
+}
+
+/* Stop pair 2 — #285FFF → #B6C9FF */
+.lp-grade__band--b {
+  right: 2%;
+  top: -6%;
+  width: 58%;
+  height: 66%;
+  background: linear-gradient(200deg, var(--lp-blue-core) 0%, var(--lp-blue-pale) 100%);
+  opacity: 0.7;
+}
+
+/* Stop pair 3 — #285FFF → #004FFF (the saturated core) */
+.lp-grade__band--c {
+  left: 22%;
+  top: 26%;
+  width: 60%;
+  height: 62%;
+  background: linear-gradient(180deg, var(--lp-blue-core) 0%, var(--lp-blue-deep) 100%);
+  opacity: 0.95;
+}
+
+/* Stop pair 4 — the black mass that grounds the composition */
+.lp-grade__band--d {
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -34%;
+  width: 128%;
+  height: 74%;
+  background: linear-gradient(180deg, #000000 0%, #000000 100%);
+  mix-blend-mode: normal;
+  opacity: 1;
+  border-radius: 46% 46% 0 0;
+}
+
+/* Mono noise — Figma: size 0.21, density 100%, white at 20%. */
+.lp-noise {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.2;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   Progressive layer blur — the stacked-mask technique from reference 3.
+   Each layer blurs harder and is masked to a narrower band, so the blur
+   ramps smoothly instead of stepping.
+   ========================================================================== */
+
+.lp-progressive {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  /* Below .lp-shell (z-index 2): this is a background-edge treatment for
+     the gradient field behind it, and must never sit in front of — and
+     therefore backdrop-blur — real foreground content like the step cards. */
+  z-index: 1;
+}
+
+.lp-progressive__layer {
+  position: absolute;
+  inset: 0;
+}
+
+.lp-progressive__layer:nth-child(1) {
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 20%, transparent 40%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 20%, transparent 40%);
+}
+.lp-progressive__layer:nth-child(2) {
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  mask-image: linear-gradient(to bottom, transparent 10%, #000 30%, #000 50%, transparent 70%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 10%, #000 30%, #000 50%, transparent 70%);
+}
+.lp-progressive__layer:nth-child(3) {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  mask-image: linear-gradient(to bottom, transparent 35%, #000 60%, #000 80%, transparent 95%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 35%, #000 60%, #000 80%, transparent 95%);
+}
+.lp-progressive__layer:nth-child(4) {
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  mask-image: linear-gradient(to bottom, transparent 60%, #000 88%, #000 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 60%, #000 88%, #000 100%);
+}
+
+/* ==========================================================================
+   Layout shell
+   ========================================================================== */
+
+.lp-shell {
+  width: 100%;
+  max-width: var(--lp-shell);
+  margin-inline: auto;
+  padding-inline: var(--lp-gutter);
+  position: relative;
+  z-index: 2;
+}
+
+.lp-section {
+  position: relative;
+  padding-block: var(--lp-section);
+}
+
+.lp-section--paper {
+  background: var(--lp-paper);
+  color: var(--lp-ink);
+}
+
+.lp-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lp-gutter);
+}
+
+.lp-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.lp-center .lp-lead,
+.lp-center .lp-body {
+  margin-inline: auto;
+}
+
+/* ==========================================================================
+   Eyebrow pill
+   ========================================================================== */
+
+.lp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px 7px 13px;
+  border-radius: var(--lp-r-pill);
+  border: 1px solid var(--lp-line-strong);
+  background: var(--lp-glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  font-size: var(--lp-t-caption);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: var(--lp-text-soft);
+  white-space: nowrap;
+}
+
+.lp-pill strong {
+  color: var(--lp-blue-mid);
+  font-weight: 600;
+}
+
+.lp-pill--ink {
+  border-color: rgba(40, 95, 255, 0.22);
+  background: rgba(40, 95, 255, 0.08);
+  color: var(--lp-blue-deep);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.lp-pill__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--lp-blue-lift);
+  box-shadow: 0 0 0 4px rgba(77, 123, 255, 0.2);
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.lp-btn {
+  --btn-bg: var(--lp-blue-core);
+  --btn-fg: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 8px 0 24px;
+  height: 52px;
+  border: 1px solid transparent;
+  border-radius: var(--lp-r-pill);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--lp-body);
+  font-size: var(--lp-t-sm);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  position: relative;
+  isolation: isolate;
+  transition: transform 0.35s var(--lp-ease), box-shadow 0.35s var(--lp-ease),
+    background-color 0.25s ease;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.22) inset,
+    0 10px 30px -8px rgba(40, 95, 255, 0.6);
+}
+
+.lp-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.28) inset,
+    0 18px 40px -10px rgba(40, 95, 255, 0.72);
+}
+
+.lp-btn:active {
+  transform: translateY(0);
+}
+
+.lp-btn:focus-visible {
+  outline: 2px solid var(--lp-blue-mid);
+  outline-offset: 3px;
+}
+
+/* The trailing circular arrow chip, as in the reference CTA. */
+.lp-btn__chip {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.35s var(--lp-ease), background-color 0.25s ease;
+}
+
+.lp-btn:hover .lp-btn__chip {
+  transform: translateX(3px);
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.lp-btn--ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--lp-text);
+  border-color: var(--lp-line-strong);
+  box-shadow: none;
+  padding-inline: 22px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.lp-btn--ghost:hover {
+  background: var(--lp-glass);
+  box-shadow: none;
+}
+
+.lp-btn--sm {
+  height: 42px;
+  padding: 0 6px 0 18px;
+  font-size: var(--lp-t-caption);
+}
+
+.lp-btn--sm .lp-btn__chip {
+  width: 30px;
+  height: 30px;
+}
+
+.lp-btn--plain {
+  padding-inline: 24px;
+}
+
+/* Text link with an underline that wipes in from the left. */
+.lp-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--lp-t-sm);
+  font-weight: 600;
+  color: var(--lp-blue-deep);
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.4s var(--lp-ease);
+  cursor: pointer;
+}
+
+.lp-link:hover {
+  background-size: 100% 1px;
+}
+
+.lp-link svg {
+  transition: transform 0.35s var(--lp-ease);
+}
+
+.lp-link:hover svg {
+  transform: translateX(3px);
+}
+
+/* ==========================================================================
+   Glass card
+   ========================================================================== */
+
+.lp-glass {
+  position: relative;
+  border-radius: var(--lp-r-lg);
+  border: 1px solid var(--lp-line-strong);
+  background: linear-gradient(
+    150deg,
+    rgba(255, 255, 255, 0.13) 0%,
+    rgba(255, 255, 255, 0.05) 46%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  box-shadow: 0 24px 60px -22px rgba(1, 3, 15, 0.75),
+    0 1px 0 rgba(255, 255, 255, 0.16) inset;
+  overflow: hidden;
+}
+
+/* Specular sheen across the top edge — the Vevox card treatment. */
+.lp-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0) 32%
+  );
+  pointer-events: none;
+}
+
+.lp-glass--light {
+  border-color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--lp-ink);
+  box-shadow: 0 24px 60px -26px rgba(4, 16, 47, 0.45);
+}
+
+.lp-glass--light::after {
+  display: none;
+}
+
+/* ==========================================================================
+   Navbar — floating pill
+   Detached from the viewport edges and inset from the top, rather than a
+   full-width bar. The outer .lp-nav only centers the pill; .lp-nav__inner
+   is the actual glass pill and owns the pointer events, background and
+   shadow so the transparent margin around it stays click-through.
+   ========================================================================== */
+
+.lp-nav {
+  position: fixed;
+  top: clamp(12px, 2.4vw, 22px);
+  left: 0;
+  right: 0;
+  z-index: 60;
+  display: flex;
+  justify-content: center;
+  padding-inline: var(--lp-gutter);
+  pointer-events: none;
+  transition: top 0.4s var(--lp-ease);
+}
+
+.lp-nav--stuck {
+  top: clamp(8px, 1.4vw, 14px);
+}
+
+.lp-nav__inner {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lp-gutter);
+  border-radius: var(--lp-r-pill);
+  border: 1px solid var(--lp-line-strong);
+  background: rgba(3, 7, 32, 0.5);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  padding: 8px 8px 8px 20px;
+  box-shadow: 0 20px 45px -22px rgba(1, 3, 15, 0.65),
+    0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  transition: background-color 0.4s var(--lp-ease), box-shadow 0.4s var(--lp-ease),
+    border-color 0.4s var(--lp-ease), padding 0.4s var(--lp-ease);
+}
+
+.lp-nav--stuck .lp-nav__inner {
+  background: rgba(3, 7, 32, 0.82);
+  border-color: var(--lp-line-strong);
+  box-shadow: 0 24px 55px -20px rgba(1, 3, 15, 0.85),
+    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+}
+
+.lp-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--lp-display);
+  font-size: 1.1875rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--lp-text);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.lp-logo__suffix {
+  color: var(--lp-text-faint);
+  font-weight: 600;
+}
+
+.lp-logo__mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: linear-gradient(145deg, var(--lp-blue-mid), var(--lp-blue-deep));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px -6px rgba(40, 95, 255, 0.9);
+  flex-shrink: 0;
+}
+
+.lp-nav__links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.lp-nav__link {
+  position: relative;
+  padding: 8px 14px;
+  border-radius: var(--lp-r-pill);
+  font-size: var(--lp-t-sm);
+  font-weight: 500;
+  color: var(--lp-text-soft);
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--lp-body);
+  letter-spacing: -0.008em;
+  transition: color 0.25s ease;
+  white-space: nowrap;
+}
+
+.lp-nav__link:hover,
+.lp-nav__link[aria-current='true'] {
+  color: var(--lp-text);
+}
+
+.lp-nav__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.lp-nav__burger {
+  display: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--lp-line-strong);
+  background: var(--lp-glass);
+  color: var(--lp-text);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Mobile drawer */
+.lp-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 59;
+  background: rgba(1, 3, 15, 0.92);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  padding: 96px var(--lp-gutter) var(--lp-gutter);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lp-drawer__link {
+  padding: 16px 4px;
+  border-bottom: 1px solid var(--lp-line);
+  font-family: var(--lp-display);
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--lp-text);
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+
+/* ==========================================================================
+   Hero
+   ========================================================================== */
+
+.lp-hero {
+  position: relative;
+  padding-top: clamp(120px, 15vw, 180px);
+  padding-bottom: clamp(60px, 8vw, 110px);
+  isolation: isolate;
+  background: var(--lp-void);
+}
+
+/* ---- Halftone dot field --------------------------------------------------
+   A true halftone varies dot SIZE with luminance, which CSS cannot do from a
+   single gradient. Three stacked grids approximate it: each layer steps up in
+   dot size and brightness and is masked to a lower band, so the field reads
+   as dots swelling toward the light at the foot of the hero.              */
+
+.lp-halftone {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.lp-halftone__layer {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+/* Fine dots across the whole field. */
+.lp-halftone__layer--fine {
+  background-image: radial-gradient(
+    circle,
+    rgba(138, 168, 255, 0.5) 1px,
+    transparent 1.3px
+  );
+  background-size: 13px 13px;
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.28) 0%,
+    rgba(0, 0, 0, 0.7) 48%,
+    #000 76%,
+    rgba(0, 0, 0, 0.25) 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.28) 0%,
+    rgba(0, 0, 0, 0.7) 48%,
+    #000 76%,
+    rgba(0, 0, 0, 0.25) 100%
+  );
+}
+
+/* Medium dots gathering through the lower half. */
+.lp-halftone__layer--mid {
+  background-image: radial-gradient(
+    circle,
+    rgba(182, 201, 255, 0.72) 1.9px,
+    transparent 2.2px
+  );
+  background-size: 15px 15px;
+  mask-image: radial-gradient(
+    ellipse 92% 52% at 50% 96%,
+    #000 0%,
+    rgba(0, 0, 0, 0.45) 48%,
+    transparent 78%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 92% 52% at 50% 96%,
+    #000 0%,
+    rgba(0, 0, 0, 0.45) 48%,
+    transparent 78%
+  );
+}
+
+/* Large, near-white dots inside the bloom band. */
+.lp-halftone__layer--bloom {
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.9) 2.6px,
+    transparent 2.9px
+  );
+  background-size: 17px 17px;
+  mask-image: radial-gradient(
+    ellipse 68% 30% at 50% 104%,
+    #000 0%,
+    rgba(0, 0, 0, 0.5) 42%,
+    transparent 74%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 68% 30% at 50% 104%,
+    #000 0%,
+    rgba(0, 0, 0, 0.5) 42%,
+    transparent 74%
+  );
+}
+
+/* The horizon glow the dots resolve into, which also carries the hero into
+   the light section below it. */
+.lp-hero__bloom {
+  position: absolute;
+  left: calc(50% - min(700px, 60vw));
+  bottom: -14%;
+  width: min(1400px, 120vw);
+  height: clamp(260px, 34vw, 460px);
+  z-index: 2;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center 78%,
+    rgba(226, 238, 255, 0.95) 0%,
+    rgba(138, 168, 255, 0.6) 26%,
+    rgba(40, 95, 255, 0.32) 46%,
+    rgba(1, 3, 15, 0) 72%
+  );
+  filter: blur(46px);
+  will-change: transform, opacity;
+}
+
+.lp-hero__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(1.25rem, 2.4vw, 1.75rem);
+  position: relative;
+  z-index: 3;
+}
+
+/* Uppercase, letterspaced micro eyebrow with a square mark — the reference's
+   treatment, and a deliberate contrast against the display headline. */
+.lp-hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 17px;
+  border-radius: var(--lp-r-pill);
+  border: 1px solid var(--lp-line-strong);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--lp-text-soft);
+  white-space: nowrap;
+}
+
+.lp-hero__eyebrow-mark {
+  width: 6px;
+  height: 6px;
+  border-radius: 1.5px;
+  background: var(--lp-blue-lift);
+  box-shadow: 0 0 0 4px rgba(77, 123, 255, 0.18);
+  flex-shrink: 0;
+}
+
+.lp-hero__headline {
+  /* Slightly open leading and a touch less tracking than the global display
+     setting, so the mixed roman/italic line still breathes at hero size. */
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.lp-hero__headline .lp-word {
+  display: inline-block;
+  will-change: transform;
+}
+
+.lp-hero__headline em {
+  font-style: italic;
+  font-weight: 600;
+  padding-right: 0.06em;
+  background: linear-gradient(115deg, #dce8ff 0%, var(--lp-blue-pale) 45%, var(--lp-blue-mid) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.lp-hero__cta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* --- Floating hero cards ------------------------------------------------- */
+
+.lp-hero__deck {
+  position: relative;
+  z-index: 3;
+  margin-top: clamp(2.5rem, 5vw, 4.5rem);
+  display: grid;
+  grid-template-columns: 1fr 1.12fr 1fr;
+  align-items: center;
+  gap: clamp(0.75rem, 1.6vw, 1.25rem);
+}
+
+.lp-float {
+  will-change: transform;
+}
+
+.lp-deck__side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lp-deck__side--left {
+  align-items: flex-start;
+  padding-bottom: 40px;
+}
+
+.lp-deck__side--right {
+  align-items: flex-end;
+  padding-bottom: 40px;
+}
+
+/* Points card */
+.lp-card-points {
+  width: 100%;
+  max-width: 240px;
+  padding: 16px 18px;
+  border-radius: var(--lp-r-lg);
+}
+
+.lp-card-points__value {
+  font-family: var(--lp-display);
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--lp-ink);
+}
+
+/* Search card */
+.lp-card-search {
+  padding: 22px 20px;
+  border-radius: var(--lp-r-xl);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lp-card-search__title {
+  font-family: var(--lp-display);
+  font-size: clamp(1.125rem, 1.6vw, 1.5rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--lp-ink);
+  margin: 0;
+}
+
+.lp-card-search__title span {
+  color: var(--lp-blue-core);
+}
+
+/* Deal card */
+.lp-card-deal {
+  width: 100%;
+  max-width: 250px;
+  padding: 18px;
+  border-radius: var(--lp-r-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lp-card-deal__value {
+  font-family: var(--lp-display);
+  font-size: 1.625rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  color: #fff;
+  margin: 0;
+}
+
+/* Radial progress ring */
+.lp-ring {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-family: var(--lp-display);
+  font-size: 0.875rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--lp-blue-core);
+  background: conic-gradient(
+      var(--lp-blue-core) calc(var(--pct, 0) * 1%),
+      rgba(40, 95, 255, 0.14) 0
+    );
+  position: relative;
+}
+
+.lp-ring::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.lp-ring span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Avatar stack */
+.lp-avatars {
+  display: inline-flex;
+  align-items: center;
+}
+
+.lp-avatars img,
+.lp-avatars span {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  margin-left: -8px;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.lp-avatars > :first-child {
+  margin-left: 0;
+}
+
+/* ==========================================================================
+   About — intro row, 3-card grid, stat strip, services row
+   ========================================================================== */
+
+.lp-about-intro {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  flex-wrap: wrap;
+  margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+}
+
+.lp-about-intro .lp-lead {
+  flex: 1 1 420px;
+  max-width: 46ch;
+  color: var(--lp-ink-soft);
+}
+
+.lp-about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 1fr;
+  gap: clamp(0.875rem, 1.6vw, 1.25rem);
+  align-items: stretch;
+}
+
+.lp-about-card {
+  position: relative;
+  border-radius: var(--lp-r-xl);
+  padding: 24px 22px;
+  display: flex;
+  flex-direction: column;
+  min-height: 300px;
+  overflow: hidden;
+}
+
+.lp-about-card--dark {
+  background: var(--lp-void);
+  color: #fff;
+  justify-content: space-between;
+}
+
+.lp-about-card__icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--lp-line-strong);
+  color: #fff;
+}
+
+.lp-about-card__body {
+  font-family: var(--lp-display);
+  font-size: clamp(1.0625rem, 1.6vw, 1.3125rem);
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+  color: var(--lp-text-soft);
+  margin: 20px 0 0;
+}
+
+.lp-about-card__body strong {
+  color: #fff;
+  font-weight: 700;
+}
+
+.lp-about-toggle {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--lp-body);
+  font-size: var(--lp-t-sm);
+  font-weight: 500;
+  color: var(--lp-text-soft);
+}
+
+.lp-about-toggle__track {
+  width: 38px;
+  height: 22px;
+  border-radius: var(--lp-r-pill);
+  background: rgba(255, 255, 255, 0.16);
+  padding: 3px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.lp-about-toggle__thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.3s var(--lp-ease);
+}
+
+.lp-about-toggle--on .lp-about-toggle__track {
+  background: var(--lp-blue-core);
+}
+
+.lp-about-toggle--on .lp-about-toggle__thumb {
+  transform: translateX(16px);
+}
+
+.lp-about-card--visual {
+  background: linear-gradient(165deg, #0a1a4a 0%, var(--lp-blue-core) 55%, var(--lp-blue-mid) 100%);
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.lp-about-card__pill {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: var(--lp-r-pill);
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #fff;
+  font-size: var(--lp-t-caption);
+  font-weight: 600;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1;
+}
+
+.lp-about-wave {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 96px;
+}
+
+.lp-about-wave-bar {
+  width: 4px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.85);
+  display: block;
+}
+
+.lp-about-card__badge {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--lp-blue-core);
+  display: grid;
+  place-items: center;
+}
+
+.lp-about-card--stat {
+  background: var(--lp-paper);
+  border: 1px solid var(--lp-line-ink);
+  gap: 4px;
+}
+
+.lp-about-card__value {
+  font-family: var(--lp-display);
+  font-size: clamp(2.25rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--lp-ink);
+}
+
+.lp-about-card--stat .lp-h4 {
+  margin-top: 10px;
+}
+
+.lp-about-card__desc {
+  font-size: var(--lp-t-sm);
+  line-height: 1.5;
+  color: var(--lp-ink-faint);
+  margin: 6px 0 0;
+}
+
+.lp-about-dots {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 18px;
+}
+
+.lp-about-dots__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lp-about-dots__label {
+  font-size: 11.5px;
+  color: var(--lp-ink-faint);
+  width: 92px;
+  flex-shrink: 0;
+}
+
+.lp-about-dots__track {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.lp-about-dots__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(40, 95, 255, 0.16);
+}
+
+.lp-about-dots__dot.is-filled {
+  background: var(--lp-blue-core);
+}
+
+.lp-about-dots__value {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--lp-ink);
+  width: 20px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.lp-about-caption {
+  text-align: center;
+  margin: clamp(2.5rem, 5vw, 3.5rem) 0 clamp(1.75rem, 3.5vw, 2.5rem);
+  font-family: var(--lp-display);
+  font-size: var(--lp-t-lead);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--lp-ink);
+}
+
+.lp-about-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.lp-about-stat {
+  text-align: center;
+}
+
+.lp-about-stat__value {
+  font-family: var(--lp-display);
+  font-size: clamp(1.875rem, 3.4vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--lp-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.lp-about-stat__label {
+  margin-top: 8px;
+  font-size: var(--lp-t-caption);
+  color: var(--lp-ink-faint);
+}
+
+.lp-about-divider {
+  height: 1px;
+  background: var(--lp-line-ink);
+  margin: clamp(3rem, 6vw, 5rem) 0;
+}
+
+.lp-about-services {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: center;
+}
+
+.lp-about-services__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.lp-about-services__copy .lp-h3 {
+  color: var(--lp-ink);
+  max-width: 20ch;
+}
+
+.lp-about-services__copy .lp-body {
+  color: var(--lp-ink-faint);
+  max-width: 36ch;
+}
+
+.lp-about-explore {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  padding: 0 8px 0 22px;
+  height: 48px;
+  border-radius: var(--lp-r-pill);
+  background: var(--lp-ink);
+  color: #fff;
+  font-size: var(--lp-t-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.35s var(--lp-ease);
+}
+
+.lp-about-explore:hover {
+  transform: translateY(-2px);
+}
+
+.lp-about-explore__chip {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.lp-about-services__cards {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: clamp(0.875rem, 1.6vw, 1.25rem);
+}
+
+.lp-about-service-card {
+  position: relative;
+  border-radius: var(--lp-r-xl);
+  min-height: 260px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+  overflow: hidden;
+  color: #fff;
+}
+
+.lp-about-service-card--maps {
+  background: linear-gradient(155deg, #ff9a5a 0%, var(--lp-blue-core) 68%, #0a1a4a 100%);
+}
+
+.lp-about-service-card--calls {
+  background: linear-gradient(165deg, var(--lp-blue-core) 0%, #0a1a4a 100%);
+}
+
+.lp-about-service-card__view {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--lp-ink);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+  font-size: 15px;
+  transition: transform 0.35s var(--lp-ease);
+}
+
+.lp-about-service-card__view:hover {
+  transform: scale(1.08);
+}
+
+.lp-about-service-card__caption {
+  font-family: var(--lp-display);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+  margin: 0;
+  max-width: 22ch;
+}
+
+@media (max-width: 1080px) {
+  .lp-about-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .lp-about-card--visual {
+    grid-column: span 2;
+  }
+  .lp-about-services {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .lp-about-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.75rem 1rem;
+  }
+  .lp-about-services__cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .lp-about-grid {
+    grid-template-columns: 1fr;
+  }
+  .lp-about-card--visual {
+    grid-column: auto;
+  }
+}
+
+/* ==========================================================================
+   Feature grid — bento layout
+   ========================================================================== */
+
+.lp-feat-head {
+  text-align: center;
+  margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.lp-feat-head .lp-h2 {
+  text-align: center;
+}
+
+.lp-feat-head__accent {
+  color: var(--lp-blue-core);
+}
+
+.lp-feat-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  grid-auto-rows: 1fr;
+  gap: clamp(0.875rem, 1.6vw, 1.25rem);
+}
+
+.lp-feat-card {
+  position: relative;
+  border-radius: var(--lp-r-xl);
+  background: #ffffff;
+  border: 1px solid var(--lp-line-ink);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.lp-feat-card__text h3 {
+  margin: 0;
+  color: var(--lp-ink);
+}
+
+.lp-feat-card__text p {
+  margin: 8px 0 0;
+  color: var(--lp-ink-faint);
+  max-width: 42ch;
+}
+
+/* --- Card A: Live Lead Discovery ----------------------------------------- */
+
+.lp-feat-card--discovery {
+  gap: 20px;
+}
+
+/* Grows to absorb any extra card height from the 1fr row sizing, so a
+   stretched card never leaves a dead gap between the visual and its text. */
+.lp-feat-visual {
+  position: relative;
+  flex: 1;
+  min-height: clamp(210px, 25vw, 265px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--lp-paper-soft);
+  border-radius: var(--lp-r-lg);
+}
+
+.lp-feat-orbit {
+  position: absolute;
+  width: 78%;
+  height: 78%;
+  border-radius: 50%;
+  border: 1px dashed var(--lp-line-ink);
+  will-change: transform;
+}
+
+/* Radar sweep — a single soft wedge rotating inside the orbit ring, so the
+   visual reads as actively scanning rather than decoratively spinning. */
+.lp-feat-sweep {
+  position: absolute;
+  width: 78%;
+  height: 78%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(40, 95, 255, 0) 0deg,
+    rgba(40, 95, 255, 0) 296deg,
+    rgba(40, 95, 255, 0.16) 348deg,
+    rgba(40, 95, 255, 0) 360deg
+  );
+  will-change: transform;
+  pointer-events: none;
+}
+
+.lp-feat-bubble {
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--lp-blue-core);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 10px 24px -12px rgba(4, 16, 47, 0.35);
+}
+
+.lp-feat-bubble--a {
+  top: 10%;
+  left: 16%;
+}
+.lp-feat-bubble--b {
+  top: 8%;
+  right: 14%;
+}
+.lp-feat-bubble--c {
+  bottom: 10%;
+  left: 12%;
+}
+.lp-feat-bubble--d {
+  bottom: 12%;
+  right: 16%;
+}
+
+.lp-feat-listing {
+  position: relative;
+  z-index: 1;
+  will-change: transform;
+  width: 190px;
+  padding: 14px 16px;
+  border-radius: var(--lp-r-md);
+  background: #fff;
+  box-shadow: 0 20px 40px -18px rgba(4, 16, 47, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lp-feat-listing__badge {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--lp-ink-faint);
+}
+
+.lp-feat-listing__pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  flex-shrink: 0;
+  animation: lp-live-pulse 1.9s ease-in-out infinite;
+}
+
+@keyframes lp-live-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(34, 197, 94, 0.04);
+  }
+}
+
+.lp-feat-listing__name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--lp-display);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--lp-ink);
+}
+
+.lp-feat-listing__rating {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--lp-blue-core);
+}
+
+.lp-feat-listing__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--lp-ink-faint);
+}
+
+/* --- Card B: Reactive Enrichment Queue ----------------------------------- */
+
+.lp-feat-card--queue {
+  gap: 22px;
+}
+
+/* Centred in the leftover space rather than pinned to the bottom with
+   margin-top:auto — with 1fr rows the card stretches, and pinning left a
+   dead gap between the copy and the rows. */
+.lp-feat-queue {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.lp-feat-queue__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--lp-r-md);
+  background: var(--lp-paper-soft);
+  will-change: transform;
+}
+
+.lp-feat-queue__icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--lp-blue-core);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.lp-feat-queue__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.lp-feat-queue__name {
+  font-size: var(--lp-t-sm);
+  font-weight: 600;
+  color: var(--lp-ink);
+}
+
+.lp-feat-queue__sub {
+  font-size: 11.5px;
+  color: var(--lp-ink-faint);
+}
+
+.lp-feat-queue__delta {
+  flex-shrink: 0;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--lp-blue-core);
+}
+
+/* Thin progress rail under the queue — reinforces that the waterfall is
+   continuously working through rows. */
+.lp-feat-queue__meter {
+  position: relative;
+  height: 3px;
+  margin-top: 16px;
+  border-radius: 3px;
+  background: var(--lp-paper-soft);
+  overflow: hidden;
+}
+
+.lp-feat-queue__meter-fill {
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, transparent, var(--lp-blue-core), transparent);
+  animation: lp-queue-scan 2.6s linear infinite;
+}
+
+@keyframes lp-queue-scan {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(350%);
+  }
+}
+
+/* --- Card C: Voice & Call Analytics -------------------------------------- */
+
+.lp-feat-card--voice {
+  gap: 20px;
+}
+
+/* Grows to fill the stretched card so the gradient panel carries the
+   surplus height instead of leaving a gap above it. */
+.lp-feat-phone {
+  flex: 1;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--lp-r-lg);
+  overflow: hidden;
+  background: linear-gradient(160deg, #0a1a4a 0%, var(--lp-blue-core) 55%, var(--lp-blue-mid) 100%);
+}
+
+.lp-feat-phone__screen {
+  position: relative;
+  flex: 1;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.lp-feat-phone__tag {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 10px;
+  border-radius: var(--lp-r-pill);
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+/* Recording indicator. */
+.lp-feat-rec {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff5a5a;
+  box-shadow: 0 0 8px rgba(255, 90, 90, 0.9);
+  flex-shrink: 0;
+}
+
+.lp-feat-phone__timer {
+  padding-left: 7px;
+  margin-left: 1px;
+  border-left: 1px solid rgba(255, 255, 255, 0.28);
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+}
+
+.lp-feat-wave {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 64px;
+  width: 100%;
+}
+
+.lp-feat-wave-bar {
+  width: 3px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.85);
+  display: block;
+}
+
+.lp-feat-phone__stat {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+}
+
+.lp-feat-phone__stat strong {
+  color: #fff;
+}
+
+/* --- Card D: CTA ---------------------------------------------------------- */
+
+.lp-feat-card--cta {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(165deg, var(--lp-blue-core) 0%, #1a3ecc 100%);
+  border-color: transparent;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.lp-feat-cta-glow {
+  position: absolute;
+  left: 8%;
+  bottom: -30%;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.4), transparent 70%);
+  filter: blur(50px);
+  opacity: 0.4;
+  pointer-events: none;
+  will-change: transform, opacity;
+  z-index: 0;
+}
+
+/* Keep the CTA's real content above its decorative layers. */
+.lp-feat-card--cta > :not(.lp-feat-cta-glow):not(.lp-feat-cta-grid) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Faint blueprint grid, masked so it fades toward the card's centre. */
+.lp-feat-cta-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.09) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, transparent 20%, #000 100%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, transparent 20%, #000 100%);
+}
+
+.lp-feat-cta__btn {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  margin-top: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 18px;
+  height: 42px;
+  border-radius: var(--lp-r-pill);
+  background: #fff;
+  color: var(--lp-ink);
+  border: none;
+  cursor: pointer;
+  font-family: var(--lp-body);
+  font-size: var(--lp-t-caption);
+  font-weight: 600;
+  transition: transform 0.3s var(--lp-ease);
+}
+
+.lp-feat-cta__btn:hover {
+  transform: translateY(-2px);
+}
+
+/* Sweeping highlight, driven by GSAP on a repeating delay. */
+.lp-feat-cta__shine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 45%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(40, 95, 255, 0.16) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+@media (max-width: 1080px) {
+  .lp-feat-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .lp-feat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   How it works
+   ========================================================================== */
+
+.lp-hiw {
+  position: relative;
+  isolation: isolate;
+  background: var(--lp-void);
+  overflow: hidden;
+}
+
+/* Left-aligned, lighter-weight heading — the editorial treatment from the
+   reference, deliberately not the centred bold H2 used elsewhere. */
+.lp-hiw-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.lp-hiw-head__label {
+  color: var(--lp-blue-mid);
+}
+
+.lp-hiw-head__title {
+  font-family: var(--lp-display);
+  font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+  font-weight: 500;
+  line-height: 1.14;
+  letter-spacing: -0.025em;
+  color: #fff;
+  margin: 0;
+  max-width: 24ch;
+}
+
+.lp-hiw-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.875rem, 1.6vw, 1.25rem);
+}
+
+.lp-hiw-card {
+  position: relative;
+  border-radius: var(--lp-r-lg);
+  overflow: hidden;
+  min-height: clamp(300px, 34vw, 380px);
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+}
+
+.lp-hiw-card__label {
+  color: var(--lp-text-faint);
+  position: relative;
+  z-index: 2;
+}
+
+.lp-hiw-card__label--ink {
+  color: var(--lp-ink-faint);
+}
+
+.lp-hiw-card__title {
+  position: relative;
+  z-index: 2;
+  margin: 16px 0 0;
+  font-family: var(--lp-display);
+  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: #fff;
+}
+
+.lp-hiw-card__title--ink {
+  color: var(--lp-ink);
+}
+
+.lp-hiw-card__lead {
+  position: relative;
+  z-index: 2;
+  margin: auto 0 0;
+  font-size: var(--lp-t-base);
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+
+/* --- Card treatments ------------------------------------------------------ */
+
+.lp-hiw-card--dark {
+  background: linear-gradient(165deg, #0b1024 0%, #05070f 100%);
+  border: 1px solid var(--lp-line);
+}
+
+.lp-hiw-card--blue {
+  background: linear-gradient(165deg, var(--lp-blue-deep) 0%, #0a1a4a 100%);
+}
+
+.lp-hiw-card--split {
+  padding: 0;
+  background: none;
+}
+
+.lp-hiw-split__top {
+  background: var(--lp-paper);
+  padding: 22px;
+  flex: 0 0 auto;
+}
+
+.lp-hiw-split__bottom {
+  position: relative;
+  flex: 1;
+  background: linear-gradient(165deg, #0b1024 0%, #05070f 100%);
+  display: flex;
+  align-items: flex-end;
+  padding: 22px;
+  overflow: hidden;
+}
+
+.lp-hiw-split__brand {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lp-hiw-split__mark {
+  font-family: var(--lp-display);
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fff;
+  line-height: 1;
+}
+
+.lp-hiw-split__name {
+  font-size: var(--lp-t-sm);
+  color: var(--lp-text-faint);
+}
+
+/* --- The glowing ring motif ----------------------------------------------- */
+
+.lp-hiw-visual {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-block: 18px;
+}
+
+.lp-hiw-visual--corner {
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+.lp-hiw-ring {
+  position: relative;
+  z-index: 1;
+  width: clamp(64px, 8vw, 92px);
+  height: clamp(64px, 8vw, 92px);
+  border-radius: 50%;
+  border: 7px solid var(--lp-blue-core);
+  box-shadow: 0 0 34px rgba(40, 95, 255, 0.9),
+    inset 0 0 18px rgba(138, 168, 255, 0.75);
+  /* An asymmetric edge tint is what sells it as a lit torus rather than a
+     flat circle — the highlight falls on one side only. */
+  border-top-color: var(--lp-blue-pale);
+  border-right-color: var(--lp-blue-mid);
+  will-change: transform;
+}
+
+.lp-hiw-ring--sm {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  width: clamp(52px, 6vw, 70px);
+  height: clamp(52px, 6vw, 70px);
+  border-width: 6px;
+}
+
+.lp-hiw-halo {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: clamp(150px, 18vw, 210px);
+  height: clamp(150px, 18vw, 210px);
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--lp-blue-core) 0%, transparent 68%);
+  filter: blur(46px);
+  opacity: 0.6;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.lp-hiw-visual--corner .lp-hiw-halo {
+  left: auto;
+  right: -10%;
+  top: auto;
+  bottom: -20%;
+  transform: none;
+}
+
+.lp-hiw-split__bottom .lp-hiw-halo {
+  left: auto;
+  right: -8%;
+  top: auto;
+  bottom: -25%;
+  transform: none;
+}
+
+@media (max-width: 900px) {
+  .lp-hiw-grid {
+    grid-template-columns: 1fr;
+  }
+  .lp-hiw-card {
+    min-height: 280px;
+  }
+}
+
+/* ==========================================================================
+   Pricing — dark glass cards over a watermark + orb backdrop
+   ========================================================================== */
+
+.lp-pricing {
+  position: relative;
+  isolation: isolate;
+  background: var(--lp-void);
+  overflow: hidden;
+  /* The watermark already supplies the headroom above the cards, so the
+     section does not need the full symmetric section padding. */
+  padding-bottom: clamp(3.5rem, 7vw, 6rem);
+}
+
+.lp-pricing__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* A wide, low-saturation ellipse that lights the card row from BEHIND.
+   Sized in absolute units and centred on the shell, so the glow always
+   sits square behind the cards instead of drifting off to one side, and
+   the colour is graded inside the gradient (rather than a solid fill at
+   low opacity) so it falls off into the void without a visible edge. */
+.lp-pricing__orb {
+  position: absolute;
+  /* Centred with calc rather than translateX(-50%): GSAP animates scale on
+     this element and would bake the percentage translate into stale pixels,
+     letting the glow slide off-centre on resize. */
+  left: calc(50% - min(430px, 39vw));
+  top: clamp(120px, 16vw, 220px);
+  width: min(860px, 78vw);
+  height: min(420px, 42vw);
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(40, 95, 255, 0.75) 0%,
+    rgba(0, 79, 255, 0.34) 42%,
+    rgba(4, 16, 47, 0) 72%
+  );
+  filter: blur(120px);
+  opacity: 0.75;
+  will-change: transform, opacity;
+}
+
+/* Shell-aligned stage for the wordmark + brand tag. */
+.lp-pricing__stage {
+  position: relative;
+  width: 100%;
+  max-width: var(--lp-shell);
+  height: 100%;
+  margin-inline: auto;
+  padding-inline: var(--lp-gutter);
+}
+
+/* Giant cropped wordmark sitting behind the card row. */
+.lp-pricing__watermark {
+  position: absolute;
+  left: 50%;
+  top: clamp(0.5rem, 3vw, 2.5rem);
+  transform: translateX(-50%);
+  font-family: var(--lp-display);
+  font-weight: 800;
+  font-size: clamp(4.5rem, 13vw, 10rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.06);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.lp-pricing__brand {
+  position: absolute;
+  top: clamp(1.5rem, 4vw, 3rem);
+  right: var(--lp-gutter);
+  font-family: var(--lp-display);
+  font-weight: 700;
+  font-size: clamp(1rem, 1.8vw, 1.5rem);
+  letter-spacing: -0.02em;
+  color: var(--lp-blue-mid);
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+.lp-pricing-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.875rem, 1.6vw, 1.25rem);
+  align-items: stretch;
+  margin-top: clamp(3rem, 8vw, 6rem);
+}
+
+.lp-pricing-card {
+  position: relative;
+  border-radius: var(--lp-r-xl);
+  border: 1px solid var(--lp-line-strong);
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.035) 44%,
+    rgba(255, 255, 255, 0.015) 100%
+  );
+  backdrop-filter: blur(26px) saturate(150%);
+  -webkit-backdrop-filter: blur(26px) saturate(150%);
+  box-shadow: 0 30px 70px -30px rgba(1, 3, 15, 0.85),
+    0 1px 0 rgba(255, 255, 255, 0.14) inset;
+  padding: 26px 24px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The middle plan sits slightly proud of its neighbours, as in the
+   reference — a lift rather than a loud colour change. */
+.lp-pricing-card--featured {
+  border-color: rgba(138, 168, 255, 0.42);
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(40, 95, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+}
+
+.lp-pricing-card__name {
+  font-family: var(--lp-display);
+  font-size: var(--lp-t-lead);
+  font-weight: 500;
+  color: var(--lp-text-soft);
+  letter-spacing: -0.015em;
+}
+
+.lp-pricing-card__price {
+  margin-top: 2px;
+  font-family: var(--lp-display);
+  font-weight: 700;
+  font-size: clamp(1.875rem, 3vw, 2.375rem);
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  color: #fff;
+}
+
+.lp-pricing-card__period {
+  font-family: var(--lp-body);
+  font-size: var(--lp-t-base);
+  font-weight: 400;
+  color: var(--lp-text-faint);
+}
+
+.lp-pricing-card__tagline {
+  margin: 16px 0 0;
+  font-size: var(--lp-t-caption);
+  line-height: 1.5;
+  color: var(--lp-text-faint);
+  max-width: 34ch;
+}
+
+.lp-pricing-card__features {
+  list-style: none;
+  margin: 22px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+}
+
+.lp-pricing-card__features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  font-size: var(--lp-t-caption);
+  line-height: 1.45;
+  color: var(--lp-text-soft);
+}
+
+.lp-pricing-card__check {
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.lp-pricing-card--featured .lp-pricing-card__check {
+  background: var(--lp-blue-core);
+  border-color: transparent;
+}
+
+.lp-pricing-card__cta {
+  width: 100%;
+  height: 46px;
+  margin-top: 26px;
+  border-radius: var(--lp-r-pill);
+  background: #fff;
+  color: var(--lp-ink);
+  font-family: var(--lp-body);
+  font-weight: 600;
+  font-size: var(--lp-t-sm);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.3s var(--lp-ease), box-shadow 0.3s var(--lp-ease);
+}
+
+.lp-pricing-card__cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px -14px rgba(255, 255, 255, 0.35);
+}
+
+.lp-pricing-toggle-row {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-size: var(--lp-t-base);
+  color: var(--lp-text-soft);
+}
+
+.lp-pricing-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.lp-pricing-toggle__track {
+  width: 52px;
+  height: 30px;
+  border-radius: var(--lp-r-pill);
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid var(--lp-line-strong);
+  padding: 3px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.lp-pricing-toggle__thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.3s var(--lp-ease);
+}
+
+.lp-pricing-toggle--on .lp-pricing-toggle__track {
+  background: var(--lp-blue-core);
+  border-color: transparent;
+}
+
+.lp-pricing-toggle--on .lp-pricing-toggle__thumb {
+  transform: translateX(22px);
+}
+
+.lp-pricing-save {
+  padding: 4px 11px;
+  border-radius: var(--lp-r-pill);
+  background: rgba(40, 95, 255, 0.2);
+  color: var(--lp-blue-mid);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .lp-pricing-grid {
+    grid-template-columns: 1fr;
+    margin-top: clamp(2rem, 6vw, 3rem);
+  }
+  .lp-pricing__brand {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Stats
+   ========================================================================== */
+
+.lp-proof {
+  position: relative;
+  isolation: isolate;
+  background: var(--lp-void);
+  overflow: hidden;
+}
+
+/* Centred on the content, not hung off the right edge — an off-centre
+   orb this large reads as a stray bright patch rather than lighting. */
+.lp-proof__glow {
+  position: absolute;
+  /* calc-centred for the same reason as .lp-pricing__orb. */
+  left: calc(50% - min(440px, 40vw));
+  top: calc(50% - min(220px, 22vw));
+  width: min(880px, 80vw);
+  height: min(440px, 44vw);
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(40, 95, 255, 0.6) 0%,
+    rgba(0, 79, 255, 0.26) 44%,
+    rgba(4, 16, 47, 0) 72%
+  );
+  filter: blur(120px);
+  opacity: 0.7;
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform, opacity;
+}
+
+.lp-stats {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(0.75rem, 1.4vw, 1.125rem);
+}
+
+.lp-stat {
+  border-radius: var(--lp-r-lg);
+  border: 1px solid var(--lp-line-strong);
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.09) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset;
+  padding: 26px 20px;
+  text-align: center;
+}
+
+.lp-stat__value {
+  font-family: var(--lp-display);
+  font-size: clamp(1.75rem, 3vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.lp-stat__label {
+  margin-top: 8px;
+  font-size: var(--lp-t-caption);
+  color: var(--lp-text-faint);
+  letter-spacing: 0;
+}
+
+/* ==========================================================================
+   Testimonials
+   ========================================================================== */
+
+.lp-quotes {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.875rem, 1.6vw, 1.25rem);
+}
+
+.lp-quote {
+  position: relative;
+  padding: 26px 24px 24px;
+  border-radius: var(--lp-r-xl);
+  border: 1px solid var(--lp-line-strong);
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.035) 46%,
+    rgba(255, 255, 255, 0.015) 100%
+  );
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  box-shadow: 0 28px 60px -30px rgba(1, 3, 15, 0.8),
+    0 1px 0 rgba(255, 255, 255, 0.14) inset;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  overflow: hidden;
+  transition: transform 0.45s var(--lp-ease), border-color 0.45s var(--lp-ease);
+}
+
+.lp-quote:hover {
+  transform: translateY(-4px);
+  border-color: rgba(138, 168, 255, 0.4);
+}
+
+/* Oversized opening quote, set as a watermark behind the text. */
+.lp-quote__glyph {
+  position: absolute;
+  top: -18px;
+  right: 14px;
+  font-family: var(--lp-display);
+  font-size: 7rem;
+  font-weight: 800;
+  line-height: 1;
+  color: rgba(138, 168, 255, 0.16);
+  pointer-events: none;
+  user-select: none;
+}
+
+.lp-quote__text {
+  position: relative;
+  z-index: 1;
+  font-family: var(--lp-display);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  line-height: 1.55;
+  letter-spacing: -0.018em;
+  color: #fff;
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.lp-quote__who {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--lp-line);
+}
+
+.lp-quote__av {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 6px 16px -6px rgba(40, 95, 255, 0.8);
+}
+
+.lp-quote__name {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.lp-quote__role {
+  font-size: 12.5px;
+  color: var(--lp-text-faint);
+}
+
+/* ==========================================================================
+   FAQ
+   ========================================================================== */
+
+.lp-faq {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 780px;
+  margin-inline: auto;
+}
+
+.lp-faq__item {
+  border: 1px solid var(--lp-line);
+  border-radius: var(--lp-r-md);
+  background: linear-gradient(
+    170deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  overflow: hidden;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.lp-faq__item[data-open='true'] {
+  border-color: rgba(138, 168, 255, 0.4);
+}
+
+.lp-faq__q {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: var(--lp-text);
+  font-family: var(--lp-display);
+  font-size: var(--lp-t-h4);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+}
+
+.lp-faq__sign {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--lp-line-strong);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: transform 0.4s var(--lp-ease), background-color 0.3s ease;
+}
+
+.lp-faq__item[data-open='true'] .lp-faq__sign {
+  transform: rotate(45deg);
+  background: var(--lp-blue-core);
+  border-color: transparent;
+}
+
+.lp-faq__a {
+  overflow: hidden;
+  height: 0;
+}
+
+.lp-faq__a > div {
+  padding: 0 20px 20px;
+  color: var(--lp-text-soft);
+  font-size: var(--lp-t-sm);
+  line-height: 1.7;
+  max-width: 62ch;
+}
+
+/* ==========================================================================
+   Closing CTA + footer
+   ========================================================================== */
+
+.lp-cta {
+  position: relative;
+  border-radius: var(--lp-r-xl);
+  overflow: hidden;
+  padding: clamp(2.5rem, 6vw, 4.5rem) var(--lp-gutter);
+  text-align: center;
+  isolation: isolate;
+  border: 1px solid var(--lp-line-strong);
+}
+
+.lp-footer {
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid var(--lp-line);
+  padding-top: clamp(3rem, 6vw, 4.5rem);
+  background: var(--lp-void);
+  z-index: 2;
+}
+
+/* The gradient bleed behind everything — a soft blurred glow that rises out
+   of the void and fades back into it on every side, same "grading"
+   technique as .lp-grade and .lp-pricing__glow elsewhere on the page.
+   Deliberately NOT a flat linear-gradient: hard color stops over a tall
+   section read as a solid banded block rather than a graded light. */
+.lp-footer__grade {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--lp-void);
+}
+
+.lp-footer__glow {
+  position: absolute;
+  /* calc-centred: GSAP animates scale/x here, so a percentage translate
+     would be baked to stale pixels on resize. */
+  left: calc(50% - min(550px, 65vw));
+  top: 6%;
+  width: min(1100px, 130vw);
+  height: 62%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    var(--lp-blue-core) 0%,
+    var(--lp-blue-deep) 38%,
+    transparent 72%
+  );
+  filter: blur(110px);
+  opacity: 0.48;
+  will-change: transform, opacity;
+}
+
+.lp-footer__grade::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+}
+
+.lp-footer__top {
+  padding-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.lp-footer__grid {
+  display: grid;
+  grid-template-columns: 1.6fr repeat(3, 1fr);
+  gap: clamp(1.5rem, 3vw, 3rem);
+}
+
+.lp-footer__socials {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.lp-footer__social {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--lp-line-strong);
+  background: var(--lp-glass);
+  color: var(--lp-text-soft);
+  transition: color 0.25s ease, background-color 0.25s ease, transform 0.3s var(--lp-ease);
+}
+
+.lp-footer__social:hover {
+  color: #fff;
+  background: var(--lp-glass-strong);
+  transform: translateY(-2px);
+}
+
+.lp-footer__col h4 {
+  font-size: var(--lp-t-micro);
+  font-weight: 700;
+  letter-spacing: var(--lp-track-micro);
+  text-transform: uppercase;
+  color: var(--lp-text-faint);
+  margin: 0 0 14px;
+}
+
+.lp-footer__col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.lp-footer__col a {
+  color: var(--lp-text-soft);
+  text-decoration: none;
+  font-size: var(--lp-t-sm);
+  transition: color 0.25s ease;
+}
+
+.lp-footer__col a:hover {
+  color: var(--lp-text);
+}
+
+.lp-footer__base {
+  margin-top: 40px;
+  padding-top: 22px;
+  border-top: 1px solid var(--lp-line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: var(--lp-t-caption);
+  color: var(--lp-text-faint);
+}
+
+/* Giant bleed wordmark — cropped tight by a fixed-height, overflow-hidden
+   box so only the top of the glyphs show, same as the reference. */
+.lp-footer__mark {
+  position: relative;
+  z-index: 1;
+  height: clamp(3.5rem, 11vw, 7.5rem);
+  overflow: hidden;
+  text-align: center;
+  font-family: var(--lp-display);
+  font-weight: 800;
+  line-height: 0.78;
+  letter-spacing: -0.03em;
+  font-size: clamp(5rem, 19vw, 13rem);
+  color: rgba(255, 255, 255, 0.12);
+  white-space: nowrap;
+  user-select: none;
+}
+
+
+/* ==========================================================================
+   Reveal primitive — GSAP drives these; CSS only sets the resting state.
+   ========================================================================== */
+
+/* Deliberately NOT opacity:0 here.
+   GSAP's fromTo sets the hidden state in useLayoutEffect, before first paint,
+   so there is no flash — and if JS fails, errors, or is disabled, the content
+   stays readable instead of leaving a blank page. Hiding in CSS would make
+   the whole site depend on a script succeeding. */
+.lp-reveal {
+  will-change: transform, opacity;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 1080px) {
+  .lp-footer__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .lp-nav__links {
+    display: none;
+  }
+  .lp-nav__burger {
+    display: inline-flex;
+  }
+  .lp-nav__actions .lp-btn--login {
+    display: none;
+  }
+  .lp-hero__deck {
+    grid-template-columns: 1fr;
+    max-width: 460px;
+    margin-inline: auto;
+  }
+  .lp-deck__side {
+    flex-direction: row;
+    justify-content: center;
+    padding-bottom: 0;
+  }
+  .lp-deck__side--left,
+  .lp-deck__side--right {
+    align-items: stretch;
+  }
+  .lp-card-points,
+  .lp-card-deal {
+    max-width: none;
+    flex: 1;
+  }
+  .lp-steps,
+  .lp-quotes {
+    grid-template-columns: 1fr;
+  }
+  .lp-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .lp-footer__grid {
+    grid-template-columns: 1fr;
+  }
+  .lp-deck__side {
+    flex-direction: column;
+  }
+  .lp-nav__inner {
+    padding-left: 14px;
+  }
+}
+
+/* ==========================================================================
+   Motion preferences — honour the OS setting.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .lp *,
+  .lp *::before,
+  .lp *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .lp-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

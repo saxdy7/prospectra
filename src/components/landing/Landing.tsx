@@ -1,16 +1,22 @@
+'use client';
+
 import { useEffect } from 'react';
 import { Navbar } from './Navbar';
 import { Hero } from './Hero';
+import { About } from './About';
 import { Features } from './Features';
 import { HowItWorks } from './HowItWorks';
 import { Proof } from './Proof';
+import { Pricing } from './Pricing';
 import { Faq } from './Faq';
 import { Footer } from './Footer';
 import { BRAND } from './brand';
-import { ScrollTrigger } from './motion';
+import { ScrollTrigger, useLenis } from './motion';
 import './landing.css';
 
-export function Landing({ onLaunch }: { onLaunch: () => void }) {
+export function Landing({ onLaunch = () => {} }: { onLaunch?: () => void }) {
+  useLenis();
+
   useEffect(() => {
     document.title = `${BRAND.name}${BRAND.suffix} — ${BRAND.tagline}`;
 
@@ -31,12 +37,14 @@ export function Landing({ onLaunch }: { onLaunch: () => void }) {
     <div className="lp">
       <Navbar onLaunch={onLaunch} />
       <main>
+        {/* The hero's halftone bloom grades into the light About section, so
+            no scallop shoulder is needed between them. */}
         <Hero onLaunch={onLaunch} />
-        {/* Scalloped shoulder where the dark hero meets the paper section. */}
-        <div className="lp-scallop" />
-        <Features />
+        <About />
+        <Features onLaunch={onLaunch} />
         <HowItWorks />
         <Proof />
+        <Pricing />
         <Faq />
       </main>
       <Footer onLaunch={onLaunch} />
