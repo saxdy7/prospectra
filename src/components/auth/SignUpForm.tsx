@@ -3,8 +3,20 @@
 import { useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Check, KeyRound, Loader2, Lock, Mail, User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import {
+  AlertCircle,
+  ArrowRight,
+  Check,
+  KeyRound,
+  Loader2,
+  Lock,
+  Mail,
+  MailCheck,
+  User
+} from 'lucide-react';
 import { Field } from './Field';
+import { createClient } from '@/utils/supabase/client';
 
 type Errors = { name?: string; email?: string; password?: string; terms?: string };
 
@@ -21,13 +33,19 @@ function scorePassword(pw: string) {
   return Math.min(3, Math.ceil(score * 0.75));
 }
 
+/** New accounts go straight into workspace setup. */
+const AFTER_SIGN_UP = '/onboarding';
+
 export function SignUpForm() {
+  const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [terms, setTerms] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
+  const [alert, setAlert] = useState<string>();
   const [busy, setBusy] = useState(false);
+  const [confirmSent, setConfirmSent] = useState(false);
 
   const strength = useMemo(() => scorePassword(password), [password]);
   const tier = strength > 0 ? TIERS[strength - 1] : null;
@@ -44,14 +62,71 @@ export function SignUpForm() {
     if (!terms) next.terms = 'Please accept the terms to continue.';
 
     setErrors(next);
+    setAlert(undefined);
     if (Object.keys(next).length) return;
 
-    /* No auth backend is wired up yet — this stands in for the request so the
-       button's pending state is real rather than decorative. */
     setBusy(true);
-    await new Promise((r) => setTimeout(r, 900));
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+      options: {
+        data: { full_name: name.trim() },
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=/onboarding`
+      }
+    });
+
+    if (error) {
+      setBusy(false);
+      setAlert(error.message);
+      return;
+    }
+
+    /* Two valid outcomes, decided by the project's email-confirmation
+       setting: a session means they are already in; no session means a
+       confirmation mail is on its way and nothing more happens until they
+       click it. Treating the second as success would strand them on a page
+       that looks signed in but is not. */
+    if (data.session) {
+      router.refresh();
+      router.push(AFTER_SIGN_UP);
+      return;
+    }
+
     setBusy(false);
+    setConfirmSent(true);
   };
+
+  if (confirmSent) {
+    return (
+      <>
+        <span className="lp-auth__sent-mark" aria-hidden="true">
+          <MailCheck size={22} strokeWidth={1.9} />
+        </span>
+
+        <h2 className="lp-auth__heading">Confirm your email</h2>
+        <p className="lp-auth__lede">
+          We sent a confirmation link to{' '}
+          <span className="lp-auth__strong">{email.trim()}</span>. Click it and your
+          workspace is ready — the link expires in 24 hours.
+        </p>
+
+        <p className="lp-auth__swap">
+          Wrong address?{' '}
+          <button
+            type="button"
+            className="lp-auth__link"
+            onClick={() => {
+              setConfirmSent(false);
+              setPassword('');
+            }}
+          >
+            Use a different one
+          </button>
+        </p>
+      </>
+    );
+  }
 
   return (
     <>
@@ -135,6 +210,13 @@ export function SignUpForm() {
             </span>
           )}
         </div>
+
+        {alert && (
+          <p className="lp-auth__alert" role="alert">
+            <AlertCircle size={15} strokeWidth={2.2} />
+            {alert}
+          </p>
+        )}
 
         <button className="lp-auth__submit" type="submit" disabled={busy}>
           {busy ? (

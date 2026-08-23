@@ -3,16 +3,23 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Check, KeyRound, Loader2, Lock, Mail } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { AlertCircle, ArrowRight, Check, KeyRound, Loader2, Lock, Mail } from 'lucide-react';
 import { Field } from './Field';
+import { createClient } from '@/utils/supabase/client';
 
 type Errors = { email?: string; password?: string };
 
+/** Where a successful sign-in lands. */
+const AFTER_SIGN_IN = '/';
+
 export function SignInForm() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(true);
   const [errors, setErrors] = useState<Errors>({});
+  const [alert, setAlert] = useState<string>();
   const [busy, setBusy] = useState(false);
 
   const submit = async (e: FormEvent) => {
@@ -24,13 +31,33 @@ export function SignInForm() {
     if (!password) next.password = 'Enter your password.';
 
     setErrors(next);
+    setAlert(undefined);
     if (Object.keys(next).length) return;
 
-    /* No auth backend is wired up yet — this stands in for the request so the
-       button's pending state is real rather than decorative. */
     setBusy(true);
-    await new Promise((r) => setTimeout(r, 900));
-    setBusy(false);
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password
+    });
+
+    if (error) {
+      setBusy(false);
+      /* Supabase returns the same "Invalid login credentials" for a wrong
+         password and an unknown address, which is deliberate — telling them
+         apart would confirm which emails have accounts. Keep it that way. */
+      setAlert(
+        error.message === 'Invalid login credentials'
+          ? 'That email and password do not match an account.'
+          : error.message
+      );
+      return;
+    }
+
+    /* refresh() re-runs the server components with the new session cookie
+       before navigating, so the destination renders as signed in. */
+    router.refresh();
+    router.push(AFTER_SIGN_IN);
   };
 
   return (
@@ -83,6 +110,13 @@ export function SignInForm() {
             Forgot password?
           </Link>
         </div>
+
+        {alert && (
+          <p className="lp-auth__alert" role="alert">
+            <AlertCircle size={15} strokeWidth={2.2} />
+            {alert}
+          </p>
+        )}
 
         <button className="lp-auth__submit" type="submit" disabled={busy}>
           {busy ? (

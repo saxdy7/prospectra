@@ -592,3 +592,32 @@
   color: #fff;
   text-decoration: none;
 }
+
+/* --- Form-level alert -----------------------------------------------------
+   For errors that belong to the submission rather than to one field —
+   bad credentials, rate limits, an unconfirmed address. Sits above the
+   submit button so it is adjacent to the action that produced it. */
+
+.lp-auth__alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 11px 13px;
+  border-radius: 11px;
+  border: 1px solid rgba(255, 122, 122, 0.3);
+  background: rgba(255, 122, 122, 0.1);
+  color: #ffb4b4;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.lp-auth__alert svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.lp-auth__alert--ok {
+  border-color: rgba(61, 220, 151, 0.32);
+  background: rgba(61, 220, 151, 0.12);
+  color: #7ce8bd;
+}
