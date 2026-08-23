@@ -145,7 +145,7 @@ export function Hero({ onLaunch }: { onLaunch: () => void }) {
 
   return (
     <section className="lp-hero" id="home" ref={scope}>
-      <GradientField style={{ opacity: 0.55 }} />
+      <GradientField style={{ opacity: 0.34 }} />
 
       {/* Halftone dot field — three grids of increasing dot size, each
           masked to a different band, so the dots read as growing and
@@ -171,10 +171,17 @@ export function Hero({ onLaunch }: { onLaunch: () => void }) {
             {HEADLINE.map((w, i) => (
               <span
                 key={i}
-                style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'top' }}
+                /* The word-gap is a margin, not a text space: the mask wrapper
+                   clips overflow, so a trailing space inside it disappears and
+                   the words run together. */
+                style={{
+                  display: 'inline-block',
+                  overflow: 'hidden',
+                  verticalAlign: 'top',
+                  marginRight: i < HEADLINE.length - 1 ? '0.26em' : undefined
+                }}
               >
                 <span className="lp-word">{w.accent ? <em>{w.text}</em> : w.text}</span>
-                {i < HEADLINE.length - 1 && ' '}
               </span>
             ))}
           </h1>
@@ -392,7 +399,10 @@ function SearchCard() {
           alignItems: 'center',
           justifyContent: 'center',
           gap: 3,
-          minHeight: 96
+          /* A definite height, not min-height: the bars size themselves in
+             percentages, which cannot resolve against a content-sized box
+             and collapse the waveform to nothing. */
+          height: 112
         }}
       >
         {WAVE.map((h, i) => (

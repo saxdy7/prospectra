@@ -760,10 +760,29 @@
 
 .lp-hero {
   position: relative;
-  padding-top: clamp(120px, 15vw, 180px);
+  /* Must clear the floating nav pill (its top offset + its own height) with
+     room to spare, or the eyebrow tucks under it. */
+  padding-top: clamp(168px, 17vw, 232px);
   padding-bottom: clamp(60px, 8vw, 110px);
   isolation: isolate;
   background: var(--lp-void);
+}
+
+/* Keeps the top of the hero dark behind the nav so the pill and eyebrow
+   stay legible against it. */
+.lp-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: clamp(220px, 26vw, 340px);
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(1, 3, 15, 0.92) 0%,
+    rgba(1, 3, 15, 0.55) 46%,
+    rgba(1, 3, 15, 0) 100%
+  );
 }
 
 /* ---- Halftone dot field --------------------------------------------------
@@ -856,23 +875,26 @@
 
 /* The horizon glow the dots resolve into, which also carries the hero into
    the light section below it. */
+/* Sits low and stays behind the card deck (z-index 1, under .lp-shell's 2)
+   so it lights the foot of the hero without washing out the cards in
+   front of it. */
 .lp-hero__bloom {
   position: absolute;
   left: calc(50% - min(700px, 60vw));
-  bottom: -14%;
+  bottom: -22%;
   width: min(1400px, 120vw);
-  height: clamp(260px, 34vw, 460px);
-  z-index: 2;
+  height: clamp(220px, 26vw, 360px);
+  z-index: 1;
   pointer-events: none;
   border-radius: 50%;
   background: radial-gradient(
-    ellipse at center 78%,
-    rgba(226, 238, 255, 0.95) 0%,
-    rgba(138, 168, 255, 0.6) 26%,
-    rgba(40, 95, 255, 0.32) 46%,
+    ellipse at center 82%,
+    rgba(226, 238, 255, 0.72) 0%,
+    rgba(138, 168, 255, 0.42) 24%,
+    rgba(40, 95, 255, 0.2) 46%,
     rgba(1, 3, 15, 0) 72%
   );
-  filter: blur(46px);
+  filter: blur(54px);
   will-change: transform, opacity;
 }
 
