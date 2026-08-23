@@ -41,7 +41,7 @@ export function HowItWorks() {
   }, []);
 
   return (
-    <section className="lp-section lp-hiw" id="how" ref={scope}>
+    <section className="lp-section lp-hiw lp-curve-top" id="how" ref={scope}>
       <GradientField style={{ opacity: 0.34 }} />
 
       <div className="lp-shell">

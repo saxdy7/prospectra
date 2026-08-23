@@ -62,33 +62,9 @@ export function Hero({ onLaunch }: { onLaunch: () => void }) {
         '-=0.45'
       );
 
-    /* Idle float — each card drifts on its own period so the deck never
-       pulses in lockstep. */
-    gsap.utils.toArray<HTMLElement>('.lp-float').forEach((card, i) => {
-      gsap.to(card, {
-        y: i % 2 === 0 ? -12 : -18,
-        duration: 3 + i * 0.45,
-        ease: 'sine.inOut',
-        repeat: -1,
-        yoyo: true,
-        delay: 1.4 + i * 0.2
-      });
-    });
-
-    /* Depth parallax — outer cards travel further than the centre one. */
-    gsap.utils.toArray<HTMLElement>('[data-depth]').forEach((card) => {
-      const depth = Number(card.dataset.depth ?? 1);
-      gsap.to(card, {
-        yPercent: -14 * depth,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: el,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: 0.6
-        }
-      });
-    });
+    /* The deck is fixed: no idle float and no scroll parallax, so the cards
+       hold the positions they are laid out in. Life comes only from the
+       content inside them (the live waveform). */
 
     /* Voice waveform — each bar breathes on its own offset so the strip
        reads as a live call rather than a looping graphic. */
@@ -129,31 +105,16 @@ export function Hero({ onLaunch }: { onLaunch: () => void }) {
       transformOrigin: '50% 100%'
     });
 
-    /* Dot field parallaxes a touch slower than the page, giving the
-       halftone depth against the copy in front of it. */
-    gsap.to('.lp-halftone', {
-      yPercent: 8,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '.lp-hero',
-        start: 'top top',
-        end: 'bottom top',
-        scrub: 0.8
-      }
-    });
+    /* The dot field stays put — it is a fixed texture, not a moving layer. */
   }, []);
 
   return (
     <section className="lp-hero" id="home" ref={scope}>
       <GradientField style={{ opacity: 0.34 }} />
 
-      {/* Halftone dot field — three grids of increasing dot size, each
-          masked to a different band, so the dots read as growing and
-          brightening toward the bloom at the foot of the hero. */}
+      {/* Even dot field — one uniform grid across the whole hero. */}
       <div className="lp-halftone" aria-hidden="true">
-        <span className="lp-halftone__layer lp-halftone__layer--fine" />
-        <span className="lp-halftone__layer lp-halftone__layer--mid" />
-        <span className="lp-halftone__layer lp-halftone__layer--bloom" />
+        <span className="lp-halftone__layer" />
       </div>
 
       <span className="lp-hero__bloom" aria-hidden="true" />
@@ -191,7 +152,7 @@ export function Hero({ onLaunch }: { onLaunch: () => void }) {
           </p>
 
           <div className="lp-hero__cta">
-            <Button chip onClick={onLaunch}>
+            <Button chip href="/signup">
               Start Prospecting Free
             </Button>
             <Button variant="ghost" onClick={onLaunch}>
@@ -203,20 +164,20 @@ export function Hero({ onLaunch }: { onLaunch: () => void }) {
         {/* ---------------- Floating card deck ---------------- */}
         <div className="lp-hero__deck">
           <div className="lp-deck__side lp-deck__side--left">
-            <Glass tone="light" className="lp-float lp-card-points" data-depth="1.4">
+            <Glass tone="light" className="lp-float lp-card-points">
               <CreditsCard />
             </Glass>
-            <Glass tone="light" className="lp-float" data-depth="1.15">
+            <Glass tone="light" className="lp-float lp-card-skeleton">
               <SkeletonRow color="var(--lp-blue-core)" />
             </Glass>
           </div>
 
-          <Glass tone="light" className="lp-float lp-card-search" data-depth="0.5">
+          <Glass tone="light" className="lp-float lp-card-search">
             <SearchCard />
           </Glass>
 
           <div className="lp-deck__side lp-deck__side--right">
-            <Glass className="lp-float lp-card-deal" data-depth="1.3">
+            <Glass className="lp-float lp-card-deal">
               <DealCard />
             </Glass>
           </div>

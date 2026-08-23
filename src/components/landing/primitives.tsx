@@ -201,6 +201,30 @@ export function Glass({
    eyebrow → headline → lead rhythm.
    ========================================================================== */
 
+/**
+ * Splits a string into per-word spans, each inside an overflow-clipping mask
+ * so `useGsap` can rise them in one after another.
+ *
+ * The word gap is a margin, not a text space — a trailing space inside the
+ * mask would be clipped and the words would run together.
+ */
+export function SplitWords({ text }: { text: string }) {
+  const words = text.split(' ');
+  return (
+    <>
+      {words.map((w, i) => (
+        <span
+          key={`${w}-${i}`}
+          className="lp-word-mask"
+          style={{ marginRight: i < words.length - 1 ? '0.26em' : undefined }}
+        >
+          <span className="lp-word">{w}</span>
+        </span>
+      ))}
+    </>
+  );
+}
+
 export function SectionHead({
   eyebrow,
   title,
@@ -225,8 +249,14 @@ export function SectionHead({
       }}
     >
       <Pill tone={tone === 'ink' ? 'ink' : 'glass'}>{eyebrow}</Pill>
-      <h2 className="lp-h2 lp-balance" style={{ maxWidth: '18ch' }}>
-        {title}
+      <h2
+        className="lp-h2 lp-balance"
+        style={{ maxWidth: '18ch' }}
+        /* A plain string is split for the word-by-word reveal; richer nodes
+           are left alone and fall back to the container fade. */
+        {...(typeof title === 'string' ? { 'data-split-words': '' } : {})}
+      >
+        {typeof title === 'string' ? <SplitWords text={title} /> : title}
       </h2>
       {lead && (
         <p

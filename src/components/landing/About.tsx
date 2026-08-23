@@ -59,7 +59,11 @@ export function About() {
   }, []);
 
   return (
-    <section className="lp-section lp-section--paper lp-about" id="about" ref={scope}>
+    <section
+      className="lp-section lp-section--paper lp-curve-top lp-about"
+      id="about"
+      ref={scope}
+    >
       <div className="lp-shell lp-on-paper">
         {/* ---------------- Intro row ---------------- */}
         <div className="lp-about-intro lp-reveal">

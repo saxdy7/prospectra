@@ -128,10 +128,10 @@ export function Navbar({ onLaunch }: { onLaunch: () => void }) {
           </nav>
 
           <div className="lp-nav__actions">
-            <button className="lp-nav__link lp-btn--login" onClick={onLaunch}>
+            <a className="lp-nav__link lp-btn--login" href="/signin">
               Log In
-            </button>
-            <Button size="sm" onClick={onLaunch}>
+            </a>
+            <Button size="sm" href="/signup">
               Get Started
             </Button>
             <button
@@ -154,10 +154,10 @@ export function Navbar({ onLaunch }: { onLaunch: () => void }) {
             </button>
           ))}
           <div style={{ marginTop: 'auto', display: 'flex', gap: 10 }}>
-            <Button variant="ghost" onClick={onLaunch} className="lp-btn--plain">
+            <Button variant="ghost" href="/signin" className="lp-btn--plain">
               Log In
             </Button>
-            <Button chip onClick={onLaunch}>
+            <Button chip href="/signup">
               Get Started
             </Button>
           </div>

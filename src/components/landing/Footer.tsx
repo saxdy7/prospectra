@@ -81,7 +81,7 @@ export function Footer({ onLaunch }: { onLaunch: () => void }) {
                 marginTop: '2rem'
               }}
             >
-              <Button chip onClick={onLaunch}>
+              <Button chip href="/signup">
                 Start Prospecting Free
               </Button>
               <Button variant="ghost" onClick={onLaunch}>

@@ -37,13 +37,56 @@ export function useGsap(
     if (!el) return;
 
     const reduced = prefersReducedMotion();
-    const ctx = gsap.context(() => setup({ scope: el, reduced }), el);
+    const ctx = gsap.context(() => {
+      setup({ scope: el, reduced });
+      /* Runs inside the same context so it is reverted with everything else.
+         Scoped to .lp-word-mask so the hero — which drives its own word
+         timeline — is never animated twice. */
+      revealMaskedWords(el, reduced);
+    }, el);
 
     return () => ctx.revert();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
   return scope;
+}
+
+/**
+ * Word-by-word heading reveal. Each word sits in a `.lp-word-mask` wrapper
+ * that clips overflow, so the word rises out of its own baseline rather than
+ * simply fading — the smooth display-type reveal used across the page.
+ *
+ * Applied automatically by `useGsap` to any masked words in scope.
+ */
+export function revealMaskedWords(scope: HTMLElement, reduced = false) {
+  const groups = scope.querySelectorAll<HTMLElement>('[data-split-words]');
+  if (!groups.length) return;
+
+  groups.forEach((group) => {
+    const words = group.querySelectorAll('.lp-word-mask .lp-word');
+    if (!words.length) return;
+
+    if (reduced) {
+      gsap.set(words, { yPercent: 0, opacity: 1, rotateX: 0 });
+      return;
+    }
+
+    gsap.fromTo(
+      words,
+      { yPercent: 115, opacity: 0, rotateX: -46 },
+      {
+        yPercent: 0,
+        opacity: 1,
+        rotateX: 0,
+        duration: 1,
+        stagger: 0.045,
+        ease: EASE,
+        transformOrigin: '50% 100%',
+        scrollTrigger: { trigger: group, start: 'top 86%', once: true }
+      }
+    );
+  });
 }
 
 /**

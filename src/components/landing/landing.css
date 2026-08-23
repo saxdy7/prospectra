@@ -183,6 +183,34 @@
   text-wrap: balance;
 }
 
+/* Word-by-word reveal primitive. The mask clips the word's travel so it
+   rises out of its own baseline instead of merely fading in. */
+.lp-word-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.lp-word {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* ==========================================================================
+   Curved section shoulders
+   Each block that changes surface colour rises over the one above it on a
+   rounded top edge, instead of meeting it on a hard horizontal seam.
+   ========================================================================== */
+
+.lp-curve-top {
+  position: relative;
+  z-index: 5;
+  border-top-left-radius: clamp(28px, 4vw, 60px);
+  border-top-right-radius: clamp(28px, 4vw, 60px);
+  margin-top: clamp(-60px, -4vw, -28px);
+  overflow: hidden;
+}
+
 /* Tabular figures for anything that counts or aligns in a column. */
 .lp-nums {
   font-variant-numeric: tabular-nums;
@@ -785,11 +813,10 @@
   );
 }
 
-/* ---- Halftone dot field --------------------------------------------------
-   A true halftone varies dot SIZE with luminance, which CSS cannot do from a
-   single gradient. Three stacked grids approximate it: each layer steps up in
-   dot size and brightness and is masked to a lower band, so the field reads
-   as dots swelling toward the light at the foot of the hero.              */
+/* ---- Dot field -----------------------------------------------------------
+   One uniform grid at a single dot size, top to bottom. Stacking extra grids
+   at larger sizes over the lower half made the dots swell and read as noise
+   near the bloom; an even field keeps the texture quiet behind the content. */
 
 .lp-halftone {
   position: absolute;
@@ -803,73 +830,26 @@
   position: absolute;
   inset: 0;
   display: block;
-}
-
-/* Fine dots across the whole field. */
-.lp-halftone__layer--fine {
   background-image: radial-gradient(
     circle,
-    rgba(138, 168, 255, 0.5) 1px,
+    rgba(138, 168, 255, 0.42) 1px,
     transparent 1.3px
   );
-  background-size: 13px 13px;
+  background-size: 15px 15px;
+  /* Only the opacity varies down the field — never the dot size. */
   mask-image: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0.28) 0%,
-    rgba(0, 0, 0, 0.7) 48%,
-    #000 76%,
-    rgba(0, 0, 0, 0.25) 100%
+    rgba(0, 0, 0, 0.5) 0%,
+    rgba(0, 0, 0, 0.78) 38%,
+    rgba(0, 0, 0, 0.6) 74%,
+    rgba(0, 0, 0, 0.22) 100%
   );
   -webkit-mask-image: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0.28) 0%,
-    rgba(0, 0, 0, 0.7) 48%,
-    #000 76%,
-    rgba(0, 0, 0, 0.25) 100%
-  );
-}
-
-/* Medium dots gathering through the lower half. */
-.lp-halftone__layer--mid {
-  background-image: radial-gradient(
-    circle,
-    rgba(182, 201, 255, 0.72) 1.9px,
-    transparent 2.2px
-  );
-  background-size: 15px 15px;
-  mask-image: radial-gradient(
-    ellipse 92% 52% at 50% 96%,
-    #000 0%,
-    rgba(0, 0, 0, 0.45) 48%,
-    transparent 78%
-  );
-  -webkit-mask-image: radial-gradient(
-    ellipse 92% 52% at 50% 96%,
-    #000 0%,
-    rgba(0, 0, 0, 0.45) 48%,
-    transparent 78%
-  );
-}
-
-/* Large, near-white dots inside the bloom band. */
-.lp-halftone__layer--bloom {
-  background-image: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.9) 2.6px,
-    transparent 2.9px
-  );
-  background-size: 17px 17px;
-  mask-image: radial-gradient(
-    ellipse 68% 30% at 50% 104%,
-    #000 0%,
-    rgba(0, 0, 0, 0.5) 42%,
-    transparent 74%
-  );
-  -webkit-mask-image: radial-gradient(
-    ellipse 68% 30% at 50% 104%,
-    #000 0%,
-    rgba(0, 0, 0, 0.5) 42%,
-    transparent 74%
+    rgba(0, 0, 0, 0.5) 0%,
+    rgba(0, 0, 0, 0.78) 38%,
+    rgba(0, 0, 0, 0.6) 74%,
+    rgba(0, 0, 0, 0.22) 100%
   );
 }
 
@@ -975,7 +955,9 @@
   margin-top: clamp(2.5rem, 5vw, 4.5rem);
   display: grid;
   grid-template-columns: 1fr 1.12fr 1fr;
-  align-items: center;
+  /* Cards sit on one baseline rather than floating at their own centres,
+     so the deck reads as a composed group instead of three loose cards. */
+  align-items: end;
   gap: clamp(0.75rem, 1.6vw, 1.25rem);
 }
 
@@ -986,17 +968,16 @@
 .lp-deck__side {
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
   gap: 14px;
 }
 
-.lp-deck__side--left {
-  align-items: flex-start;
-  padding-bottom: 40px;
-}
-
+/* Side columns stretch so their cards share the centre card's width rules
+   instead of collapsing to their content. */
+.lp-deck__side--left,
 .lp-deck__side--right {
-  align-items: flex-end;
-  padding-bottom: 40px;
+  align-items: stretch;
+  padding-bottom: 34px;
 }
 
 /* Points card */
@@ -1004,6 +985,14 @@
   width: 100%;
   max-width: 240px;
   padding: 16px 18px;
+  border-radius: var(--lp-r-lg);
+}
+
+/* The skeleton strip has no intrinsic width of its own — without this it
+   collapses to the avatar dot and the card renders as a tiny square. */
+.lp-card-skeleton {
+  width: 100%;
+  max-width: 240px;
   border-radius: var(--lp-r-lg);
 }
 
