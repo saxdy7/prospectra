@@ -18,8 +18,9 @@ export async function GET(request: NextRequest) {
    * absolute one would let a crafted link bounce a freshly authenticated user
    * to an attacker's site.
    */
-  const requested = searchParams.get('next') ?? '/';
-  const next = requested.startsWith('/') && !requested.startsWith('//') ? requested : '/';
+  const requested = searchParams.get('next') ?? '/app';
+  const next =
+    requested.startsWith('/') && !requested.startsWith('//') ? requested : '/app';
 
   if (!code) {
     return NextResponse.redirect(`${origin}/signin?error=missing_code`);

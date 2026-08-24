@@ -11,7 +11,14 @@ import { createClient } from '@/utils/supabase/client';
 type Errors = { email?: string; password?: string };
 
 /** Where a successful sign-in lands. */
-const AFTER_SIGN_IN = '/';
+/**
+ * Signing in goes into the product, not back to the marketing page.
+ *
+ * /app is the right single target for both cases: it checks for a completed
+ * workspace and sends anyone who has not finished setup on to /onboarding,
+ * so this does not need to know which of the two applies.
+ */
+const AFTER_SIGN_IN = '/app';
 
 export function SignInForm() {
   const router = useRouter();
