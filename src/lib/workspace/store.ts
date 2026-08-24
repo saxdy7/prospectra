@@ -39,12 +39,67 @@ export interface DemoRow extends TableRow {
   cellStatus?: Record<string, 'queued' | 'running' | 'filled' | 'failed'>;
 }
 
+/** An audience is a saved slice of a table. */
+export interface DemoAudience {
+  id: string;
+  workspaceId: string;
+  name: string;
+  sourceTableId: string;
+  memberIds: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DemoCampaignStep {
+  id: string;
+  position: number;
+  delayDays: number;
+  subject: string;
+  body: string;
+}
+
+/** Drafts only. Sending needs a provider and a verified sender. */
+export interface DemoCampaign {
+  id: string;
+  workspaceId: string;
+  name: string;
+  audienceId?: string;
+  status: 'draft';
+  steps: DemoCampaignStep[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DemoAgentVersion {
+  version: number;
+  prompt: string;
+  firstMessage: string;
+  model: string;
+  languages: string[];
+  voice: string;
+  savedAt: string;
+}
+
+/** Drafts only. Calling needs telephony, a number and consent. */
+export interface DemoVoiceAgent {
+  id: string;
+  workspaceId: string;
+  name: string;
+  status: 'draft';
+  versions: DemoAgentVersion[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface WorkspaceData {
   version: 1;
   tables: DemoTable[];
   rows: Record<string, DemoRow[]>;
   searchJobs: SearchJob[];
   importJobs: ImportJob[];
+  audiences: DemoAudience[];
+  campaigns: DemoCampaign[];
+  agents: DemoVoiceAgent[];
 }
 
 export interface WorkspaceDataStore {
@@ -56,7 +111,16 @@ export interface WorkspaceDataStore {
 export const DATA_KEY = 'prospectra:data:v1';
 
 function empty(): WorkspaceData {
-  return { version: 1, tables: [], rows: {}, searchJobs: [], importJobs: [] };
+  return {
+    version: 1,
+    tables: [],
+    rows: {},
+    searchJobs: [],
+    importJobs: [],
+    audiences: [],
+    campaigns: [],
+    agents: []
+  };
 }
 
 function isBrowser() {
@@ -76,7 +140,10 @@ export const localDataStore: WorkspaceDataStore = {
         tables: Array.isArray(parsed.tables) ? parsed.tables : [],
         rows: typeof parsed.rows === 'object' && parsed.rows ? parsed.rows : {},
         searchJobs: Array.isArray(parsed.searchJobs) ? parsed.searchJobs : [],
-        importJobs: Array.isArray(parsed.importJobs) ? parsed.importJobs : []
+        importJobs: Array.isArray(parsed.importJobs) ? parsed.importJobs : [],
+        audiences: Array.isArray(parsed.audiences) ? parsed.audiences : [],
+        campaigns: Array.isArray(parsed.campaigns) ? parsed.campaigns : [],
+        agents: Array.isArray(parsed.agents) ? parsed.agents : []
       };
     } catch {
       /* Malformed JSON or a private-mode denial. Degrading to an empty

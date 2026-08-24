@@ -23,6 +23,7 @@ import { GOALS } from '@/lib/onboarding/config';
 import type { WorkspaceState } from '@/lib/onboarding/types';
 import { TablesSection } from './tables/TablesSection';
 import { SearchPanel } from './search/SearchPanel';
+import { AudiencesSection, CampaignsSection, VoiceSection } from './modules/Modules';
 import { dataStore, type WorkspaceData } from '@/lib/workspace/store';
 import type { SearchJob } from '@/lib/types/models';
 import '../landing/landing.css';
@@ -611,6 +612,12 @@ export function WorkspaceApp() {
                   persistData({ ...data, searchJobs: [j, ...data.searchJobs] })
                 }
               />
+            ) : section === 'audiences' ? (
+              <AudiencesSection workspaceId={workspaceId} data={data} onChange={persistData} />
+            ) : section === 'campaigns' ? (
+              <CampaignsSection workspaceId={workspaceId} data={data} onChange={persistData} />
+            ) : section === 'voice' ? (
+              <VoiceSection workspaceId={workspaceId} data={data} onChange={persistData} />
             ) : (
               <SectionPanel id={section} />
             )}
