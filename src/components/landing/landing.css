@@ -972,18 +972,18 @@
   gap: 14px;
 }
 
-/* Side columns stretch so their cards share the centre card's width rules
-   instead of collapsing to their content. */
+/* Cards fill their grid column and share the centre card's bottom edge.
+   The side columns previously carried a padding-bottom the centre card did
+   not, which pushed them off that shared baseline. */
 .lp-deck__side--left,
 .lp-deck__side--right {
   align-items: stretch;
-  padding-bottom: 34px;
 }
 
-/* Points card */
+/* Points card. Fills its grid column so the three columns read as an even
+   set — a fixed max-width left ragged gaps against the centre card. */
 .lp-card-points {
   width: 100%;
-  max-width: 240px;
   padding: 16px 18px;
   border-radius: var(--lp-r-lg);
 }
@@ -992,7 +992,6 @@
    collapses to the avatar dot and the card renders as a tiny square. */
 .lp-card-skeleton {
   width: 100%;
-  max-width: 240px;
   border-radius: var(--lp-r-lg);
 }
 
@@ -1031,7 +1030,6 @@
 /* Deal card */
 .lp-card-deal {
   width: 100%;
-  max-width: 250px;
   padding: 18px;
   border-radius: var(--lp-r-lg);
   display: flex;
@@ -2974,10 +2972,8 @@
   }
   .lp-card-points,
   .lp-card-deal {
-    max-width: none;
     flex: 1;
   }
-  .lp-steps,
   .lp-quotes {
     grid-template-columns: 1fr;
   }

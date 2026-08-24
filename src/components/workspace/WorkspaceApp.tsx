@@ -9,7 +9,7 @@ import { WorkspaceMark } from './OnboardingShell';
 import { checklistFor, nextStepFor } from '@/lib/onboarding/plan';
 import { workspaceStore } from '@/lib/onboarding/storage';
 import { GOALS, wantsCalling } from '@/lib/onboarding/config';
-import { emptyWorkspaceState, type WorkspaceState } from '@/lib/onboarding/types';
+import type { WorkspaceState } from '@/lib/onboarding/types';
 import './workspace.css';
 
 /** What each planned module will do, taken from the platform specification. */
@@ -84,8 +84,16 @@ export function WorkspaceApp() {
 
   const [state, setState] = useState<WorkspaceState | null>(null);
   const [hydrated, setHydrated] = useState(false);
-  const [section, setSection] = useState('home');
   const [menuOpen, setMenuOpen] = useState(false);
+
+  /* The finish screen deep-links to the section it recommended. Read once as
+     the initial value rather than syncing it from an effect — this only ever
+     seeds where the workspace opens, and an effect would both cascade a
+     render and fight the user if they navigated before it ran. */
+  const [section, setSection] = useState(() => {
+    const start = params.get('start');
+    return start && NAV.some((n) => n.id === start) ? start : 'home';
+  });
 
   /* Client-only read, so the server and first client render agree. */
   useEffect(() => {
@@ -109,12 +117,6 @@ export function WorkspaceApp() {
       cancelled = true;
     };
   }, [router]);
-
-  /* The finish screen deep-links straight to the section it recommended. */
-  useEffect(() => {
-    const start = params.get('start');
-    if (start && NAV.some((n) => n.id === start)) setSection(start);
-  }, [params]);
 
   const persist = useCallback(async (next: WorkspaceState) => {
     setState(next);

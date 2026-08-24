@@ -13,7 +13,9 @@ const LINKS = [
   { id: 'faq', label: 'FAQ' }
 ];
 
-export function Navbar({ onLaunch }: { onLaunch: () => void }) {
+/* No onLaunch prop: this bar's Log In and Get Started are real links to
+   /signin and /signup, so it never needed the callback the other sections use. */
+export function Navbar() {
   const [stuck, setStuck] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState('home');

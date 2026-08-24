@@ -35,7 +35,7 @@ export function Landing({ onLaunch = () => {} }: { onLaunch?: () => void }) {
 
   return (
     <div className="lp">
-      <Navbar onLaunch={onLaunch} />
+      <Navbar />
       <main>
         {/* The hero's halftone bloom grades into the light About section, so
             no scallop shoulder is needed between them. */}

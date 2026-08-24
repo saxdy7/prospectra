@@ -20,7 +20,7 @@ const HEADLINE = [
 ];
 
 export function Hero({ onLaunch }: { onLaunch: () => void }) {
-  const scope = useGsap(({ scope: el, reduced }) => {
+  const scope = useGsap(({ reduced }) => {
     if (reduced) {
       gsap.set(
         ['.lp-hero__pill', '.lp-word', '.lp-hero__lead', '.lp-hero__cta', '.lp-float'],

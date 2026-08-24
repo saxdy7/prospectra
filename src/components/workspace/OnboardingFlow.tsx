@@ -83,20 +83,32 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
     };
   }, [suggestedName, router]);
 
-  /* Persist on every change once hydrated, and flash the saved indicator. */
+  /* Persist on every change once hydrated, then flash the saved indicator.
+     The flag is set inside the promise callback rather than in the effect
+     body — both because "saved" should mean the write actually finished, and
+     because a synchronous setState here would cascade an extra render on
+     every keystroke. */
   useEffect(() => {
     if (!hydrated) return;
+    let cancelled = false;
 
-    workspaceStore.read().then((existing) => {
-      const base = existing ?? emptyWorkspaceState();
-      workspaceStore.write({ ...base, onboarding: data });
-    });
+    workspaceStore
+      .read()
+      .then((existing) => {
+        const base = existing ?? emptyWorkspaceState();
+        return workspaceStore.write({ ...base, onboarding: data });
+      })
+      .then(() => {
+        if (cancelled) return;
+        setSaved(true);
+        window.clearTimeout(savedTimer.current);
+        savedTimer.current = window.setTimeout(() => setSaved(false), 1800);
+      });
 
-    setSaved(true);
-    window.clearTimeout(savedTimer.current);
-    savedTimer.current = window.setTimeout(() => setSaved(false), 1800);
-
-    return () => window.clearTimeout(savedTimer.current);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(savedTimer.current);
+    };
   }, [data, hydrated]);
 
   /* Move focus to the new step heading so keyboard and screen-reader users
