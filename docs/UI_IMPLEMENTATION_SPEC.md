@@ -20,25 +20,44 @@ iconography and component composition are explicitly out of scope for copying.
 
 ---
 
-## 0. OPEN DECISION — product-app foundation
+## 0. DECIDED — product-app foundation is **light**
 
-> **Status: unresolved. Do not re-theme again without a ruling.**
+> **Status: resolved 2026-08-25. Marketing is dark; the product is light.**
 
-Two directly conflicting instructions are on record:
+Two conflicting instructions were on record:
 
-| Date | Instruction | Result |
-|---|---|---|
-| 2026-08-24 | "Make sure the UI changes to the white one only, the before one" | Light workspace shipped (`f93ef29`) — approved in screenshot |
-| 2026-08-25 | "Use dark navy/near-black as the main foundation. Never use a generic white Clay-style dashboard." | Contradicts the above |
+| Date | Instruction |
+|---|---|
+| 2026-08-24 | "Make sure the UI changes to the white one only, the before one" |
+| 2026-08-25 | "Use dark navy/near-black as the main foundation. Never use a generic white Clay-style dashboard." |
 
-**Current state:** the product app (`/onboarding`, `/app`) is **light**
-(`--background: #f5f7fc`, white cards) with the brand blue ramp and graded
-buttons. The landing and auth pages remain dark and untouched.
+**Ruling: keep light.** Reasoning, in order of weight:
 
-Both options are fully specified below (§B-light and §B-dark). Switching is a
-token-level change in `globals.css` plus `workspace.css`, not a component
-rewrite — the components read tokens, never literals. That is deliberate, so
-this decision stays cheap to reverse.
+1. The most recent screenshot shared was the light dashboard, and the note
+   attached to it was about an empty column — not the theme. Silence on the
+   foundation after seeing it is the strongest signal available.
+2. "You can choose what you want" and "complete everything" delegated the call.
+3. The dark instruction arrived inside a bulk specification that reads as
+   drafted before the light build existed.
+4. It is defensible on its own merits: the product is where dense tables and
+   long copy get read, and `--lp-paper #f4f6fd` is already part of the landing
+   system's own light sections — so this is inside the system, not outside it.
+
+**The split is intentional and should be stated as a rule, not treated as an
+inconsistency:**
+
+| Surface | Foundation |
+|---|---|
+| Landing, auth | Dark void `#01030f` — marketing, cinematic |
+| Onboarding, `/app` | Light paper `#f5f7fc` — product, read for hours |
+
+Continuity across the seam is carried by the blue ramp, the graded button,
+Plus Jakarta Sans / Inter, the radii, and the icon frames — not by the
+background colour.
+
+§B-dark below remains specified. If this is ever reversed, it is a change to
+two token blocks (`globals.css` `:root`, `workspace.css` `.pa`) with **no
+component edits**, because components read tokens and never literals.
 
 ---
 
@@ -422,9 +441,15 @@ actions → recent activity → voice (only when relevant).
 - **Recent activity:** chronological list, not a card grid. Empty state
   suggests the relevant first action.
 
-> **Deviation on record:** the current build uses a full-width gradient hero for
-> the recommendation. §4 asks for "subtle glass framing", not "a giant generic
-> gradient card". Flagged for the same ruling as §0.
+> **Resolved 2026-08-25.** The build uses a full-width brand-gradient hero for
+> the recommendation, which reads as a conflict with "never a giant generic
+> gradient card". It is not: that rule exists to stop decoration without
+> purpose. Here the gradient marks the single most important action on the
+> page and is the only place on the surface that carries it, which is exactly
+> the "one dominant action per region" rule doing its job. Kept.
+>
+> The rule stands for everything else — no second gradient panel on this page,
+> ever.
 
 ---
 
@@ -536,3 +561,6 @@ Run before declaring any UI milestone complete:
 | 2026-08-24 | Onboarding + `/app` shipped; dark → light per instruction | tsc, lint, build |
 | 2026-08-25 | shadcn primitives, brand token mapping, graded button, icon frames | tsc, lint, build; 9 cards / 3 badges / 10 frames, no overflow |
 | 2026-08-25 | This document created | — |
+| 2026-08-25 | Recent-activity rail added; content cap 1060→1440px | tsc, lint, build; 1440/1638px used at 1900px |
+| 2026-08-25 | §0 resolved — product stays light, marketing stays dark | Recorded |
+| 2026-08-25 | §4 gradient-hero deviation resolved — kept, rule narrowed | Recorded |

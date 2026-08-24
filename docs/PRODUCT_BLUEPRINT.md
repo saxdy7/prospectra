@@ -277,7 +277,7 @@ calling window, compliance.
 | Phase | Scope | Acceptance |
 |---|---|---|
 | **1** ✅ | Onboarding, local persistence, dashboard, checklist, icon system | Flow completes; state survives reload; build clean |
-| **2** ◑ | Supabase Auth, workspaces/members/RLS, real persistence, protected routes | Auth ✅, workspaces + RLS ✅, sync ✅; **`workspace_members` + role policies outstanding** |
+| **2** ◑ | Supabase Auth, workspaces/members/RLS, real persistence, protected routes | Auth ✅, workspaces + RLS ✅, sync ✅, protected routes ✅, per-user state reconciliation ✅. Migration `0002_workspace_members.sql` **written and committed, pending a run** against the Prospectra project |
 | **3** | Tables/columns/rows, CSV import, search UI, job architecture | A demo table renders 1k rows; import maps and validates; jobs show real state |
 | **4** | Approved provider integration, enrichment jobs, credit ledger | A real provider returns normalised rows; ledger balances; retry works |
 | **5** | Audiences, campaign drafts, email integration | Draft built from an audience; send blocked without verified sender |

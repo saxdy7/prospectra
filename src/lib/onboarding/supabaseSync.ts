@@ -58,6 +58,25 @@ export async function syncWorkspaceToSupabase(
       .single();
     if (error) return { ok: false, reason: error.message };
     workspaceId = inserted.id as string;
+
+    /* Seed the owner's membership row.
+     *
+     * Written non-fatally: migration 0002 introduces workspace_members, and
+     * until it is applied this table does not exist. A failure here must not
+     * lose a workspace the user just created, so the error is swallowed and
+     * the owner_id column continues to carry access under 0001's policies. */
+    await supabase
+      .from('workspace_members')
+      .insert({
+        workspace_id: workspaceId,
+        user_id: user.id,
+        role: 'owner',
+        joined_at: new Date().toISOString()
+      })
+      .then(
+        () => undefined,
+        () => undefined
+      );
   } else {
     const { error } = await supabase
       .from('workspaces')
