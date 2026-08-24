@@ -21,6 +21,10 @@ import { workspaceStore, readForOwner } from '@/lib/onboarding/storage';
 import { currentUser } from '@/lib/onboarding/session';
 import { GOALS } from '@/lib/onboarding/config';
 import type { WorkspaceState } from '@/lib/onboarding/types';
+import { TablesSection } from './tables/TablesSection';
+import { SearchPanel } from './search/SearchPanel';
+import { dataStore, type WorkspaceData } from '@/lib/workspace/store';
+import type { SearchJob } from '@/lib/types/models';
 import '../landing/landing.css';
 import './workspace.css';
 
@@ -123,6 +127,7 @@ export function WorkspaceApp() {
   const [state, setState] = useState<WorkspaceState | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [data, setData] = useState<WorkspaceData | null>(null);
 
   /* Read once as the initial value rather than syncing from an effect: this
      only seeds where the workspace opens, and an effect would both cascade a
@@ -159,6 +164,7 @@ export function WorkspaceApp() {
       }
 
       setState(saved);
+      setData(await dataStore.read());
       setHydrated(true);
     })();
 
@@ -172,6 +178,11 @@ export function WorkspaceApp() {
     await workspaceStore.write(next);
   }, []);
 
+  const persistData = useCallback(async (next: WorkspaceData) => {
+    setData(next);
+    await dataStore.write(next);
+  }, []);
+
   const items = useMemo(() => (state ? checklistFor(state.onboarding) : []), [state]);
   const callingTasks = useMemo(
     () => (state ? callingTasksFor(state.onboarding) : []),
@@ -182,7 +193,7 @@ export function WorkspaceApp() {
     [state]
   );
 
-  if (!hydrated || !state) {
+  if (!hydrated || !state || !data) {
     /* Neutral shell while storage is read — the same markup the server
        produced, so there is nothing to reconcile. */
     return (
@@ -198,6 +209,9 @@ export function WorkspaceApp() {
   const activeNav = NAV.find((n) => n.id === section);
   const firstName = onboarding.workspaceName.trim() || 'your workspace';
   const initial = firstName.charAt(0).toUpperCase();
+  /* One workspace per user in this phase; the id is the owner until the
+     Supabase workspace row is the source of truth. */
+  const workspaceId = state.ownerId ?? 'local';
 
   const setupTotal = items.length;
   const setupDone = items.filter((i) => checklistDone[i.id]).length;
@@ -573,6 +587,30 @@ export function WorkspaceApp() {
                   </div>
                 </div>
               </div>
+            ) : section === 'tables' ? (
+              <TablesSection
+                workspaceId={workspaceId}
+                tables={data.tables}
+                rows={data.rows}
+                onCreateTable={(t) =>
+                  persistData({ ...data, tables: [...data.tables, t] })
+                }
+                onImport={(t, r) =>
+                  persistData({
+                    ...data,
+                    tables: [...data.tables, t],
+                    rows: { ...data.rows, [t.id]: r }
+                  })
+                }
+              />
+            ) : section === 'find-leads' ? (
+              <SearchPanel
+                workspaceId={workspaceId}
+                jobs={data.searchJobs}
+                onCreateJob={(j: SearchJob) =>
+                  persistData({ ...data, searchJobs: [j, ...data.searchJobs] })
+                }
+              />
             ) : (
               <SectionPanel id={section} />
             )}

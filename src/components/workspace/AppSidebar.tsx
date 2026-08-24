@@ -36,8 +36,8 @@ export interface NavItem {
 
 export const NAV: NavItem[] = [
   { id: 'home', label: 'Home', icon: Home, maturity: 'live' },
-  { id: 'find-leads', label: 'Find leads', icon: Search, maturity: 'soon' },
-  { id: 'tables', label: 'Tables', icon: Table2, maturity: 'soon' },
+  { id: 'find-leads', label: 'Find leads', icon: Search, maturity: 'live' },
+  { id: 'tables', label: 'Tables', icon: Table2, maturity: 'live' },
   { id: 'campaigns', label: 'Campaigns', icon: Send, maturity: 'soon' },
   { id: 'voice', label: 'Voice agents', icon: Mic, maturity: 'soon' },
   { id: 'audiences', label: 'Audiences', icon: Users, maturity: 'soon' },
