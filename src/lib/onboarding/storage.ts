@@ -62,6 +62,15 @@ function reviveState(raw: unknown): WorkspaceState | null {
           : []
       }
     },
+    /* Clamped: a hand-edited or out-of-date value must not resume the flow
+       on a step that does not exist. */
+    onboardingStep:
+      typeof candidate.onboardingStep === 'number' &&
+      Number.isInteger(candidate.onboardingStep) &&
+      candidate.onboardingStep >= 0 &&
+      candidate.onboardingStep <= 5
+        ? candidate.onboardingStep
+        : 0,
     checklistDone:
       typeof candidate.checklistDone === 'object' && candidate.checklistDone !== null
         ? candidate.checklistDone

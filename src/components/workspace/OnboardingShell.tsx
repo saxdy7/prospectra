@@ -2,71 +2,68 @@
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Clock } from 'lucide-react';
 import { BRAND } from '../landing/brand';
+import { GradientField, Logomark } from '../landing/primitives';
 import { OnboardingProgress } from './OnboardingProgress';
 import type { StepMeta } from '@/lib/onboarding/config';
+import '../landing/landing.css';
 import './workspace.css';
-
-/** The brand mark, redrawn for the light surface. Same glyph as the site. */
-export function WorkspaceMark({ size = 28 }: { size?: number }) {
-  return (
-    <span className="pa-brand__mark" style={{ width: size, height: size }}>
-      <svg
-        width={size * 0.54}
-        height={size * 0.54}
-        viewBox="0 0 20 20"
-        fill="none"
-        aria-hidden="true"
-      >
-        <path
-          d="M3 13.5C6.5 13.5 8 11 10 7.5C12 4 13.5 1.5 17 1.5"
-          stroke="white"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-        />
-        <circle cx="4" cy="16.5" r="2" fill="white" />
-      </svg>
-    </span>
-  );
-}
 
 export function OnboardingShell({
   steps,
   currentIndex,
   saved,
+  onFinishLater,
   children,
-  /** Omitted on the finish screen, which has its own actions. */
   actions
 }: {
   steps: StepMeta[];
   currentIndex: number;
   saved: boolean;
+  /** Omitted on the finish screen, where there is nothing left to defer. */
+  onFinishLater?: () => void;
   children: ReactNode;
   actions?: ReactNode;
 }) {
   return (
-    <div className="pa">
+    <div className="lp pa">
       <div className="pa-onboard">
-        <div className="pa-onboard__bar">
+        {/* The same background treatment as the hero and the auth showcase:
+            gradient field, mono grain, and a horizon bloom at the foot. */}
+        <GradientField style={{ opacity: 0.32 }} />
+        <span className="pa-onboard__bloom" aria-hidden="true" />
+
+        <header className="pa-onboard__bar">
           <Link className="pa-brand" href="/">
-            <WorkspaceMark />
+            <Logomark size={28} />
             {BRAND.name}
             <span className="pa-brand__suffix">{BRAND.suffix}</span>
           </Link>
 
-          {/* Announced politely so a screen reader hears it without losing
-              the user's place in the form. */}
-          <span
-            className="pa-onboard__saved"
-            role="status"
-            aria-live="polite"
-            style={{ opacity: saved ? 1 : 0 }}
-          >
-            <Check size={13} strokeWidth={2.6} />
-            Progress saved
-          </span>
-        </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+            {/* Announced politely, so a screen reader hears it without being
+                pulled out of the field the user is in. */}
+            <span
+              className="pa-onboard__saved"
+              role="status"
+              aria-live="polite"
+              style={{ opacity: saved ? 1 : 0 }}
+            >
+              <Check size={13} strokeWidth={2.8} />
+              Saved
+            </span>
+
+            {/* Only offered because progress genuinely persists locally —
+                leaving and returning resumes on the same step. */}
+            {onFinishLater && (
+              <button type="button" className="pa-onboard__later" onClick={onFinishLater}>
+                <Clock size={13} strokeWidth={2} />
+                <span>Save and finish later</span>
+              </button>
+            )}
+          </div>
+        </header>
 
         <main className="pa-onboard__body">
           {currentIndex >= 0 && (
@@ -85,36 +82,35 @@ export function OnboardingShell({
   );
 }
 
-/** The standard Back / Skip / Continue trio at the foot of every step. */
+/** Back / Skip / Continue, shared by every step. */
 export function StepActions({
   onBack,
   onSkip,
   onContinue,
   canContinue,
-  busy = false,
-  continueLabel = 'Continue',
-  backDisabled = false
+  showBack,
+  continueLabel = 'Continue'
 }: {
   onBack: () => void;
-  /** Omitted on steps whose answer is required to build the workspace. */
+  /** Omitted where the answer is required to build the workspace. */
   onSkip?: () => void;
   onContinue: () => void;
   canContinue: boolean;
-  busy?: boolean;
+  /** False on step one, which has nothing to go back to. */
+  showBack: boolean;
   continueLabel?: string;
-  backDisabled?: boolean;
 }) {
   return (
     <>
-      <button
-        type="button"
-        className="pa-btn pa-btn--quiet"
-        onClick={onBack}
-        disabled={backDisabled}
-      >
-        <ArrowLeft size={15} strokeWidth={2.2} />
-        Back
-      </button>
+      {showBack ? (
+        <button type="button" className="pa-btn pa-btn--quiet" onClick={onBack}>
+          <ArrowLeft size={15} strokeWidth={2.2} />
+          Back
+        </button>
+      ) : (
+        /* Holds the layout so Continue does not jump left on step one. */
+        <span aria-hidden="true" />
+      )}
 
       <div className="pa-actions__right">
         {onSkip && (
@@ -126,19 +122,10 @@ export function StepActions({
           type="button"
           className="pa-btn"
           onClick={onContinue}
-          disabled={!canContinue || busy}
+          disabled={!canContinue}
         >
-          {busy ? (
-            <>
-              <Loader2 size={15} strokeWidth={2.4} className="pa-spin" />
-              Setting up…
-            </>
-          ) : (
-            <>
-              {continueLabel}
-              <ArrowRight size={15} strokeWidth={2.2} />
-            </>
-          )}
+          {continueLabel}
+          <ArrowRight size={15} strokeWidth={2.2} />
         </button>
       </div>
     </>

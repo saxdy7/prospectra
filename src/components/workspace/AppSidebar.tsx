@@ -14,37 +14,35 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { BRAND } from '../landing/brand';
-import { WorkspaceMark } from './OnboardingShell';
+import { Logomark } from '../landing/primitives';
 import type { OnboardingData } from '@/lib/onboarding/types';
 
 /**
- * Module maturity, stated plainly in the navigation.
+ * Section maturity, stated plainly in the navigation.
  *
- *   demo    — something real to look at in this build
- *   planned — designed and specified, not built
+ *   live   — something real to look at in this build
+ *   soon   — designed and specified, not built
  *
- * Every entry opens a panel either way, so nothing here is a dead link.
+ * Every entry opens a panel either way, so nothing here is a dead click.
  */
-export type Maturity = 'demo' | 'planned';
+export type Maturity = 'live' | 'soon';
 
 export interface NavItem {
   id: string;
   label: string;
   icon: LucideIcon;
   maturity: Maturity;
-  /** Voice-flavoured modules get the teal tag rather than the blue one. */
-  voice?: boolean;
 }
 
 export const NAV: NavItem[] = [
-  { id: 'home', label: 'Home', icon: Home, maturity: 'demo' },
-  { id: 'find-leads', label: 'Find leads', icon: Search, maturity: 'planned' },
-  { id: 'tables', label: 'Tables', icon: Table2, maturity: 'planned' },
-  { id: 'campaigns', label: 'Campaigns', icon: Send, maturity: 'planned' },
-  { id: 'voice', label: 'Voice agents', icon: Mic, maturity: 'planned', voice: true },
-  { id: 'audiences', label: 'Audiences', icon: Users, maturity: 'planned' },
-  { id: 'analytics', label: 'Analytics', icon: BarChart3, maturity: 'planned' },
-  { id: 'settings', label: 'Settings', icon: Settings, maturity: 'planned' }
+  { id: 'home', label: 'Home', icon: Home, maturity: 'live' },
+  { id: 'find-leads', label: 'Find leads', icon: Search, maturity: 'soon' },
+  { id: 'tables', label: 'Tables', icon: Table2, maturity: 'soon' },
+  { id: 'campaigns', label: 'Campaigns', icon: Send, maturity: 'soon' },
+  { id: 'voice', label: 'Voice agents', icon: Mic, maturity: 'soon' },
+  { id: 'audiences', label: 'Audiences', icon: Users, maturity: 'soon' },
+  { id: 'analytics', label: 'Analytics', icon: BarChart3, maturity: 'soon' },
+  { id: 'settings', label: 'Settings', icon: Settings, maturity: 'soon' }
 ];
 
 export function AppSidebar({
@@ -66,15 +64,15 @@ export function AppSidebar({
   return (
     <nav className="pa-side" data-open={open} aria-label="Workspace">
       <div className="pa-side__brand">
-        <Link className="pa-brand" href="/" style={{ fontSize: '1rem' }}>
-          <WorkspaceMark size={26} />
+        <Link className="pa-brand" href="/">
+          <Logomark size={26} />
           {BRAND.name}
           <span className="pa-brand__suffix">{BRAND.suffix}</span>
         </Link>
       </div>
 
-      {/* Workspace switcher. One workspace exists in this build, so it reports
-          the current one rather than pretending to offer a list. */}
+      {/* One workspace exists in this build, so the switcher reports the
+          current one rather than offering a list that is not there. */}
       <button
         type="button"
         className="pa-switcher"
@@ -92,7 +90,7 @@ export function AppSidebar({
         <span className="pa-switcher__text">
           <span className="pa-switcher__name">{name}</span>
           <span className="pa-switcher__meta">
-            {onboarding.teamSize === 'solo' || !onboarding.teamSize
+            {!onboarding.teamSize || onboarding.teamSize === 'solo'
               ? 'Personal'
               : `Team · ${onboarding.teamSize}`}
           </span>
@@ -113,35 +111,21 @@ export function AppSidebar({
             >
               <item.icon size={16} strokeWidth={1.9} />
               <span className="pa-nav__label">{item.label}</span>
-              {item.maturity === 'demo' ? (
-                <span className="pa-tag pa-tag--demo">Demo</span>
-              ) : (
-                <span className={`pa-tag${item.voice ? ' pa-tag--voice' : ''}`}>Soon</span>
-              )}
+              {item.maturity === 'soon' && <span className="pa-tag">Soon</span>}
             </button>
           </li>
         ))}
       </ul>
 
       <div className="pa-side__foot">
-        {/* Illustrative balances for the demo workspace — not billing data. */}
+        {/* A placeholder balance for the demo workspace — not billing data. */}
         <div className="pa-meter">
           <div className="pa-meter__row">
-            <span className="pa-meter__label">Enrichment credits</span>
+            <span className="pa-meter__label">Setup credits</span>
             <span className="pa-meter__value">500</span>
           </div>
           <div className="pa-meter__track">
             <div className="pa-meter__fill" style={{ width: '100%' }} />
-          </div>
-        </div>
-
-        <div className="pa-meter">
-          <div className="pa-meter__row">
-            <span className="pa-meter__label">Voice minutes</span>
-            <span className="pa-meter__value">Not yet available</span>
-          </div>
-          <div className="pa-meter__track">
-            <div className="pa-meter__fill pa-meter__fill--teal" style={{ width: '0%' }} />
           </div>
         </div>
       </div>
@@ -150,7 +134,7 @@ export function AppSidebar({
         type="button"
         className="pa-btn pa-btn--quiet"
         onClick={onClose}
-        style={{ display: open ? undefined : 'none', marginTop: 8 }}
+        style={{ display: open ? undefined : 'none', marginTop: 10 }}
       >
         <X size={15} strokeWidth={2.2} />
         Close menu

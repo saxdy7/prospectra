@@ -71,6 +71,7 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
 
       if (state) {
         setData(state.onboarding);
+        setStep(Math.min(state.onboardingStep, STEPS.length - 1));
       } else if (suggestedName) {
         setData((d) => ({ ...d, workspaceName: defaultWorkspaceName(suggestedName) }));
       }
@@ -96,7 +97,7 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
       .read()
       .then((existing) => {
         const base = existing ?? emptyWorkspaceState();
-        return workspaceStore.write({ ...base, onboarding: data });
+        return workspaceStore.write({ ...base, onboarding: data, onboardingStep: step });
       })
       .then(() => {
         if (cancelled) return;
@@ -109,7 +110,7 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
       cancelled = true;
       window.clearTimeout(savedTimer.current);
     };
-  }, [data, hydrated]);
+  }, [data, step, hydrated]);
 
   /* Move focus to the new step heading so keyboard and screen-reader users
      land in the right place instead of at the top of the document. */
@@ -139,13 +140,14 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
     }
   })();
 
-  const back = () => {
-    if (step === 0) {
-      router.push('/');
-      return;
-    }
-    setStep((s) => Math.max(0, s - 1));
-  };
+  const back = () => setStep((s) => Math.max(0, s - 1));
+
+  /**
+   * Leaving mid-flow is safe: every answer is already written on change, and
+   * the hydration effect above resumes from whatever was saved. This is only
+   * offered because that is genuinely true, not as a courtesy label.
+   */
+  const finishLater = () => router.push('/');
 
   const advance = () => setStep((s) => Math.min(DONE, s + 1));
 
@@ -250,12 +252,14 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
       steps={STEPS}
       currentIndex={step}
       saved={saved}
+      onFinishLater={finishLater}
       actions={
         <StepActions
           onBack={back}
           onSkip={STEPS[step].required ? undefined : skip}
           onContinue={step === STEPS.length - 1 ? finish : next}
           canContinue={canContinue}
+          showBack={step > 0}
           continueLabel={step === STEPS.length - 1 ? 'Finish setup' : 'Continue'}
         />
       }
@@ -265,11 +269,11 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
         <section className="pa-step">
           <header className="pa-step__head">
             <h1 className="pa-title" tabIndex={-1} ref={headingRef}>
-              Create your workspace
+              Make this workspace yours.
             </h1>
             <p className="pa-lede">
-              This is where your leads, tables, enrichment, campaigns and — before
-              long — your AI agents all live together.
+              Your tables, enrichments, campaigns and future voice agents will live
+              here.
             </p>
           </header>
 
@@ -331,7 +335,7 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
         <section className="pa-step">
           <header className="pa-step__head">
             <h1 className="pa-title" tabIndex={-1} ref={headingRef}>
-              What are you here to achieve?
+              What do you want Prospectra to help you do first?
             </h1>
             <p className="pa-lede">
               Pick the one closest to your first job. It shapes the rest of setup and
@@ -363,11 +367,11 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
         <section className="pa-step">
           <header className="pa-step__head">
             <h1 className="pa-title" tabIndex={-1} ref={headingRef}>
-              Start with your data
+              Where should we start?
             </h1>
             <p className="pa-lede">
-              Where should your first rows come from? Nothing runs yet — this only
-              decides what your workspace sets up for you.
+              Where your first rows come from. Nothing runs yet — this only decides
+              what your workspace sets up for you.
             </p>
           </header>
 
@@ -401,8 +405,8 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
               ))}
             </Group>
             <p className="pa-logo__hint" style={{ marginTop: 10 }}>
-              Saved as a connection intent. Nothing is authorised and no data moves —
-              we will walk you through connecting when integrations open.
+              We’ll help you connect this later. Nothing is authorised and no data
+              moves — this only records what you use.
             </p>
           </Reveal>
         </section>
@@ -413,11 +417,11 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
         <section className="pa-step">
           <header className="pa-step__head">
             <h1 className="pa-title" tabIndex={-1} ref={headingRef}>
-              What should we prepare?
+              What should we prepare for you?
             </h1>
             <p className="pa-lede">
-              Pick the columns worth having on day one. Figures below are rough
-              illustrations of usage, not a bill — nothing runs until you say so.
+              Pick what is worth having on day one. Nothing runs until you say so,
+              and the labels below are a rough sense of effort, not a bill.
             </p>
           </header>
 
@@ -448,9 +452,8 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
               Will calling be part of your workflow?
             </h1>
             <p className="pa-lede">
-              Voice calling is on the roadmap, not in your hands yet. Answer this and
-              your workspace will be shaped for it — you can configure agents, phone
-              numbers, consent settings and call controls later.
+              You can configure agents, numbers, consent controls and call settings
+              later. Answering now just shapes your workspace for it.
             </p>
           </header>
 

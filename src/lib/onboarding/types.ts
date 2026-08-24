@@ -42,7 +42,6 @@ export type PrepareId =
   | 'ai-research'
   | 'hiring-signals'
   | 'email-personalisation'
-  | 'call-ready-phone'
   | 'audience-segments'
   | 'voice-agent-draft'
   | 'call-ready-audience'
@@ -105,6 +104,12 @@ export interface ChecklistItem {
 /** Everything the workspace persists between visits. */
 export interface WorkspaceState {
   onboarding: OnboardingData;
+  /**
+   * Which step to resume on. Stored rather than derived, because the last two
+   * steps are optional — an empty `prepare` is a legitimate answer, so there
+   * is no way to tell "not reached yet" from "deliberately skipped".
+   */
+  onboardingStep: number;
   /** Checklist item id → completed. Items themselves are derived, not stored. */
   checklistDone: Record<string, boolean>;
   checklistDismissed: boolean;
@@ -124,6 +129,7 @@ export function emptyOnboarding(): OnboardingData {
 export function emptyWorkspaceState(): WorkspaceState {
   return {
     onboarding: emptyOnboarding(),
+    onboardingStep: 0,
     checklistDone: {},
     checklistDismissed: false
   };

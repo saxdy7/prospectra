@@ -2,15 +2,15 @@ import type { ChecklistItem, GoalId, OnboardingData } from './types';
 import { wantsCalling } from './config';
 
 /**
- * Everything the finish screen and the workspace dashboard derive from the
- * user's answers. Kept as pure functions so both surfaces stay in step
- * without passing props between them.
+ * Everything the finish screen and the workspace home derive from the
+ * answers. Pure functions, so both surfaces stay in step without passing
+ * props between them.
  */
 
 export interface NextStep {
   /** The single highest-value action for this user. */
   cta: string;
-  /** One line explaining why this is the suggested starting point. */
+  /** One line on why this is the suggested starting point. */
   why: string;
   /** Which workspace section the action belongs to. */
   section: string;
@@ -24,27 +24,27 @@ const NEXT_BY_GOAL: Record<GoalId, NextStep> = {
   },
   'company-list': {
     cta: 'Build your first list',
-    why: 'Set the filters that describe a good account and save the result as a table.',
+    why: 'Set the filters that describe a good account, and save the result as a table.',
     section: 'find-leads'
   },
   'find-people': {
     cta: 'Build your first list',
-    why: 'Start from the roles you sell to, then let enrichment fill in the rest.',
+    why: 'Start from the roles you sell to, and let enrichment fill in the rest.',
     section: 'find-leads'
   },
   'enrich-list': {
     cta: 'Create an enrichment table',
-    why: 'Bring your rows in once and every column you add runs across all of them.',
+    why: 'Bring your rows in once, and every column you add runs across all of them.',
     section: 'tables'
   },
   outreach: {
-    cta: 'Build your first list',
-    why: 'A campaign needs an audience first — start with the people you want to reach.',
-    section: 'find-leads'
+    cta: 'Build a campaign draft',
+    why: 'Sketch the audience and the first message now, and send once channels connect.',
+    section: 'campaigns'
   },
   'voice-agent': {
     cta: 'Create a voice-agent draft',
-    why: 'Write the role and opening line now so the agent is ready when calling opens.',
+    why: 'Write the role and opening line now, so the agent is ready when calling opens.',
     section: 'voice'
   },
   explore: {
@@ -60,7 +60,7 @@ export function nextStepFor(data: OnboardingData): NextStep {
   if (data.dataSource === 'import-csv') {
     return {
       cta: 'Import a CSV',
-      why: 'Map your columns once and the list becomes a table the rest of the workspace can use.',
+      why: 'Map your columns once, and the list becomes a table the rest of the workspace can use.',
       section: 'tables'
     };
   }
@@ -79,19 +79,19 @@ export function setupSummary(data: OnboardingData): string[] {
 
   if (data.dataSource && data.dataSource !== 'later') {
     const label: Record<string, string> = {
-      'search-web': 'Web search ready as your first source',
+      'search-web': 'Local business search ready as your first source',
       'find-companies': 'Company search ready as your first source',
       'find-people': 'People search ready as your first source',
       'import-csv': 'CSV import ready for your first list',
-      'connect-crm': 'CRM connection saved for when integrations open',
+      'connect-crm': 'CRM noted, to connect when integrations open',
       'blank-table': 'A blank table is waiting for you'
     };
-    lines.push(label[data.dataSource] ?? 'First data source noted');
+    lines.push(label[data.dataSource] ?? 'First starting point noted');
   }
 
   if (data.prepare.length) {
     lines.push(
-      `${data.prepare.length} enrichment ${
+      `${data.prepare.length} setup ${
         data.prepare.length === 1 ? 'step' : 'steps'
       } queued for your first table`
     );
@@ -106,16 +106,12 @@ export function setupSummary(data: OnboardingData): string[] {
 
 /**
  * The workspace checklist. Items are derived from the answers rather than
- * stored, so changing the config never leaves a stale row behind; only the
- * done/not-done flags persist.
+ * stored, so changing the config never strands a row; only the done flags
+ * persist.
  */
 export function checklistFor(data: OnboardingData): ChecklistItem[] {
   const items: ChecklistItem[] = [
-    {
-      id: 'name-workspace',
-      label: 'Name your workspace',
-      hint: 'Done during setup.'
-    }
+    { id: 'name-workspace', label: 'Name your workspace', hint: 'Done during setup.' }
   ];
 
   if (data.dataSource === 'import-csv') {
@@ -127,8 +123,8 @@ export function checklistFor(data: OnboardingData): ChecklistItem[] {
   } else if (data.dataSource === 'connect-crm') {
     items.push({
       id: 'crm-intent',
-      label: 'Confirm your CRM',
-      hint: 'Saved as an intent — nothing is connected yet.'
+      label: 'Confirm which CRM you use',
+      hint: 'Noted for later — nothing is connected yet.'
     });
   } else {
     items.push({
@@ -141,16 +137,8 @@ export function checklistFor(data: OnboardingData): ChecklistItem[] {
   if (data.prepare.length) {
     items.push({
       id: 'review-enrichment',
-      label: 'Review your enrichment columns',
-      hint: 'Check the order before a run spends anything.'
-    });
-  }
-
-  if (wantsCalling(data.calling.stance)) {
-    items.push({
-      id: 'voice-draft',
-      label: 'Draft your first voice agent',
-      hint: 'Write the role and opening line ahead of the rollout.'
+      label: 'Review your setup columns',
+      hint: 'Check the order before a run does any work.'
     });
   }
 
@@ -169,6 +157,51 @@ export function checklistFor(data: OnboardingData): ChecklistItem[] {
   });
 
   return items;
+}
+
+/**
+ * The separate, future-facing calling checklist. Only shown to people who
+ * said calling matters; every item is preparation, never a live call.
+ */
+export function callingTasksFor(data: OnboardingData): ChecklistItem[] {
+  if (!wantsCalling(data.calling.stance)) return [];
+
+  const tasks: ChecklistItem[] = [
+    {
+      id: 'draft-agent',
+      label: 'Draft the agent’s role and opening line',
+      hint: 'The part that takes thought — worth doing before the rest exists.'
+    },
+    {
+      id: 'map-number-column',
+      label: 'Decide which column holds the number to dial',
+      hint: 'A dialler needs one agreed field to read from.'
+    }
+  ];
+
+  if (data.calling.language) {
+    const label: Record<string, string> = {
+      english: 'English',
+      hindi: 'Hindi',
+      'hindi-english': 'Hindi and English',
+      other: 'your chosen languages'
+    };
+    tasks.push({
+      id: 'confirm-language',
+      label: `Confirm handling for ${label[data.calling.language]}`,
+      hint: 'Language shapes both the voice and the script.'
+    });
+  }
+
+  if (data.calling.interests.includes('knowledge-base')) {
+    tasks.push({
+      id: 'gather-docs',
+      label: 'Gather the documents an agent should answer from',
+      hint: 'Collect them now; attach them when the knowledge base lands.'
+    });
+  }
+
+  return tasks;
 }
 
 /** Pre-tick what setup genuinely completed, so the list starts honest. */

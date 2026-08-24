@@ -58,7 +58,7 @@ export function ChoiceCard<T extends string>({
         <span className="pa-choice__label">{label}</span>
         {blurb && <span className="pa-choice__blurb">{blurb}</span>}
         {estimate && (
-          <span className="pa-choice__estimate">Estimated usage · {estimate}</span>
+          <span className="pa-choice__estimate">Estimated setup usage · {estimate}</span>
         )}
       </span>
 
@@ -108,7 +108,7 @@ export function MultiSelectChoice<T extends string>({
         <span className="pa-choice__label">{label}</span>
         {blurb && <span className="pa-choice__blurb">{blurb}</span>}
         {estimate && (
-          <span className="pa-choice__estimate">Estimated usage · {estimate}</span>
+          <span className="pa-choice__estimate">Estimated setup usage · {estimate}</span>
         )}
       </span>
 

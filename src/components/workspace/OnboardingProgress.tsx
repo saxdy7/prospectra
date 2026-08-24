@@ -3,10 +3,10 @@
 import type { StepMeta } from '@/lib/onboarding/config';
 
 /**
- * Progress for the onboarding flow.
+ * "Step 2 of 5" plus a thin electric-blue line.
  *
- * The percentage reflects steps *completed*, not the step you are standing on,
- * so arriving at step 1 reads as 0% rather than as already part-done.
+ * The fill reflects steps *completed*, not the step you are standing on, so
+ * arriving at step one reads as empty rather than as already part-done.
  */
 export function OnboardingProgress({
   steps,
@@ -23,16 +23,17 @@ export function OnboardingProgress({
     <div className="pa-progress">
       <div className="pa-progress__meta">
         <span className="pa-progress__step">
-          Step {currentIndex + 1} of {total}
-          {current ? ` · ${current.label}` : ''}
-          {current && !current.required && (
-            <span style={{ color: 'var(--pa-ink-faint)', fontWeight: 400 }}>
-              {' '}
-              · optional
-            </span>
+          Step <b>{currentIndex + 1}</b> of {total}
+          {current && (
+            <>
+              {' · '}
+              {current.label}
+              {!current.required && (
+                <span className="pa-progress__optional"> · optional</span>
+              )}
+            </>
           )}
         </span>
-        <span className="pa-progress__pct">{pct}%</span>
       </div>
 
       <div
@@ -45,23 +46,6 @@ export function OnboardingProgress({
       >
         <div className="pa-progress__fill" style={{ width: `${pct}%` }} />
       </div>
-
-      <ol className="pa-progress__dots">
-        {steps.map((s, i) => {
-          const state = i < currentIndex ? 'done' : i === currentIndex ? 'current' : 'todo';
-          return (
-            <li
-              key={s.id}
-              className="pa-progress__dot"
-              data-state={state}
-              aria-current={state === 'current' ? 'step' : undefined}
-            >
-              <span aria-hidden="true" />
-              {s.label}
-            </li>
-          );
-        })}
-      </ol>
     </div>
   );
 }

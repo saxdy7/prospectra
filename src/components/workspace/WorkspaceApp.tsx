@@ -2,18 +2,19 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowRight, Menu, PhoneCall, Sparkles } from 'lucide-react';
+import { ArrowRight, Circle, Menu, Sparkles } from 'lucide-react';
 import { AppSidebar, NAV } from './AppSidebar';
 import { SetupChecklist } from './SetupChecklist';
-import { WorkspaceMark } from './OnboardingShell';
-import { checklistFor, nextStepFor } from '@/lib/onboarding/plan';
+import { GradientField } from '../landing/primitives';
+import { callingTasksFor, checklistFor, nextStepFor } from '@/lib/onboarding/plan';
 import { workspaceStore } from '@/lib/onboarding/storage';
-import { GOALS, wantsCalling } from '@/lib/onboarding/config';
+import { GOALS } from '@/lib/onboarding/config';
 import type { WorkspaceState } from '@/lib/onboarding/types';
+import '../landing/landing.css';
 import './workspace.css';
 
-/** What each planned module will do, taken from the platform specification. */
-const MODULE_COPY: Record<string, { blurb: string; bullets: string[] }> = {
+/** What each section will do, drawn from the platform specification. */
+const SECTION_COPY: Record<string, { blurb: string; bullets: string[] }> = {
   'find-leads': {
     blurb:
       'Sourcing brings rows in from the open web and from B2B databases, streaming them into a table as they are found.',
@@ -25,11 +26,11 @@ const MODULE_COPY: Record<string, { blurb: string; bullets: string[] }> = {
   },
   tables: {
     blurb:
-      'The reactive table is where a list becomes work: columns that compute, statuses per cell, and enrichment that reruns as rows arrive.',
+      'The reactive table is where a list becomes work: columns that compute, a status per cell, and enrichment that reruns as rows arrive.',
     bullets: [
       'Column types for text, links, phone, email, numbers and AI prompts',
       'Waterfall enrichment that falls through providers until one answers',
-      'An auto-run queue so new rows are processed without being asked'
+      'An auto-run queue, so new rows are processed without being asked'
     ]
   },
   campaigns: {
@@ -45,14 +46,14 @@ const MODULE_COPY: Record<string, { blurb: string; bullets: string[] }> = {
     blurb:
       'The voice studio is where an agent gets its role, objective, opening line and voice — drafted now, live once telephony is connected.',
     bullets: [
-      'Role and objective prompts with variables drawn from table columns',
+      'Role and objective prompts, with variables drawn from table columns',
       'Multilingual handling, including switching mid-conversation',
-      'A browser test call before anything touches a phone line'
+      'A browser test call, before anything touches a phone line'
     ]
   },
   audiences: {
     blurb:
-      'Audiences are saved slices of your tables, shaped for a specific campaign or agent.',
+      'Audiences are saved slices of your tables, shaped for one campaign or one agent.',
     bullets: [
       'Build a segment from any table view',
       'Map which column holds the number an agent should dial',
@@ -73,7 +74,7 @@ const MODULE_COPY: Record<string, { blurb: string; bullets: string[] }> = {
     bullets: [
       'Rename the workspace and change its image',
       'Invite teammates and set their access',
-      'Manage credit balances and usage alerts'
+      'Manage balances and usage alerts'
     ]
   }
 };
@@ -86,23 +87,22 @@ export function WorkspaceApp() {
   const [hydrated, setHydrated] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  /* The finish screen deep-links to the section it recommended. Read once as
-     the initial value rather than syncing it from an effect — this only ever
-     seeds where the workspace opens, and an effect would both cascade a
-     render and fight the user if they navigated before it ran. */
+  /* Read once as the initial value rather than syncing from an effect: this
+     only seeds where the workspace opens, and an effect would both cascade a
+     render and fight a user who navigated before it ran. */
   const [section, setSection] = useState(() => {
     const start = params.get('start');
     return start && NAV.some((n) => n.id === start) ? start : 'home';
   });
 
-  /* Client-only read, so the server and first client render agree. */
+  /* Client-only read, so server and first client render agree. */
   useEffect(() => {
     let cancelled = false;
 
     workspaceStore.read().then((saved) => {
       if (cancelled) return;
 
-      /* No completed onboarding means this person has not been through setup.
+      /* No completed setup means this person has not been through onboarding.
          Send them there rather than showing an empty workspace. */
       if (!saved || !saved.onboarding.completedAt) {
         router.replace('/onboarding');
@@ -123,19 +123,18 @@ export function WorkspaceApp() {
     await workspaceStore.write(next);
   }, []);
 
-  const items = useMemo(
-    () => (state ? checklistFor(state.onboarding) : []),
+  const items = useMemo(() => (state ? checklistFor(state.onboarding) : []), [state]);
+  const callingTasks = useMemo(
+    () => (state ? callingTasksFor(state.onboarding) : []),
     [state]
   );
 
   if (!hydrated || !state) {
-    /* Neutral shell while the client reads storage — same markup the server
-       produced, so there is nothing for React to reconcile against. */
+    /* Neutral shell while storage is read — the same markup the server
+       produced, so there is nothing to reconcile. */
     return (
-      <div className="pa">
-        <div style={{ minHeight: '100dvh', display: 'grid', placeItems: 'center' }}>
-          <p className="pa-lede">Opening your workspace…</p>
-        </div>
+      <div className="lp pa">
+        <div style={{ minHeight: '100dvh' }} />
       </div>
     );
   }
@@ -143,12 +142,16 @@ export function WorkspaceApp() {
   const { onboarding, checklistDone, checklistDismissed } = state;
   const recommended = nextStepFor(onboarding);
   const goal = GOALS.find((g) => g.id === onboarding.goal);
-  const voiceMinded = wantsCalling(onboarding.calling.stance) || onboarding.goal === 'voice-agent';
   const activeNav = NAV.find((n) => n.id === section);
+  const firstName = onboarding.workspaceName.trim() || 'your workspace';
 
   return (
-    <div className="pa">
+    <div className="lp pa">
       <div className="pa-app">
+        {/* The same ambient field as the rest of the product, held well back
+            so it lights the shell without competing with the content. */}
+        <GradientField style={{ opacity: 0.16 }} />
+
         {menuOpen && (
           <button
             className="pa-scrim"
@@ -181,9 +184,12 @@ export function WorkspaceApp() {
             </div>
 
             <div className="pa-top__right">
-              <span className="pa-tag pa-tag--demo">Demo workspace</span>
+              <span className="pa-credits">
+                <Sparkles size={13} strokeWidth={2} />
+                <b>500</b> setup credits
+              </span>
               <span className="pa-avatar" aria-hidden="true">
-                {(onboarding.workspaceName.trim() || 'P').charAt(0).toUpperCase()}
+                {firstName.charAt(0).toUpperCase()}
               </span>
             </div>
           </header>
@@ -191,10 +197,8 @@ export function WorkspaceApp() {
           <main className="pa-content">
             {section === 'home' ? (
               <>
-                <h2 className="pa-title">
-                  {onboarding.workspaceName.trim() || 'Your workspace'}
-                </h2>
-                <p className="pa-lede" style={{ marginTop: 8 }}>
+                <h2 className="pa-title">Welcome to {firstName}.</h2>
+                <p className="pa-lede" style={{ marginTop: 12 }}>
                   {goal
                     ? `Set up to ${goal.label.toLowerCase()}. Here is the shortest path to something useful.`
                     : 'Here is the shortest path to something useful.'}
@@ -203,37 +207,26 @@ export function WorkspaceApp() {
                 {/* ---------- Recommended next step ---------- */}
                 <section
                   className="pa-panel pa-panel--next"
-                  style={{ marginTop: 22 }}
+                  style={{ marginTop: 26 }}
                   aria-labelledby="next-heading"
                 >
                   <p className="pa-micro">Recommended next step</p>
-                  <h3 className="pa-h3" id="next-heading" style={{ marginTop: 8 }}>
+                  <h3 className="pa-h3" id="next-heading" style={{ marginTop: 10 }}>
                     {recommended.cta}
                   </h3>
-                  <p className="pa-lede" style={{ fontSize: '0.875rem', marginTop: 6 }}>
+                  <p className="pa-lede" style={{ marginTop: 8 }}>
                     {recommended.why}
                   </p>
                   <button
                     type="button"
                     className="pa-btn"
-                    style={{ marginTop: 14 }}
+                    style={{ marginTop: 18 }}
                     onClick={() => setSection(recommended.section)}
                   >
                     {recommended.cta}
                     <ArrowRight size={15} strokeWidth={2.2} />
                   </button>
                 </section>
-
-                {/* ---------- Snapshot ---------- */}
-                <div className="pa-grid pa-grid--stats">
-                  <Stat value="0" label="Tables" />
-                  <Stat value="0" label="Rows enriched" />
-                  <Stat
-                    value={String(onboarding.prepare.length)}
-                    label="Enrichments queued"
-                  />
-                  <Stat value="500" label="Credits available" />
-                </div>
 
                 <div className="pa-grid pa-grid--two">
                   {!checklistDismissed && (
@@ -243,65 +236,46 @@ export function WorkspaceApp() {
                       onToggle={(id) =>
                         persist({
                           ...state,
-                          checklistDone: {
-                            ...checklistDone,
-                            [id]: !checklistDone[id]
-                          }
+                          checklistDone: { ...checklistDone, [id]: !checklistDone[id] }
                         })
                       }
                       onDismiss={() => persist({ ...state, checklistDismissed: true })}
                     />
                   )}
 
-                  {/* ---------- Voice, only for people who asked ---------- */}
-                  {voiceMinded && (
-                    <section
-                      className="pa-panel pa-panel--voice"
-                      aria-labelledby="voice-heading"
-                    >
-                      <p className="pa-micro" style={{ color: '#0b6f65' }}>
-                        Calling · in development
-                      </p>
-                      <h3 className="pa-h3" id="voice-heading" style={{ marginTop: 8 }}>
+                  {/* ---------- Calling setup, only where asked for ---------- */}
+                  {callingTasks.length > 0 && (
+                    <section className="pa-panel" aria-labelledby="calling-heading">
+                      <p className="pa-micro">Calling setup · in development</p>
+                      <h3 className="pa-h3" id="calling-heading" style={{ marginTop: 10 }}>
                         Prepare your first calling workflow
                       </h3>
-                      <p
-                        className="pa-lede"
-                        style={{ fontSize: '0.875rem', marginTop: 6 }}
-                      >
+                      <p className="pa-lede" style={{ marginTop: 8 }}>
                         Telephony is not connected yet. What you can do now is get the
-                        pieces ready so the first call is a short step rather than a
+                        pieces ready, so the first call is a short step rather than a
                         project.
                       </p>
 
-                      <ul className="pa-module__list">
-                        <li>Draft the agent&rsquo;s role, objective and opening line</li>
-                        <li>Decide which column holds the number to dial</li>
-                        <li>Collect the documents an agent should answer from</li>
-                        {onboarding.calling.language && (
-                          <li>
-                            Confirm handling for{' '}
-                            {
-                              {
-                                english: 'English',
-                                hindi: 'Hindi',
-                                'hindi-english': 'Hindi and English',
-                                other: 'your chosen languages'
-                              }[onboarding.calling.language]
-                            }
+                      <ul className="pa-tasks">
+                        {callingTasks.map((t) => (
+                          <li key={t.id}>
+                            <Circle size={7} strokeWidth={3} fill="currentColor" />
+                            <span>
+                              {t.label}
+                              <span
+                                style={{
+                                  display: 'block',
+                                  color: 'var(--lp-text-faint)',
+                                  fontSize: 'var(--lp-t-caption)',
+                                  marginTop: 2
+                                }}
+                              >
+                                {t.hint}
+                              </span>
+                            </span>
                           </li>
-                        )}
+                        ))}
                       </ul>
-
-                      <button
-                        type="button"
-                        className="pa-btn pa-btn--teal"
-                        style={{ marginTop: 14 }}
-                        onClick={() => setSection('voice')}
-                      >
-                        <PhoneCall size={15} strokeWidth={2.1} />
-                        Open the voice studio
-                      </button>
                     </section>
                   )}
                 </div>
@@ -309,17 +283,16 @@ export function WorkspaceApp() {
                 {checklistDismissed && (
                   <button
                     type="button"
-                    className="pa-btn pa-btn--quiet"
-                    style={{ marginTop: 16 }}
+                    className="pa-btn pa-btn--ghost"
+                    style={{ marginTop: 20 }}
                     onClick={() => persist({ ...state, checklistDismissed: false })}
                   >
-                    <Sparkles size={15} strokeWidth={2} />
                     Show setup checklist
                   </button>
                 )}
               </>
             ) : (
-              <ModulePanel id={section} />
+              <SectionPanel id={section} />
             )}
           </main>
         </div>
@@ -328,22 +301,14 @@ export function WorkspaceApp() {
   );
 }
 
-function Stat({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="pa-stat">
-      <div className="pa-stat__value">{value}</div>
-      <div className="pa-stat__label">{label}</div>
-    </div>
-  );
-}
-
 /**
- * A planned module. It says what the module will do and what is not built,
- * rather than presenting an empty version of a feature that does not exist.
+ * A section that is designed but not built. It says what the section will do
+ * and what is missing, rather than presenting an empty version of a feature
+ * that does not exist.
  */
-function ModulePanel({ id }: { id: string }) {
+function SectionPanel({ id }: { id: string }) {
   const nav = NAV.find((n) => n.id === id);
-  const copy = MODULE_COPY[id];
+  const copy = SECTION_COPY[id];
   if (!nav || !copy) return null;
 
   return (
@@ -353,16 +318,14 @@ function ModulePanel({ id }: { id: string }) {
       </span>
 
       <div>
-        <span className={`pa-tag${nav.voice ? ' pa-tag--voice' : ''}`}>
-          In development
-        </span>
-        <h2 className="pa-title" style={{ fontSize: '1.5rem', marginTop: 10 }}>
+        <span className="pa-tag">Coming soon</span>
+        <h2 className="pa-title" style={{ fontSize: '1.625rem', marginTop: 12 }}>
           {nav.label}
         </h2>
-        <p className="pa-lede" style={{ marginTop: 8 }}>
+        <p className="pa-lede" style={{ marginTop: 10 }}>
           {copy.blurb}
         </p>
-        <p className="pa-micro" style={{ marginTop: 18 }}>
+        <p className="pa-micro" style={{ marginTop: 22 }}>
           What it will do
         </p>
         <ul className="pa-module__list">
@@ -374,5 +337,3 @@ function ModulePanel({ id }: { id: string }) {
     </section>
   );
 }
-
-export { WorkspaceMark };

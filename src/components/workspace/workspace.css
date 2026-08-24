@@ -1,133 +1,82 @@
 /* ==========================================================================
    Prospectra — Workspace surface (onboarding + app shell)
    --------------------------------------------------------------------------
-   The landing and auth pages live on the dark void (.lp). Once someone is
-   inside the product the surface flips to a calm light paper, because this is
-   where people read tables and dense copy for long stretches.
+   Scoped under .lp, the same way auth.css is, so it inherits the landing
+   page's tokens, fluid type scale and primitives (.lp-glass, .lp-btn,
+   GradientField, Noise) rather than redefining a second design system.
 
-   What carries over so it still reads as one product:
-     · the same two typefaces, via the next/font variables on <html>
-     · the same blue signal ramp (#285fff …) for primary action
-     · the same navy ink (#070b1c) for text
-   What is new here:
-     · a light paper surface instead of the void
-     · teal, used only for calling/voice — never for general UI
-
-   Scoped under .pa so it cannot collide with .lp or with Tailwind utilities.
+   This is the dark Prospectra universe continuing past the sign-up page:
+   the same void background, the same gradient field and grain, the same
+   electric-blue ramp. Nothing here switches to a light admin surface.
    ========================================================================== */
 
 .pa {
-  /* --- Surface ------------------------------------------------------------ */
-  --pa-canvas: #f6f7fc;
-  --pa-surface: #ffffff;
-  --pa-sunken: #eef1f9;
-  --pa-raised: #fbfcfe;
+  /* Workspace-only additions. Everything else comes from .lp. */
+  --pa-surface: rgba(255, 255, 255, 0.035);
+  --pa-surface-hover: rgba(255, 255, 255, 0.055);
+  --pa-surface-solid: #070c22;
+  --pa-selected: rgba(40, 95, 255, 0.14);
 
-  /* --- Ink (shared with the landing page's light sections) ---------------- */
-  --pa-ink: #070b1c;
-  --pa-ink-soft: #4a5473;
-  --pa-ink-faint: #7b849e;
-  --pa-ink-ghost: #a8b0c4;
-
-  /* --- Signal blue, same ramp as the landing gradient --------------------- */
-  --pa-blue: #285fff;
-  --pa-blue-deep: #1a3ecc;
-  --pa-blue-soft: #e8eeff;
-  --pa-blue-line: #c3d3ff;
-
-  /* --- Teal: reserved for calling and voice, nothing else ----------------- */
-  --pa-teal: #0f8b7e;
-  --pa-teal-soft: #e2f5f2;
-  --pa-teal-line: #b3e0d9;
-
-  /* --- Status ------------------------------------------------------------- */
-  --pa-danger: #c8324b;
-  --pa-danger-soft: #fdecef;
-  --pa-warn: #a86a12;
-
-  /* --- Lines -------------------------------------------------------------- */
-  --pa-line: rgba(7, 11, 28, 0.09);
-  --pa-line-strong: rgba(7, 11, 28, 0.16);
-
-  /* --- Type --------------------------------------------------------------- */
-  --pa-display: var(--font-plus-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
-  --pa-body: var(--font-inter), 'Inter', system-ui, sans-serif;
-
-  --pa-r-sm: 8px;
-  --pa-r-md: 12px;
-  --pa-r-lg: 16px;
-  --pa-r-xl: 22px;
+  --pa-r-sm: 10px;
+  --pa-r-md: 14px;
+  --pa-r-lg: 20px;
   --pa-r-pill: 999px;
 
-  --pa-ease: cubic-bezier(0.22, 1, 0.36, 1);
-
-  font-family: var(--pa-body);
-  color: var(--pa-ink);
-  background: var(--pa-canvas);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--lp-void);
+  color: var(--lp-text);
 }
 
-.pa *,
-.pa *::before,
-.pa *::after {
-  box-sizing: border-box;
-}
-
-/* A single visible focus treatment everywhere in the product surface. */
+/* One visible focus treatment across the whole product surface. */
 .pa :focus-visible {
-  outline: 2px solid var(--pa-blue);
-  outline-offset: 2px;
-  border-radius: 6px;
+  outline: 2px solid var(--lp-blue-mid);
+  outline-offset: 3px;
+  border-radius: 8px;
 }
 
 /* ==========================================================================
-   Type primitives
+   Type — reuses the landing scale, adds only what the product needs
    ========================================================================== */
 
 .pa-title {
-  font-family: var(--pa-display);
-  font-size: clamp(1.625rem, 1.15rem + 1.9vw, 2.375rem);
+  font-family: var(--lp-display);
+  font-size: clamp(1.75rem, 1.2rem + 2.1vw, 2.75rem);
   font-weight: 800;
-  letter-spacing: -0.035em;
-  line-height: 1.1;
+  letter-spacing: var(--lp-track-h2);
+  line-height: 1.08;
   margin: 0;
   text-wrap: balance;
 }
 
 .pa-h3 {
-  font-family: var(--pa-display);
+  font-family: var(--lp-display);
   font-size: 1.0625rem;
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.3;
   margin: 0;
+  color: var(--lp-text);
 }
 
 .pa-lede {
-  font-size: 0.9375rem;
+  font-size: var(--lp-t-base);
   line-height: 1.6;
-  color: var(--pa-ink-soft);
+  color: var(--lp-text-soft);
   margin: 0;
-  max-width: 58ch;
+  max-width: 56ch;
   text-wrap: pretty;
 }
 
 .pa-micro {
-  font-size: 0.6875rem;
+  font-size: var(--lp-t-micro);
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: var(--lp-track-micro);
   text-transform: uppercase;
-  color: var(--pa-ink-faint);
+  color: var(--lp-text-faint);
   margin: 0;
 }
 
-.pa-nums {
-  font-variant-numeric: tabular-nums;
-}
-
-/* Available to assistive tech, invisible on screen. Used for fieldset legends
-   whose question is already carried by the visible step heading. */
 .pa-sr {
   position: absolute;
   width: 1px;
@@ -151,7 +100,7 @@
 }
 
 /* ==========================================================================
-   Buttons
+   Buttons — same shape language as .lp-btn, sized for dense product UI
    ========================================================================== */
 
 .pa-btn {
@@ -159,159 +108,176 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 42px;
-  padding: 0 18px;
-  border-radius: var(--pa-r-md);
+  height: 44px;
+  padding: 0 20px;
+  border-radius: var(--pa-r-pill);
   border: 1px solid transparent;
-  background: var(--pa-blue);
+  background: var(--lp-blue-core);
   color: #fff;
-  font-family: var(--pa-body);
-  font-size: 0.875rem;
+  font-family: var(--lp-body);
+  font-size: var(--lp-t-sm);
   font-weight: 600;
   letter-spacing: -0.01em;
   cursor: pointer;
   text-decoration: none;
   white-space: nowrap;
-  transition: background-color 0.2s ease, transform 0.2s var(--pa-ease),
-    border-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.25s ease, transform 0.3s var(--lp-ease),
+    box-shadow 0.3s var(--lp-ease), opacity 0.2s ease;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset,
+    0 10px 30px -10px rgba(40, 95, 255, 0.7);
 }
 
 .pa-btn:hover:not(:disabled) {
-  background: var(--pa-blue-deep);
+  transform: translateY(-1px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.26) inset,
+    0 16px 38px -12px rgba(40, 95, 255, 0.85);
 }
 
 .pa-btn:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: translateY(0);
 }
 
 .pa-btn:disabled {
-  background: var(--pa-sunken);
-  color: var(--pa-ink-ghost);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--lp-text-faint);
+  box-shadow: none;
   cursor: not-allowed;
 }
 
 .pa-btn--ghost {
   background: transparent;
-  color: var(--pa-ink-soft);
-  border-color: var(--pa-line-strong);
+  color: var(--lp-text-soft);
+  border-color: var(--lp-line-strong);
+  box-shadow: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .pa-btn--ghost:hover:not(:disabled) {
-  background: var(--pa-surface);
-  color: var(--pa-ink);
-  border-color: var(--pa-ink-ghost);
+  background: var(--lp-glass);
+  color: var(--lp-text);
+  box-shadow: none;
 }
 
 .pa-btn--quiet {
   background: transparent;
-  color: var(--pa-ink-soft);
+  color: var(--lp-text-faint);
   border-color: transparent;
-  padding-inline: 10px;
+  box-shadow: none;
+  padding-inline: 12px;
 }
 
 .pa-btn--quiet:hover:not(:disabled) {
-  background: var(--pa-sunken);
-  color: var(--pa-ink);
-}
-
-.pa-btn--teal {
-  background: var(--pa-teal);
-}
-
-.pa-btn--teal:hover:not(:disabled) {
-  background: #0b6f65;
+  color: var(--lp-text);
+  background: var(--lp-glass);
 }
 
 /* ==========================================================================
-   Onboarding layout
+   Onboarding shell
    ========================================================================== */
 
 .pa-onboard {
+  position: relative;
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: var(--pa-canvas);
+  isolation: isolate;
+  overflow-x: clip;
 }
 
-/* A restrained blue wash at the top so the light surface is not flat white. */
-.pa-onboard::before {
-  content: '';
+/* The horizon bloom, same treatment as the hero and auth showcase. */
+.pa-onboard__bloom {
   position: fixed;
-  inset: 0 0 auto 0;
-  height: 380px;
-  pointer-events: none;
-  background: radial-gradient(
-    ellipse 70% 100% at 50% 0%,
-    rgba(40, 95, 255, 0.09) 0%,
-    rgba(40, 95, 255, 0) 70%
-  );
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -30%;
+  width: min(1400px, 150vw);
+  height: clamp(280px, 40vh, 520px);
   z-index: 0;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center 82%,
+    rgba(226, 238, 255, 0.4) 0%,
+    rgba(138, 168, 255, 0.24) 24%,
+    rgba(40, 95, 255, 0.14) 46%,
+    rgba(1, 3, 15, 0) 72%
+  );
+  filter: blur(64px);
+  will-change: transform, opacity;
 }
 
 .pa-onboard__bar {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 18px clamp(1rem, 4vw, 2.5rem);
+  padding: 22px clamp(1.25rem, 4vw, 2.5rem);
 }
 
 .pa-brand {
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  font-family: var(--pa-display);
+  font-family: var(--lp-display);
   font-size: 1.0625rem;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: var(--pa-ink);
+  color: var(--lp-text);
   text-decoration: none;
 }
 
 .pa-brand__suffix {
-  color: var(--pa-ink-ghost);
+  color: var(--lp-text-faint);
   font-weight: 600;
 }
 
-/* The logomark is white-on-blue on the dark site; keep the same shape here. */
-.pa-brand__mark {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(145deg, #6d92ff, var(--pa-blue-deep));
-  flex-shrink: 0;
+.pa-onboard__later {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--lp-t-caption);
+  color: var(--lp-text-faint);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--lp-body);
+  padding: 6px 2px;
+  transition: color 0.25s ease;
+}
+
+.pa-onboard__later:hover {
+  color: var(--lp-text);
 }
 
 .pa-onboard__saved {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.75rem;
-  color: var(--pa-ink-faint);
-  transition: opacity 0.3s ease;
+  font-size: var(--lp-t-caption);
+  color: var(--lp-blue-mid);
+  transition: opacity 0.35s ease;
 }
 
 .pa-onboard__body {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   flex: 1;
   width: 100%;
-  max-width: 760px;
+  max-width: 720px;
   margin-inline: auto;
-  padding: clamp(0.5rem, 2vw, 1.5rem) clamp(1rem, 4vw, 2.5rem) 140px;
+  padding: clamp(0.5rem, 2vw, 1.75rem) clamp(1.25rem, 4vw, 2.5rem) 150px;
 }
 
 /* ==========================================================================
-   Progress
+   Progress — a thin electric-blue line
    ========================================================================== */
 
 .pa-progress {
-  margin-bottom: clamp(1.75rem, 4vw, 2.75rem);
+  margin-bottom: clamp(2rem, 5vw, 3.25rem);
 }
 
 .pa-progress__meta {
@@ -319,79 +285,43 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .pa-progress__step {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--pa-ink-soft);
+  font-size: var(--lp-t-caption);
+  font-weight: 500;
+  color: var(--lp-text-soft);
+  letter-spacing: -0.005em;
 }
 
-.pa-progress__pct {
-  font-size: 0.75rem;
-  color: var(--pa-ink-faint);
-  font-variant-numeric: tabular-nums;
+.pa-progress__step b {
+  color: var(--lp-text);
+  font-weight: 600;
+}
+
+.pa-progress__optional {
+  color: var(--lp-text-faint);
 }
 
 .pa-progress__track {
-  height: 4px;
+  height: 2px;
   border-radius: 999px;
-  background: var(--pa-sunken);
+  background: rgba(255, 255, 255, 0.08);
   overflow: hidden;
 }
 
 .pa-progress__fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--pa-blue), #6d92ff);
-  transition: width 0.5s var(--pa-ease);
-}
-
-/* Dots double as the step label list on wider screens. */
-.pa-progress__dots {
-  display: flex;
-  gap: 18px;
-  margin-top: 12px;
-  list-style: none;
-  padding: 0;
-  flex-wrap: wrap;
-}
-
-.pa-progress__dot {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.75rem;
-  color: var(--pa-ink-ghost);
-}
-
-.pa-progress__dot[data-state='done'] {
-  color: var(--pa-ink-soft);
-}
-
-.pa-progress__dot[data-state='current'] {
-  color: var(--pa-blue);
-  font-weight: 600;
-}
-
-.pa-progress__dot span[aria-hidden='true'] {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: 0.55;
-}
-
-.pa-progress__dot[data-state='current'] span[aria-hidden='true'] {
-  opacity: 1;
-  box-shadow: 0 0 0 3px var(--pa-blue-soft);
-}
-
-@media (max-width: 640px) {
-  .pa-progress__dots {
-    display: none;
-  }
+  background: linear-gradient(
+    90deg,
+    var(--lp-blue-deep),
+    var(--lp-blue-core) 55%,
+    var(--lp-blue-mid)
+  );
+  box-shadow: 0 0 12px rgba(40, 95, 255, 0.75);
+  transition: width 0.6s var(--lp-ease);
 }
 
 /* ==========================================================================
@@ -399,71 +329,75 @@
    ========================================================================== */
 
 .pa-step__head {
-  margin-bottom: clamp(1.5rem, 3vw, 2rem);
+  margin-bottom: clamp(1.75rem, 4vw, 2.5rem);
 }
 
 .pa-step__head .pa-lede {
-  margin-top: 0.625rem;
+  margin-top: 0.75rem;
 }
 
 .pa-field {
   display: flex;
   flex-direction: column;
-  gap: 7px;
-  margin-bottom: 22px;
+  gap: 9px;
+  margin-bottom: 26px;
 }
 
 .pa-label {
-  font-size: 0.8125rem;
+  font-size: var(--lp-t-sm);
   font-weight: 600;
-  color: var(--pa-ink);
+  color: var(--lp-text);
 }
 
 .pa-label__optional {
   font-weight: 400;
-  color: var(--pa-ink-faint);
+  color: var(--lp-text-faint);
 }
 
 .pa-input {
-  height: 46px;
-  padding: 0 14px;
+  height: 50px;
+  padding: 0 16px;
   border-radius: var(--pa-r-md);
-  border: 1px solid var(--pa-line-strong);
+  border: 1px solid var(--lp-line-strong);
   background: var(--pa-surface);
-  font-family: var(--pa-body);
-  font-size: 0.9375rem;
-  color: var(--pa-ink);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  font-family: var(--lp-body);
+  font-size: var(--lp-t-base);
+  color: var(--lp-text);
   width: 100%;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease,
+    background-color 0.25s ease;
 }
 
 .pa-input::placeholder {
-  color: var(--pa-ink-ghost);
+  color: var(--lp-text-faint);
 }
 
 .pa-input:focus {
   outline: none;
-  border-color: var(--pa-blue);
-  box-shadow: 0 0 0 3px var(--pa-blue-soft);
+  border-color: var(--lp-blue-core);
+  background: var(--pa-surface-hover);
+  box-shadow: 0 0 0 3px rgba(40, 95, 255, 0.22);
 }
 
 .pa-input[aria-invalid='true'] {
-  border-color: var(--pa-danger);
+  border-color: #ff8f8f;
 }
 
 .pa-error {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.8125rem;
-  color: var(--pa-danger);
+  font-size: var(--lp-t-caption);
+  color: #ff9c9c;
 }
 
 /* ==========================================================================
-   Choices — single select (radio) and multi select (checkbox)
-   The real input stays in the DOM and drives every state, so arrow-key
-   navigation, Space/Enter and screen-reader semantics come from the platform
-   rather than from re-implemented key handlers.
+   Choices
+   Each wraps a real radio/checkbox, so arrow-key navigation, Space and
+   screen-reader semantics come from the platform rather than from
+   re-implemented key handlers. :has() drives the styling off the input.
    ========================================================================== */
 
 .pa-choices {
@@ -471,30 +405,47 @@
   gap: 10px;
   border: none;
   padding: 0;
-  margin: 0 0 22px;
+  margin: 0 0 26px;
 }
 
 .pa-choices--two {
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(272px, 1fr));
 }
 
 .pa-choice {
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 13px;
-  padding: 15px 16px;
+  gap: 14px;
+  padding: 17px 18px;
   border-radius: var(--pa-r-md);
-  border: 1px solid var(--pa-line);
+  border: 1px solid var(--lp-line);
   background: var(--pa-surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   cursor: pointer;
-  transition: border-color 0.18s ease, background-color 0.18s ease,
-    box-shadow 0.18s ease;
+  overflow: hidden;
+  transition: border-color 0.25s var(--lp-ease),
+    background-color 0.25s var(--lp-ease), transform 0.25s var(--lp-ease);
+}
+
+/* Specular sheen across the top edge, matching .lp-glass. */
+.pa-choice::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0) 34%
+  );
+  pointer-events: none;
 }
 
 .pa-choice:hover {
-  border-color: var(--pa-blue-line);
-  background: var(--pa-raised);
+  border-color: var(--lp-line-strong);
+  background: var(--pa-surface-hover);
 }
 
 .pa-choice__input {
@@ -507,59 +458,67 @@
 }
 
 .pa-choice__icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
   display: grid;
   place-items: center;
-  background: var(--pa-sunken);
-  color: var(--pa-ink-soft);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--lp-line);
+  color: var(--lp-text-soft);
   flex-shrink: 0;
-  transition: background-color 0.18s ease, color 0.18s ease;
+  position: relative;
+  z-index: 1;
+  transition: background-color 0.25s ease, color 0.25s ease,
+    border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .pa-choice__text {
   flex: 1;
   min-width: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .pa-choice__label {
   display: block;
-  font-size: 0.9375rem;
+  font-size: var(--lp-t-sm);
   font-weight: 600;
   letter-spacing: -0.012em;
-  color: var(--pa-ink);
+  color: var(--lp-text);
 }
 
 .pa-choice__blurb {
   display: block;
-  margin-top: 3px;
-  font-size: 0.8125rem;
+  margin-top: 4px;
+  font-size: var(--lp-t-caption);
   line-height: 1.5;
-  color: var(--pa-ink-faint);
+  color: var(--lp-text-faint);
 }
 
 .pa-choice__estimate {
   display: inline-block;
-  margin-top: 7px;
+  margin-top: 9px;
   font-size: 0.6875rem;
   font-weight: 600;
-  color: var(--pa-ink-faint);
+  letter-spacing: 0.02em;
+  color: var(--lp-text-faint);
   font-variant-numeric: tabular-nums;
 }
 
-/* The tick / radio dot. */
 .pa-choice__mark {
   width: 20px;
   height: 20px;
   border-radius: 6px;
-  border: 1.5px solid var(--pa-line-strong);
+  border: 1.5px solid var(--lp-line-strong);
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  margin-top: 6px;
+  margin-top: 7px;
   color: #fff;
-  transition: background-color 0.18s ease, border-color 0.18s ease;
+  position: relative;
+  z-index: 1;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .pa-choice--radio .pa-choice__mark {
@@ -568,28 +527,29 @@
 
 .pa-choice__mark svg {
   opacity: 0;
-  transition: opacity 0.15s ease;
+  transition: opacity 0.2s ease;
 }
 
-/* Selected state, driven entirely by the underlying input. */
-.pa-choice__input:checked ~ .pa-choice__text .pa-choice__label {
-  color: var(--pa-blue-deep);
-}
+/* --- Selected -------------------------------------------------------------
+   Blue border, a soft interior wash and the brand glow. */
 
 .pa-choice:has(.pa-choice__input:checked) {
-  border-color: var(--pa-blue);
-  background: var(--pa-blue-soft);
-  box-shadow: 0 0 0 1px var(--pa-blue);
+  border-color: var(--lp-blue-core);
+  background: var(--pa-selected);
+  box-shadow: 0 0 0 1px var(--lp-blue-core),
+    0 14px 40px -18px rgba(40, 95, 255, 0.8);
 }
 
 .pa-choice:has(.pa-choice__input:checked) .pa-choice__icon {
-  background: var(--pa-blue);
+  background: var(--lp-blue-core);
+  border-color: transparent;
   color: #fff;
+  box-shadow: 0 6px 18px -6px rgba(40, 95, 255, 0.9);
 }
 
 .pa-choice:has(.pa-choice__input:checked) .pa-choice__mark {
-  background: var(--pa-blue);
-  border-color: var(--pa-blue);
+  background: var(--lp-blue-core);
+  border-color: var(--lp-blue-core);
 }
 
 .pa-choice:has(.pa-choice__input:checked) .pa-choice__mark svg {
@@ -597,28 +557,11 @@
 }
 
 .pa-choice:has(.pa-choice__input:focus-visible) {
-  outline: 2px solid var(--pa-blue);
-  outline-offset: 2px;
+  outline: 2px solid var(--lp-blue-mid);
+  outline-offset: 3px;
 }
 
-/* Teal variant — calling only. */
-.pa-choice--voice:has(.pa-choice__input:checked) {
-  border-color: var(--pa-teal);
-  background: var(--pa-teal-soft);
-  box-shadow: 0 0 0 1px var(--pa-teal);
-}
-
-.pa-choice--voice:has(.pa-choice__input:checked) .pa-choice__icon,
-.pa-choice--voice:has(.pa-choice__input:checked) .pa-choice__mark {
-  background: var(--pa-teal);
-  border-color: var(--pa-teal);
-}
-
-.pa-choice--voice:has(.pa-choice__input:checked) .pa-choice__label {
-  color: #0b6f65;
-}
-
-/* --- Compact chips, for CRMs / languages / interests --------------------- */
+/* --- Chips: CRMs, languages, capability interests ------------------------ */
 
 .pa-chips {
   display: flex;
@@ -634,38 +577,33 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 9px 14px;
+  padding: 10px 16px;
   border-radius: var(--pa-r-pill);
-  border: 1px solid var(--pa-line-strong);
+  border: 1px solid var(--lp-line-strong);
   background: var(--pa-surface);
-  font-size: 0.8125rem;
+  font-size: var(--lp-t-caption);
   font-weight: 500;
-  color: var(--pa-ink-soft);
+  color: var(--lp-text-soft);
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: all 0.22s var(--lp-ease);
 }
 
 .pa-chip:hover {
-  border-color: var(--pa-blue-line);
-  color: var(--pa-ink);
+  border-color: rgba(138, 168, 255, 0.5);
+  color: var(--lp-text);
 }
 
 .pa-chip:has(input:checked) {
-  background: var(--pa-blue-soft);
-  border-color: var(--pa-blue);
-  color: var(--pa-blue-deep);
+  background: var(--pa-selected);
+  border-color: var(--lp-blue-core);
+  color: #fff;
   font-weight: 600;
-}
-
-.pa-chip--voice:has(input:checked) {
-  background: var(--pa-teal-soft);
-  border-color: var(--pa-teal);
-  color: #0b6f65;
+  box-shadow: 0 0 18px -6px rgba(40, 95, 255, 0.8);
 }
 
 .pa-chip:has(input:focus-visible) {
-  outline: 2px solid var(--pa-blue);
-  outline-offset: 2px;
+  outline: 2px solid var(--lp-blue-mid);
+  outline-offset: 3px;
 }
 
 .pa-chip input {
@@ -680,37 +618,41 @@
 
 .pa-segment {
   display: inline-flex;
-  padding: 3px;
-  gap: 3px;
+  padding: 4px;
+  gap: 4px;
   border-radius: var(--pa-r-md);
-  background: var(--pa-sunken);
-  border: none;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--lp-line);
   margin: 0;
   flex-wrap: wrap;
 }
 
 .pa-segment__item {
   position: relative;
-  padding: 8px 16px;
-  border-radius: 9px;
-  font-size: 0.8125rem;
+  padding: 9px 18px;
+  border-radius: 10px;
+  font-size: var(--lp-t-caption);
   font-weight: 500;
-  color: var(--pa-ink-soft);
+  color: var(--lp-text-soft);
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: all 0.22s var(--lp-ease);
   white-space: nowrap;
 }
 
+.pa-segment__item:hover {
+  color: var(--lp-text);
+}
+
 .pa-segment__item:has(input:checked) {
-  background: var(--pa-surface);
-  color: var(--pa-ink);
+  background: var(--lp-blue-core);
+  color: #fff;
   font-weight: 600;
-  box-shadow: 0 1px 3px rgba(7, 11, 28, 0.1);
+  box-shadow: 0 6px 18px -8px rgba(40, 95, 255, 0.9);
 }
 
 .pa-segment__item:has(input:focus-visible) {
-  outline: 2px solid var(--pa-blue);
-  outline-offset: 1px;
+  outline: 2px solid var(--lp-blue-mid);
+  outline-offset: 2px;
 }
 
 .pa-segment__item input {
@@ -728,19 +670,19 @@
 .pa-logo {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   flex-wrap: wrap;
 }
 
 .pa-logo__preview {
-  width: 62px;
-  height: 62px;
+  width: 64px;
+  height: 64px;
   border-radius: var(--pa-r-md);
-  border: 1.5px dashed var(--pa-line-strong);
+  border: 1.5px dashed var(--lp-line-strong);
   display: grid;
   place-items: center;
   background: var(--pa-surface);
-  color: var(--pa-ink-ghost);
+  color: var(--lp-text-faint);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -753,13 +695,13 @@
 
 .pa-logo__preview[data-filled='true'] {
   border-style: solid;
-  border-color: var(--pa-line);
+  border-color: var(--lp-line-strong);
 }
 
 .pa-logo__actions {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
 }
 
 .pa-logo__row {
@@ -770,22 +712,22 @@
 }
 
 .pa-logo__hint {
-  font-size: 0.75rem;
-  color: var(--pa-ink-faint);
+  font-size: var(--lp-t-caption);
+  color: var(--lp-text-faint);
 }
 
 /* ==========================================================================
-   Conditional reveal — progressive disclosure
+   Progressive disclosure
    ========================================================================== */
 
 .pa-reveal {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 0.4s var(--pa-ease), opacity 0.3s ease,
-    visibility 0s linear 0.4s;
+  transition: grid-template-rows 0.45s var(--lp-ease), opacity 0.3s ease,
+    visibility 0s linear 0.45s;
   opacity: 0;
-  /* Takes the collapsed controls out of the tab order and the accessibility
-     tree, which opacity alone would not do. */
+  /* Takes collapsed controls out of the tab order and the a11y tree, which
+     opacity alone would not do. */
   visibility: hidden;
 }
 
@@ -793,7 +735,7 @@
   grid-template-rows: 1fr;
   opacity: 1;
   visibility: visible;
-  transition: grid-template-rows 0.4s var(--pa-ease), opacity 0.3s ease,
+  transition: grid-template-rows 0.45s var(--lp-ease), opacity 0.3s ease,
     visibility 0s linear 0s;
 }
 
@@ -803,10 +745,11 @@
 }
 
 .pa-subhead {
-  font-size: 0.8125rem;
+  font-size: var(--lp-t-sm);
   font-weight: 600;
-  color: var(--pa-ink);
-  margin: 20px 0 9px;
+  color: var(--lp-text);
+  margin: 24px 0 11px;
+  padding: 0;
 }
 
 /* ==========================================================================
@@ -819,16 +762,16 @@
   left: 0;
   right: 0;
   z-index: 20;
-  border-top: 1px solid var(--pa-line);
-  background: rgba(246, 247, 252, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--lp-line);
+  background: rgba(1, 3, 15, 0.78);
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
 }
 
 .pa-actions__inner {
-  max-width: 760px;
+  max-width: 720px;
   margin-inline: auto;
-  padding: 14px clamp(1rem, 4vw, 2.5rem);
+  padding: 16px clamp(1.25rem, 4vw, 2.5rem);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -842,55 +785,57 @@
 }
 
 /* ==========================================================================
-   Finish screen
+   Finish state
    ========================================================================== */
 
 .pa-finish {
   text-align: center;
-  padding-top: clamp(1rem, 6vh, 3rem);
+  padding-top: clamp(1.5rem, 8vh, 4rem);
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 .pa-finish__mark {
-  width: 62px;
-  height: 62px;
-  border-radius: 18px;
+  width: 66px;
+  height: 66px;
+  border-radius: 20px;
   display: grid;
   place-items: center;
-  background: var(--pa-blue-soft);
-  color: var(--pa-blue);
-  border: 1px solid var(--pa-blue-line);
-  margin-bottom: 22px;
+  background: linear-gradient(150deg, var(--lp-blue-lift), var(--lp-blue-deep));
+  color: #fff;
+  margin-bottom: 26px;
+  box-shadow: 0 18px 44px -14px rgba(40, 95, 255, 0.9);
 }
 
 .pa-finish__list {
   list-style: none;
   padding: 0;
-  margin: 26px 0 30px;
+  margin: 30px 0 34px;
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: 10px;
   width: 100%;
-  max-width: 420px;
+  max-width: 440px;
   text-align: left;
 }
 
 .pa-finish__item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
+  gap: 12px;
+  padding: 14px 16px;
   border-radius: var(--pa-r-md);
   background: var(--pa-surface);
-  border: 1px solid var(--pa-line);
-  font-size: 0.875rem;
-  color: var(--pa-ink-soft);
+  border: 1px solid var(--lp-line);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  font-size: var(--lp-t-sm);
+  color: var(--lp-text-soft);
 }
 
 .pa-finish__item svg {
-  color: var(--pa-blue);
+  color: var(--lp-blue-mid);
   flex-shrink: 0;
 }
 
@@ -906,64 +851,70 @@
    ========================================================================== */
 
 .pa-app {
+  position: relative;
   min-height: 100vh;
   min-height: 100dvh;
   display: grid;
-  grid-template-columns: 244px 1fr;
-  background: var(--pa-canvas);
+  grid-template-columns: 256px 1fr;
+  isolation: isolate;
 }
 
 .pa-side {
-  border-right: 1px solid var(--pa-line);
-  background: var(--pa-surface);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 16px 12px;
   position: sticky;
   top: 0;
   height: 100vh;
   height: 100dvh;
   overflow-y: auto;
+  z-index: 5;
+  border-right: 1px solid var(--lp-line);
+  background: rgba(3, 7, 32, 0.6);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 22px 14px 18px;
 }
 
 .pa-side__brand {
-  padding: 4px 8px 14px;
+  padding: 2px 8px 18px;
 }
 
 .pa-switcher {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 11px;
   width: 100%;
-  padding: 9px 10px;
+  padding: 10px 11px;
   border-radius: var(--pa-r-md);
-  border: 1px solid var(--pa-line);
-  background: var(--pa-raised);
+  border: 1px solid var(--lp-line);
+  background: var(--pa-surface);
   cursor: pointer;
   text-align: left;
-  font-family: var(--pa-body);
-  margin-bottom: 14px;
-  transition: border-color 0.18s ease;
+  font-family: var(--lp-body);
+  margin-bottom: 18px;
+  transition: border-color 0.25s ease, background-color 0.25s ease;
 }
 
 .pa-switcher:hover {
-  border-color: var(--pa-line-strong);
+  border-color: var(--lp-line-strong);
+  background: var(--pa-surface-hover);
 }
 
 .pa-switcher__mark {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
   flex-shrink: 0;
   display: grid;
   place-items: center;
   overflow: hidden;
-  background: linear-gradient(145deg, #6d92ff, var(--pa-blue-deep));
+  background: linear-gradient(145deg, var(--lp-blue-mid), var(--lp-blue-deep));
   color: #fff;
-  font-family: var(--pa-display);
+  font-family: var(--lp-display);
   font-weight: 800;
-  font-size: 0.8125rem;
+  font-size: var(--lp-t-caption);
+  box-shadow: 0 6px 16px -6px rgba(40, 95, 255, 0.9);
 }
 
 .pa-switcher__mark img {
@@ -979,9 +930,9 @@
 
 .pa-switcher__name {
   display: block;
-  font-size: 0.8125rem;
+  font-size: var(--lp-t-sm);
   font-weight: 600;
-  color: var(--pa-ink);
+  color: var(--lp-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -990,45 +941,60 @@
 .pa-switcher__meta {
   display: block;
   font-size: 0.6875rem;
-  color: var(--pa-ink-faint);
+  color: var(--lp-text-faint);
+  margin-top: 1px;
 }
 
 .pa-nav {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
 .pa-nav__item {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 11px;
   width: 100%;
-  padding: 9px 10px;
+  padding: 10px 11px;
   border-radius: var(--pa-r-sm);
   border: none;
   background: none;
   cursor: pointer;
-  font-family: var(--pa-body);
-  font-size: 0.875rem;
+  font-family: var(--lp-body);
+  font-size: var(--lp-t-sm);
   font-weight: 500;
-  color: var(--pa-ink-soft);
+  color: var(--lp-text-soft);
   text-align: left;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .pa-nav__item:hover {
-  background: var(--pa-sunken);
-  color: var(--pa-ink);
+  background: var(--lp-glass);
+  color: var(--lp-text);
 }
 
 .pa-nav__item[aria-current='page'] {
-  background: var(--pa-blue-soft);
-  color: var(--pa-blue-deep);
+  background: var(--pa-selected);
+  color: #fff;
   font-weight: 600;
+}
+
+/* The active rail, echoing the navbar's underline on the landing page. */
+.pa-nav__item[aria-current='page']::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 9px;
+  bottom: 9px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--lp-blue-core);
+  box-shadow: 0 0 10px rgba(40, 95, 255, 0.9);
 }
 
 .pa-nav__item svg {
@@ -1040,42 +1006,38 @@
   min-width: 0;
 }
 
-/* Marks a module that is designed but not built. Honest, not a dead link:
+/* Marks a section that is designed but not built. Honest, not a dead link —
    the section still opens and explains what is coming. */
 .pa-tag {
   font-size: 0.5625rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
-  padding: 3px 6px;
+  padding: 3px 7px;
   border-radius: 5px;
-  background: var(--pa-sunken);
-  color: var(--pa-ink-faint);
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--lp-text-faint);
+  white-space: nowrap;
 }
 
-.pa-tag--demo {
-  background: var(--pa-blue-soft);
-  color: var(--pa-blue-deep);
-}
-
-.pa-tag--voice {
-  background: var(--pa-teal-soft);
-  color: #0b6f65;
+.pa-tag--live {
+  background: rgba(40, 95, 255, 0.2);
+  color: var(--lp-blue-pale);
 }
 
 .pa-side__foot {
   margin-top: auto;
-  padding-top: 14px;
-  border-top: 1px solid var(--pa-line);
+  padding-top: 16px;
+  border-top: 1px solid var(--lp-line);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .pa-meter {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
   padding: 0 4px;
 }
 
@@ -1083,34 +1045,32 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  gap: 8px;
   font-size: 0.6875rem;
 }
 
 .pa-meter__label {
-  color: var(--pa-ink-faint);
+  color: var(--lp-text-faint);
 }
 
 .pa-meter__value {
   font-weight: 600;
-  color: var(--pa-ink);
+  color: var(--lp-text-soft);
   font-variant-numeric: tabular-nums;
 }
 
 .pa-meter__track {
-  height: 3px;
+  height: 2px;
   border-radius: 999px;
-  background: var(--pa-sunken);
+  background: rgba(255, 255, 255, 0.08);
   overflow: hidden;
 }
 
 .pa-meter__fill {
   height: 100%;
   border-radius: 999px;
-  background: var(--pa-blue);
-}
-
-.pa-meter__fill--teal {
-  background: var(--pa-teal);
+  background: linear-gradient(90deg, var(--lp-blue-deep), var(--lp-blue-core));
+  box-shadow: 0 0 10px rgba(40, 95, 255, 0.7);
 }
 
 /* --- Top bar -------------------------------------------------------------- */
@@ -1119,6 +1079,8 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 2;
 }
 
 .pa-top {
@@ -1129,49 +1091,69 @@
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 12px clamp(1rem, 3vw, 2rem);
-  border-bottom: 1px solid var(--pa-line);
-  background: rgba(255, 255, 255, 0.86);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  padding: 14px clamp(1.25rem, 3vw, 2.25rem);
+  border-bottom: 1px solid var(--lp-line);
+  background: rgba(1, 3, 15, 0.7);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
 }
 
 .pa-top__title {
-  font-family: var(--pa-display);
-  font-size: 0.9375rem;
+  font-family: var(--lp-display);
+  font-size: var(--lp-t-sm);
   font-weight: 700;
   letter-spacing: -0.02em;
   margin: 0;
+  color: var(--lp-text);
 }
 
 .pa-top__right {
   display: flex;
   align-items: center;
+  gap: 10px;
+}
+
+.pa-credits {
+  display: inline-flex;
+  align-items: center;
   gap: 8px;
+  padding: 7px 14px;
+  border-radius: var(--pa-r-pill);
+  border: 1px solid var(--lp-line);
+  background: var(--pa-surface);
+  font-size: var(--lp-t-caption);
+  color: var(--lp-text-soft);
+  white-space: nowrap;
+}
+
+.pa-credits b {
+  color: var(--lp-text);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .pa-burger {
   display: none;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--pa-r-sm);
-  border: 1px solid var(--pa-line-strong);
+  border: 1px solid var(--lp-line-strong);
   background: var(--pa-surface);
-  color: var(--pa-ink);
+  color: var(--lp-text);
   cursor: pointer;
   align-items: center;
   justify-content: center;
 }
 
 .pa-avatar {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: var(--pa-blue-deep);
+  background: linear-gradient(145deg, var(--lp-blue-lift), var(--lp-blue-deep));
   color: #fff;
-  font-size: 0.75rem;
+  font-size: var(--lp-t-caption);
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -1179,70 +1161,95 @@
 /* --- Content -------------------------------------------------------------- */
 
 .pa-content {
-  padding: clamp(1.25rem, 3vw, 2.25rem) clamp(1rem, 3vw, 2rem) 4rem;
-  max-width: 1080px;
+  padding: clamp(1.75rem, 4vw, 3rem) clamp(1.25rem, 3vw, 2.25rem) 5rem;
+  max-width: 1060px;
   width: 100%;
 }
 
 .pa-panel {
-  border: 1px solid var(--pa-line);
+  position: relative;
+  border: 1px solid var(--lp-line);
   border-radius: var(--pa-r-lg);
   background: var(--pa-surface);
-  padding: 20px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  padding: 24px;
+  overflow: hidden;
 }
 
+/* The primary action gets the brand glow; nothing else on the page does. */
 .pa-panel--next {
-  border-color: var(--pa-blue-line);
-  background: linear-gradient(150deg, var(--pa-blue-soft), var(--pa-surface) 60%);
+  border-color: rgba(40, 95, 255, 0.4);
+  background: linear-gradient(
+    150deg,
+    rgba(40, 95, 255, 0.16) 0%,
+    rgba(255, 255, 255, 0.03) 62%
+  );
+  box-shadow: 0 26px 60px -32px rgba(40, 95, 255, 0.9);
 }
 
-.pa-panel--voice {
-  border-color: var(--pa-teal-line);
-  background: linear-gradient(150deg, var(--pa-teal-soft), var(--pa-surface) 60%);
+.pa-panel--next::after {
+  content: '';
+  position: absolute;
+  right: -18%;
+  top: -60%;
+  width: 46%;
+  height: 190%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(77, 123, 255, 0.32), transparent 66%);
+  filter: blur(38px);
+  pointer-events: none;
+}
+
+.pa-panel > * {
+  position: relative;
+  z-index: 1;
 }
 
 .pa-grid {
   display: grid;
-  gap: 14px;
-  margin-top: 18px;
+  gap: 16px;
+  margin-top: 22px;
 }
 
 .pa-grid--stats {
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
 }
 
 .pa-grid--two {
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  align-items: start;
 }
 
 .pa-stat {
-  border: 1px solid var(--pa-line);
+  border: 1px solid var(--lp-line);
   border-radius: var(--pa-r-md);
   background: var(--pa-surface);
-  padding: 15px 16px;
+  padding: 17px 18px;
 }
 
 .pa-stat__value {
-  font-family: var(--pa-display);
-  font-size: 1.5rem;
+  font-family: var(--lp-display);
+  font-size: 1.625rem;
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
   line-height: 1;
+  color: var(--lp-text);
   font-variant-numeric: tabular-nums;
 }
 
 .pa-stat__label {
-  margin-top: 5px;
-  font-size: 0.75rem;
-  color: var(--pa-ink-faint);
+  margin-top: 6px;
+  font-size: var(--lp-t-caption);
+  color: var(--lp-text-faint);
 }
 
-/* --- Setup checklist ------------------------------------------------------ */
+/* --- Checklists ----------------------------------------------------------- */
 
 .pa-check {
   list-style: none;
   padding: 0;
-  margin: 14px 0 0;
+  margin: 16px 0 0;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -1251,15 +1258,15 @@
 .pa-check__item {
   display: flex;
   align-items: flex-start;
-  gap: 11px;
-  padding: 10px;
+  gap: 12px;
+  padding: 11px 10px;
   border-radius: var(--pa-r-sm);
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  transition: background-color 0.2s ease;
 }
 
 .pa-check__item:hover {
-  background: var(--pa-sunken);
+  background: var(--lp-glass);
 }
 
 .pa-check__item input {
@@ -1274,23 +1281,24 @@
   width: 19px;
   height: 19px;
   border-radius: 6px;
-  border: 1.5px solid var(--pa-line-strong);
+  border: 1.5px solid var(--lp-line-strong);
   display: grid;
   place-items: center;
   flex-shrink: 0;
   margin-top: 1px;
   color: #fff;
-  transition: all 0.18s ease;
+  transition: all 0.22s ease;
 }
 
 .pa-check__box svg {
   opacity: 0;
-  transition: opacity 0.15s ease;
+  transition: opacity 0.18s ease;
 }
 
 .pa-check__item:has(input:checked) .pa-check__box {
-  background: var(--pa-blue);
-  border-color: var(--pa-blue);
+  background: var(--lp-blue-core);
+  border-color: var(--lp-blue-core);
+  box-shadow: 0 0 14px -3px rgba(40, 95, 255, 0.9);
 }
 
 .pa-check__item:has(input:checked) .pa-check__box svg {
@@ -1298,65 +1306,98 @@
 }
 
 .pa-check__item:has(input:checked) .pa-check__label {
-  color: var(--pa-ink-faint);
+  color: var(--lp-text-faint);
   text-decoration: line-through;
 }
 
 .pa-check__item:has(input:focus-visible) {
-  outline: 2px solid var(--pa-blue);
-  outline-offset: 1px;
+  outline: 2px solid var(--lp-blue-mid);
+  outline-offset: 2px;
 }
 
 .pa-check__label {
-  font-size: 0.875rem;
+  font-size: var(--lp-t-sm);
   font-weight: 500;
-  color: var(--pa-ink);
+  color: var(--lp-text);
   display: block;
 }
 
 .pa-check__hint {
-  font-size: 0.75rem;
-  color: var(--pa-ink-faint);
+  font-size: var(--lp-t-caption);
+  color: var(--lp-text-faint);
   display: block;
   margin-top: 2px;
 }
 
 .pa-check__head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
 }
 
-/* --- Module placeholder --------------------------------------------------- */
+/* Calling setup — a plain list of preparation tasks, not a live dialler. */
+.pa-tasks {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.pa-tasks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  font-size: var(--lp-t-sm);
+  color: var(--lp-text-soft);
+  line-height: 1.5;
+}
+
+.pa-tasks svg {
+  color: var(--lp-blue-mid);
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+/* --- Section placeholder -------------------------------------------------- */
 
 .pa-module {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 14px;
-  padding: clamp(1.5rem, 4vw, 2.5rem);
-  border: 1px solid var(--pa-line);
+  gap: 16px;
+  padding: clamp(1.75rem, 4vw, 2.75rem);
+  border: 1px solid var(--lp-line);
   border-radius: var(--pa-r-lg);
   background: var(--pa-surface);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  max-width: 640px;
 }
 
 .pa-module__icon {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: var(--pa-r-md);
   display: grid;
   place-items: center;
-  background: var(--pa-sunken);
-  color: var(--pa-ink-soft);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--lp-line);
+  color: var(--lp-text-soft);
 }
 
 .pa-module__list {
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   padding-left: 18px;
-  color: var(--pa-ink-soft);
-  font-size: 0.875rem;
-  line-height: 1.75;
+  color: var(--lp-text-soft);
+  font-size: var(--lp-t-sm);
+  line-height: 1.8;
+}
+
+.pa-module__list::marker {
+  color: var(--lp-blue-mid);
 }
 
 /* ==========================================================================
@@ -1371,11 +1412,12 @@
   .pa-side {
     position: fixed;
     inset: 0 auto 0 0;
-    width: 264px;
+    width: 272px;
     z-index: 40;
     transform: translateX(-100%);
-    transition: transform 0.3s var(--pa-ease);
-    box-shadow: 0 0 40px rgba(7, 11, 28, 0.16);
+    transition: transform 0.35s var(--lp-ease);
+    background: rgba(1, 3, 15, 0.96);
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.6);
   }
 
   .pa-side[data-open='true'] {
@@ -1390,9 +1432,16 @@
     position: fixed;
     inset: 0;
     z-index: 35;
-    background: rgba(7, 11, 28, 0.4);
+    background: rgba(1, 3, 15, 0.72);
+    backdrop-filter: blur(4px);
     border: none;
     cursor: pointer;
+  }
+}
+
+@media (max-width: 640px) {
+  .pa-credits {
+    display: none;
   }
 }
 
@@ -1413,6 +1462,10 @@
   .pa-actions__right .pa-btn {
     flex: 1;
   }
+
+  .pa-onboard__later span {
+    display: none;
+  }
 }
 
 /* ==========================================================================
@@ -1429,7 +1482,7 @@
   }
 
   /* The reveal animates a grid track; collapsing the duration alone would
-     still animate. Snap it instead. */
+     still animate it. Snap instead. */
   .pa-reveal {
     transition: none;
   }
