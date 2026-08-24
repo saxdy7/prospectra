@@ -1,61 +1,48 @@
 # Isometric icon assets
 
-This directory holds locally stored isometric icons used as accents in
-onboarding and the workspace. **It is currently empty**, and the UI runs on
-Lucide fallbacks until approved assets are added.
+Locally stored isometric icons used as small accents in onboarding and the
+workspace. **This directory is currently empty** — the UI runs on Lucide
+fallbacks until approved assets are added here.
 
 ## Why it is empty
 
-The request was for BnbIcons (https://bnbicons.com) artwork. Two blockers:
+The request was for BnbIcons (https://bnbicons.com) artwork. Two blockers,
+checked 2026-08-24:
 
-**1. No verifiable licence.** As checked on 2026-08-24:
-
-| Page | Result |
-|---|---|
-| `bnbicons.com` | No licence terms stated |
-| `bnbicons.com/pricing` | Credit tiers only; no licence terms |
-| `bnbicons.com/terms` | 404 |
-| `bnbicons.com/license` | 404 |
-
-A search snippet claimed "CC BY 4.0 with attribution". The article it came
-from does not say that — it makes an uncited "Commercial License Included"
-marketing claim. Treat the CC BY 4.0 figure as unverified.
+**1. No verifiable licence.** `bnbicons.com` states no licence terms;
+`/terms` and `/license` both 404; the pricing page lists credit tiers only.
+A search snippet claimed "CC BY 4.0" — the article it came from does not say
+that and cites no source. Treat that figure as unverified.
 
 **2. No acquisition path.** BnbIcons is a credit-based AI generation service.
-Assets require an account plus paid credits ($6 / $12 tiers), or credits
-earned by posting on social media. None of that can be done on the project's
-behalf without an owner deciding to.
+Assets require an account plus paid credits ($6 / $12), or credits earned by
+posting on social media — none of which can be done on the project's behalf.
 
-Shipping the artwork under these conditions would mean shipping images with
-no established right to use them.
+Shipping the artwork under these conditions would mean shipping images with no
+established right to use them.
 
-## What is needed to enable them
+## To enable them later
 
-1. Obtain the licence terms in writing, or pick an alternative source with a
-   clear licence (e.g. a CC0 / MIT isometric set).
-2. Confirm the licence permits use in a commercial product, and note any
-   attribution requirement — if attribution is required, add it to the site
-   footer before shipping.
-3. Save each file here using the exact filename from the manifest below.
-4. In `src/lib/icons/registry.ts`, set `asset: '/icons/bnb/<file>'` on the
-   matching entry.
-
-No code changes are needed beyond step 4. `IconIllustration` picks the asset
-up automatically, and any file that fails to load falls back to Lucide.
+1. Obtain the licence in writing, or choose a source with a clear licence
+   (e.g. a CC0 / MIT isometric set). If attribution is required, add it to the
+   site footer before shipping.
+2. Save each file here using the exact filename from the manifest below.
+3. In `src/lib/icons/registry.ts`, set `asset: '/icons/bnb/<file>'` on the
+   matching entry. No other code changes — `IconIllustration` picks it up, and
+   any file that fails to load falls back to Lucide at runtime.
 
 ## Format
 
-- PNG or WebP, square, 128×128 or 256×256, transparent background
-- Must read clearly on the dark navy surface (`#01030f`) — avoid dark outlines
-  that disappear against it
-- Keep files small; these render at 26–46px
+PNG or WebP, square, 128×128 or 256×256, transparent background. Must read on
+a light surface (`#f4f6fb`) — the frame is a soft blue well, so mid-tone
+isometric art with its own colour works best. Rendered at 24–46px.
 
 ## Manifest
 
-Generated from `src/lib/icons/registry.ts`. Every entry below is still on its
-Lucide fallback.
+Generated from `src/lib/icons/registry.ts`. Every entry is on its Lucide
+fallback.
 
-| Registry key | File to add | Depicts | Current fallback |
+| Registry key | File to add | Depicts | Fallback |
 |---|---|---|---|
 | `goal-local-business` | `goal-local-business.png` | Isometric map pin over a small storefront | `MapPin` |
 | `goal-company-list` | `goal-company-list.png` | Isometric office building | `Building2` |

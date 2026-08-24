@@ -16,12 +16,18 @@ const buttonVariants = cva(
           'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
         secondary: 'bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80',
         ghost: 'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
-        link: 'text-primary underline-offset-4 hover:underline'
+        link: 'text-primary underline-offset-4 hover:underline',
+        /* The "graded" house button — the landing-page treatment ported to the
+           product surface: brand gradient fill, an inset top gloss and a soft
+           blue drop-glow that lifts on hover. */
+        brand:
+          'text-white bg-gradient-to-b from-brand-lift to-brand-deep rounded-full shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_10px_28px_-10px_rgba(40,95,255,0.65)] hover:-translate-y-0.5 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.34),0_16px_36px_-12px_rgba(40,95,255,0.8)]'
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',
         sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
         lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
+        xl: 'h-12 rounded-full px-7 text-[0.95rem] has-[>svg]:px-5',
         icon: 'size-9'
       }
     },

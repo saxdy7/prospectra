@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Check, Clock } from 'lucide-react';
 import { BRAND } from '../landing/brand';
-import { GradientField, Logomark } from '../landing/primitives';
+import { Logomark } from '../landing/primitives';
 import { OnboardingProgress } from './OnboardingProgress';
 import type { StepMeta } from '@/lib/onboarding/config';
 import '../landing/landing.css';
@@ -29,9 +29,9 @@ export function OnboardingShell({
   return (
     <div className="lp pa">
       <div className="pa-onboard">
-        {/* The same background treatment as the hero and the auth showcase:
-            gradient field, mono grain, and a horizon bloom at the foot. */}
-        <GradientField style={{ opacity: 0.32 }} />
+        {/* A restrained blue bloom at the foot — the light surface's only
+            ambient treatment. No dark gradient field here; that belongs to
+            the landing page, not the product's light workspace. */}
         <span className="pa-onboard__bloom" aria-hidden="true" />
 
         <header className="pa-onboard__bar">

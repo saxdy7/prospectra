@@ -4,25 +4,46 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --radius: 0.75rem;
+
+  /* Surfaces stay a calm near-white paper. */
+  --background: #f5f7fc;
+  --foreground: #070b1c;
+  --card: #ffffff;
+  --card-foreground: #070b1c;
+  --popover: #ffffff;
+  --popover-foreground: #070b1c;
+
+  /* Primary is Prospectra electric blue, not shadcn's default near-black —
+     so every shadcn component (Button, Badge, ring, …) is on-brand for free. */
+  --primary: #285fff;
+  --primary-foreground: #ffffff;
+
+  --secondary: #eef1fb;
+  --secondary-foreground: #1a2545;
+  --muted: #eef1fb;
+  --muted-foreground: #6a7592;
+  --accent: #e8eeff;
+  --accent-foreground: #1a3ecc;
+  --destructive: #c8324b;
+  --border: rgba(7, 11, 28, 0.08);
+  --input: rgba(7, 11, 28, 0.12);
+  --ring: #6d92ff;
+
+  /* Brand ramp — shared with the landing gradient. Drives the graded button
+     and the isometric icon frames. */
+  --brand: #285fff;
+  --brand-deep: #004fff;
+  --brand-lift: #4d7bff;
+  --brand-mid: #8aa8ff;
+  --brand-pale: #b6c9ff;
+  --brand-ink: #1a3ecc;
+
+  --chart-1: #285fff;
+  --chart-2: #6d92ff;
+  --chart-3: #b6c9ff;
+  --chart-4: #1a3ecc;
+  --chart-5: #8aa8ff;
 }
 
 .dark {
@@ -65,6 +86,19 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-brand: var(--brand);
+  --color-brand-deep: var(--brand-deep);
+  --color-brand-lift: var(--brand-lift);
+  --color-brand-mid: var(--brand-mid);
+  --color-brand-pale: var(--brand-pale);
+  --color-brand-ink: var(--brand-ink);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-plus-jakarta), var(--font-inter), sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

@@ -17,7 +17,9 @@ import {
   wantsCalling
 } from '@/lib/onboarding/config';
 import { nextStepFor, setupSummary, initialChecklistDone } from '@/lib/onboarding/plan';
-import { workspaceStore } from '@/lib/onboarding/storage';
+import { workspaceStore, readForOwner } from '@/lib/onboarding/storage';
+import { currentUser } from '@/lib/onboarding/session';
+import { syncWorkspaceToSupabase } from '@/lib/onboarding/supabaseSync';
 import {
   emptyWorkspaceState,
   type CallingInterest,
@@ -48,6 +50,9 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
   const [hydrated, setHydrated] = useState(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const savedTimer = useRef<number | undefined>(undefined);
+  /* The user this flow belongs to, resolved once on mount. Every write stamps
+     it, so the saved blob can be reconciled against whoever logs in next. */
+  const ownerRef = useRef<string | null>(null);
 
   /* ---------------------------------------------------------------------
      Hydration. Reading localStorage during render would make the server and
@@ -57,7 +62,15 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
   useEffect(() => {
     let cancelled = false;
 
-    workspaceStore.read().then((state) => {
+    (async () => {
+      const user = await currentUser();
+      if (cancelled) return;
+      ownerRef.current = user?.id ?? null;
+
+      /* Load only state that belongs to this user. A blob left by a different
+         (or deleted) account is discarded here, so they start clean rather
+         than inheriting someone else's workspace. */
+      const state = await readForOwner(user?.id ?? null);
       if (cancelled) return;
 
       /* Setup is already finished. Send them to the workspace instead of
@@ -72,12 +85,17 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
       if (state) {
         setData(state.onboarding);
         setStep(Math.min(state.onboardingStep, STEPS.length - 1));
-      } else if (suggestedName) {
-        setData((d) => ({ ...d, workspaceName: defaultWorkspaceName(suggestedName) }));
+      } else {
+        /* Fresh flow — prefill the workspace name from the account name, or
+           the server-provided hint if there is no session yet. */
+        const hint = user?.name ?? suggestedName;
+        if (hint) {
+          setData((d) => ({ ...d, workspaceName: defaultWorkspaceName(hint) }));
+        }
       }
 
       setHydrated(true);
-    });
+    })();
 
     return () => {
       cancelled = true;
@@ -97,7 +115,12 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
       .read()
       .then((existing) => {
         const base = existing ?? emptyWorkspaceState();
-        return workspaceStore.write({ ...base, onboarding: data, onboardingStep: step });
+        return workspaceStore.write({
+          ...base,
+          ownerId: ownerRef.current ?? base.ownerId,
+          onboarding: data,
+          onboardingStep: step
+        });
       })
       .then(() => {
         if (cancelled) return;
@@ -171,12 +194,22 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
     const completed: OnboardingData = { ...data, completedAt: new Date().toISOString() };
     const existing = (await workspaceStore.read()) ?? emptyWorkspaceState();
 
-    await workspaceStore.write({
+    const finalState = {
       ...existing,
+      ownerId: ownerRef.current ?? existing.ownerId,
       onboarding: completed,
+      onboardingStep: STEPS.length,
       /* Seed the checklist with what setup genuinely achieved. */
       checklistDone: { ...initialChecklistDone(completed), ...existing.checklistDone }
-    });
+    };
+
+    await workspaceStore.write(finalState);
+
+    /* Push the finished record to Supabase for the signed-in user. Fire and
+       forget: localStorage already holds the answers, so the UI must not wait
+       on — or fail because of — a network call. If there is no session the
+       sync no-ops and the data stays local. */
+    void syncWorkspaceToSupabase(finalState).catch(() => {});
 
     setData(completed);
     setStep(DONE);

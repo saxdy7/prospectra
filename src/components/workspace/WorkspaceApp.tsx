@@ -2,14 +2,18 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowRight, Circle, Menu, Sparkles } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Check, Menu, Sparkles, X } from 'lucide-react';
 import { AppSidebar, NAV } from './AppSidebar';
-import { SetupChecklist } from './SetupChecklist';
-import { GradientField } from '../landing/primitives';
 import { IconFrame } from './IconIllustration';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Progress } from '@/components/ui/progress';
 import type { IconName } from '@/lib/icons/registry';
 import { callingTasksFor, checklistFor, nextStepFor } from '@/lib/onboarding/plan';
-import { workspaceStore } from '@/lib/onboarding/storage';
+import { workspaceStore, readForOwner } from '@/lib/onboarding/storage';
+import { currentUser } from '@/lib/onboarding/session';
 import { GOALS } from '@/lib/onboarding/config';
 import type { WorkspaceState } from '@/lib/onboarding/types';
 import '../landing/landing.css';
@@ -88,42 +92,12 @@ const QUICK_ACTIONS: {
   hint: string;
   section: string;
 }[] = [
-  {
-    icon: 'action-find-leads',
-    label: 'Find leads',
-    hint: 'Search the map or a B2B database',
-    section: 'find-leads'
-  },
-  {
-    icon: 'action-import-data',
-    label: 'Import data',
-    hint: 'Bring a CSV you already keep',
-    section: 'tables'
-  },
-  {
-    icon: 'action-build-table',
-    label: 'Build a table',
-    hint: 'Start from an empty grid',
-    section: 'tables'
-  },
-  {
-    icon: 'action-enrich-contacts',
-    label: 'Enrich contacts',
-    hint: 'Fill the gaps across every row',
-    section: 'tables'
-  },
-  {
-    icon: 'action-campaign-draft',
-    label: 'Create campaign draft',
-    hint: 'Sketch an audience and a first message',
-    section: 'campaigns'
-  },
-  {
-    icon: 'action-voice-draft',
-    label: 'Create voice-agent draft',
-    hint: 'Write the role and opening line',
-    section: 'voice'
-  }
+  { icon: 'action-find-leads', label: 'Find leads', hint: 'Search the map or a database', section: 'find-leads' },
+  { icon: 'action-import-data', label: 'Import data', hint: 'Bring a CSV you already keep', section: 'tables' },
+  { icon: 'action-build-table', label: 'Build a table', hint: 'Start from an empty grid', section: 'tables' },
+  { icon: 'action-enrich-contacts', label: 'Enrich contacts', hint: 'Fill the gaps across every row', section: 'tables' },
+  { icon: 'action-campaign-draft', label: 'Create campaign draft', hint: 'Sketch an audience and a message', section: 'campaigns' },
+  { icon: 'action-voice-draft', label: 'Create voice-agent draft', hint: 'Write the role and opening line', section: 'voice' }
 ];
 
 /** One larger illustration per section empty state. */
@@ -157,11 +131,23 @@ export function WorkspaceApp() {
   useEffect(() => {
     let cancelled = false;
 
-    workspaceStore.read().then((saved) => {
+    (async () => {
+      const user = await currentUser();
       if (cancelled) return;
 
-      /* No completed setup means this person has not been through onboarding.
-         Send them there rather than showing an empty workspace. */
+      /* The workspace is a signed-in surface. Without a session there is no
+         owner to scope the data to, so send them to sign in. */
+      if (!user) {
+        router.replace('/signin');
+        return;
+      }
+
+      /* Load only this user's state. A blob owned by a different or deleted
+         account is discarded by readForOwner, which then reads as "no
+         completed setup" and routes to a fresh onboarding. */
+      const saved = await readForOwner(user.id);
+      if (cancelled) return;
+
       if (!saved || !saved.onboarding.completedAt) {
         router.replace('/onboarding');
         return;
@@ -169,7 +155,7 @@ export function WorkspaceApp() {
 
       setState(saved);
       setHydrated(true);
-    });
+    })();
 
     return () => {
       cancelled = true;
@@ -202,14 +188,36 @@ export function WorkspaceApp() {
   const goal = GOALS.find((g) => g.id === onboarding.goal);
   const activeNav = NAV.find((n) => n.id === section);
   const firstName = onboarding.workspaceName.trim() || 'your workspace';
+  const initial = firstName.charAt(0).toUpperCase();
+
+  const setupTotal = items.length;
+  const setupDone = items.filter((i) => checklistDone[i.id]).length;
+  const setupPct = setupTotal ? Math.round((setupDone / setupTotal) * 100) : 0;
+
+  /* Honest first-run figures — a brand-new workspace genuinely has nothing run
+     yet, so these read as zero rather than inventing activity. */
+  const STATS: { icon: IconName; value: string; label: string; sub: string; badge?: string }[] =
+    [
+      { icon: 'action-build-table', value: '0', label: 'Tables', sub: 'None created yet' },
+      { icon: 'action-enrich-contacts', value: '0', label: 'Rows enriched', sub: 'Nothing run yet' },
+      {
+        icon: 'prep-verify',
+        value: String(onboarding.prepare.length),
+        label: 'Enrichments queued',
+        sub: 'Ready for your first table'
+      },
+      {
+        icon: 'next-step',
+        value: `${setupDone}/${setupTotal}`,
+        label: 'Setup steps',
+        sub: 'Complete',
+        badge: 'Demo'
+      }
+    ];
 
   return (
     <div className="lp pa">
       <div className="pa-app">
-        {/* The same ambient field as the rest of the product, held well back
-            so it lights the shell without competing with the content. */}
-        <GradientField style={{ opacity: 0.16 }} />
-
         {menuOpen && (
           <button
             className="pa-scrim"
@@ -254,124 +262,248 @@ export function WorkspaceApp() {
 
           <main className="pa-content">
             {section === 'home' ? (
-              <>
-                <h2 className="pa-title">Welcome to {firstName}.</h2>
-                <p className="pa-lede" style={{ marginTop: 12 }}>
-                  {goal
-                    ? `Set up to ${goal.label.toLowerCase()}. Here is the shortest path to something useful.`
-                    : 'Here is the shortest path to something useful.'}
-                </p>
-
-                {/* ---------- Recommended next step ---------- */}
-                <section
-                  className="pa-panel pa-panel--next"
-                  style={{ marginTop: 26 }}
-                  aria-labelledby="next-heading"
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <IconFrame name="next-step" size={38} />
-                    <p className="pa-micro">Recommended next step</p>
-                  </div>
-                  <h3 className="pa-h3" id="next-heading" style={{ marginTop: 14 }}>
-                    {recommended.cta}
-                  </h3>
-                  <p className="pa-lede" style={{ marginTop: 8 }}>
-                    {recommended.why}
+              <div className="flex flex-col gap-6">
+                {/* ---------- Greeting ---------- */}
+                <div>
+                  <h2 className="font-display text-2xl font-extrabold tracking-tight sm:text-3xl">
+                    Welcome to {firstName}.
+                  </h2>
+                  <p className="mt-1.5 text-sm text-muted-foreground">
+                    {goal
+                      ? `Set up to ${goal.label.toLowerCase()}. Here is the shortest path to something useful.`
+                      : 'Here is the shortest path to something useful.'}
                   </p>
-                  <button
-                    type="button"
-                    className="pa-btn"
-                    style={{ marginTop: 18 }}
-                    onClick={() => setSection(recommended.section)}
-                  >
-                    {recommended.cta}
-                    <ArrowRight size={15} strokeWidth={2.2} />
-                  </button>
-                </section>
+                </div>
 
-                <h3 className="pa-micro" style={{ marginTop: 34 }}>
-                  Quick actions
-                </h3>
-                <div className="pa-quick">
-                  {QUICK_ACTIONS.map((a) => (
-                    <button
-                      key={a.label}
-                      type="button"
-                      className="pa-quick__item"
-                      onClick={() => setSection(a.section)}
+                {/* ---------- Hero banner: the recommended next step ---------- */}
+                <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-brand-lift via-brand to-brand-deep text-white">
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -right-16 -top-20 size-64 rounded-full bg-white/15 blur-2xl"
+                  />
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute right-8 top-8 hidden text-white/25 sm:block"
+                  >
+                    <Sparkles className="size-24" strokeWidth={1} />
+                  </span>
+                  <CardContent className="relative flex flex-col gap-4 py-7">
+                    <Badge className="w-fit border-white/25 bg-white/15 text-white">
+                      Recommended next step
+                    </Badge>
+                    <div className="max-w-xl">
+                      <h3 className="font-display text-2xl font-extrabold tracking-tight">
+                        {recommended.cta}
+                      </h3>
+                      <p className="mt-2 text-sm leading-relaxed text-white/80">
+                        {recommended.why}
+                      </p>
+                    </div>
+                    <Button
+                      className="w-fit rounded-full bg-white font-semibold text-brand shadow-sm hover:bg-white/90"
+                      size="lg"
+                      onClick={() => setSection(recommended.section)}
                     >
-                      <IconFrame name={a.icon} size={38} />
-                      <span className="pa-quick__text">
-                        <span className="pa-quick__label">{a.label}</span>
-                        <span className="pa-quick__hint">{a.hint}</span>
-                      </span>
-                    </button>
+                      {recommended.cta}
+                      <ArrowRight className="size-4" />
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* ---------- Stat row ---------- */}
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  {STATS.map((s) => (
+                    <Card key={s.label}>
+                      <CardContent className="py-4">
+                        <div className="flex items-center justify-between">
+                          <IconFrame name={s.icon} size={40} />
+                          {s.badge && <Badge variant="muted">{s.badge}</Badge>}
+                        </div>
+                        <div className="mt-3 font-display text-2xl font-extrabold tabular-nums">
+                          {s.value}
+                        </div>
+                        <div className="text-sm font-medium">{s.label}</div>
+                        <div className="mt-0.5 text-xs text-muted-foreground">{s.sub}</div>
+                      </CardContent>
+                    </Card>
                   ))}
                 </div>
 
-                <div className="pa-grid pa-grid--two">
-                  {!checklistDismissed && (
-                    <SetupChecklist
-                      items={items}
-                      done={checklistDone}
-                      onToggle={(id) =>
-                        persist({
-                          ...state,
-                          checklistDone: { ...checklistDone, [id]: !checklistDone[id] }
-                        })
-                      }
-                      onDismiss={() => persist({ ...state, checklistDismissed: true })}
-                    />
-                  )}
-
-                  {/* ---------- Calling setup, only where asked for ---------- */}
-                  {callingTasks.length > 0 && (
-                    <section className="pa-panel" aria-labelledby="calling-heading">
-                      <p className="pa-micro">Calling setup · in development</p>
-                      <h3 className="pa-h3" id="calling-heading" style={{ marginTop: 10 }}>
-                        Prepare your first calling workflow
-                      </h3>
-                      <p className="pa-lede" style={{ marginTop: 8 }}>
-                        Telephony is not connected yet. What you can do now is get the
-                        pieces ready, so the first call is a short step rather than a
-                        project.
-                      </p>
-
-                      <ul className="pa-tasks">
-                        {callingTasks.map((t) => (
-                          <li key={t.id}>
-                            <Circle size={7} strokeWidth={3} fill="currentColor" />
-                            <span>
-                              {t.label}
-                              <span
-                                style={{
-                                  display: 'block',
-                                  color: 'var(--lp-text-faint)',
-                                  fontSize: 'var(--lp-t-caption)',
-                                  marginTop: 2
-                                }}
-                              >
-                                {t.hint}
+                {/* ---------- Main + right rail ---------- */}
+                <div className="grid gap-6 lg:grid-cols-3">
+                  {/* Left */}
+                  <div className="flex flex-col gap-6 lg:col-span-2">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base">Quick actions</CardTitle>
+                        <span className="text-xs text-muted-foreground">Jump in</span>
+                      </CardHeader>
+                      <CardContent className="pt-3">
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          {QUICK_ACTIONS.map((a) => (
+                            <button
+                              key={a.label}
+                              type="button"
+                              onClick={() => setSection(a.section)}
+                              className="group flex items-center gap-3 rounded-xl border border-border/70 bg-card p-3 text-left transition hover:-translate-y-0.5 hover:border-brand/40 hover:bg-accent/40"
+                            >
+                              <IconFrame name={a.icon} size={42} />
+                              <span className="min-w-0 flex-1">
+                                <span className="block text-sm font-semibold leading-snug">
+                                  {a.label}
+                                </span>
+                                <span className="block text-xs text-muted-foreground">
+                                  {a.hint}
+                                </span>
                               </span>
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </section>
-                  )}
-                </div>
+                              <ArrowUpRight className="size-4 shrink-0 text-muted-foreground/40 transition group-hover:text-brand" />
+                            </button>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
 
-                {checklistDismissed && (
-                  <button
-                    type="button"
-                    className="pa-btn pa-btn--ghost"
-                    style={{ marginTop: 20 }}
-                    onClick={() => persist({ ...state, checklistDismissed: false })}
-                  >
-                    Show setup checklist
-                  </button>
-                )}
-              </>
+                    {/* Setup checklist */}
+                    {!checklistDismissed && (
+                      <Card>
+                        <CardHeader>
+                          <div>
+                            <CardTitle className="text-base">Finish setting up</CardTitle>
+                            <p className="mt-0.5 text-xs text-muted-foreground">
+                              {setupDone === setupTotal
+                                ? 'That is everything — nothing left on the list.'
+                                : `${setupDone} of ${setupTotal} done`}
+                            </p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            aria-label="Hide the setup checklist"
+                            onClick={() => persist({ ...state, checklistDismissed: true })}
+                          >
+                            <X className="size-4" />
+                          </Button>
+                        </CardHeader>
+                        <CardContent className="pt-2">
+                          <ul className="flex flex-col">
+                            {items.map((item) => {
+                              const isDone = Boolean(checklistDone[item.id]);
+                              return (
+                                <li key={item.id}>
+                                  <label className="flex cursor-pointer items-start gap-3 rounded-lg p-2.5 transition hover:bg-accent/40">
+                                    <input
+                                      type="checkbox"
+                                      className="peer sr-only"
+                                      checked={isDone}
+                                      onChange={() =>
+                                        persist({
+                                          ...state,
+                                          checklistDone: {
+                                            ...checklistDone,
+                                            [item.id]: !isDone
+                                          }
+                                        })
+                                      }
+                                    />
+                                    <span className="mt-0.5 grid size-[18px] shrink-0 place-items-center rounded-md border border-input text-white transition peer-checked:border-brand peer-checked:bg-brand peer-focus-visible:ring-2 peer-focus-visible:ring-ring">
+                                      {isDone && <Check className="size-3" strokeWidth={3.4} />}
+                                    </span>
+                                    <span>
+                                      <span
+                                        className={
+                                          'block text-sm font-medium ' +
+                                          (isDone
+                                            ? 'text-muted-foreground line-through'
+                                            : '')
+                                        }
+                                      >
+                                        {item.label}
+                                      </span>
+                                      <span className="block text-xs text-muted-foreground">
+                                        {item.hint}
+                                      </span>
+                                    </span>
+                                  </label>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
+
+                  {/* Right rail */}
+                  <div className="flex flex-col gap-6">
+                    {/* Workspace statistic */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base">Your workspace</CardTitle>
+                      </CardHeader>
+                      <CardContent className="flex flex-col items-center pt-2 text-center">
+                        <div
+                          className="grid size-[76px] place-items-center rounded-full"
+                          style={{
+                            background: `conic-gradient(var(--brand) ${setupPct}%, var(--secondary) 0)`
+                          }}
+                        >
+                          <Avatar className="size-16 ring-4 ring-card">
+                            <AvatarFallback className="text-lg">{initial}</AvatarFallback>
+                          </Avatar>
+                        </div>
+                        <div className="mt-3 font-display font-bold">{firstName}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {!onboarding.teamSize || onboarding.teamSize === 'solo'
+                            ? 'Personal workspace'
+                            : `Team · ${onboarding.teamSize}`}
+                        </div>
+                        <Progress value={setupPct} className="mt-4" />
+                        <div className="mt-2 text-xs text-muted-foreground">
+                          {setupDone} of {setupTotal} setup steps complete
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Calling setup — only where asked for */}
+                    {callingTasks.length > 0 && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-base">Calling setup</CardTitle>
+                          <Badge variant="soft">In development</Badge>
+                        </CardHeader>
+                        <CardContent className="pt-2">
+                          <p className="text-sm text-muted-foreground">
+                            Telephony is not connected yet — get the pieces ready so the
+                            first call is a short step, not a project.
+                          </p>
+                          <ul className="mt-4 flex flex-col gap-3">
+                            {callingTasks.map((t) => (
+                              <li key={t.id} className="flex items-start gap-2.5">
+                                <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand" />
+                                <span>
+                                  <span className="block text-sm">{t.label}</span>
+                                  <span className="block text-xs text-muted-foreground">
+                                    {t.hint}
+                                  </span>
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {checklistDismissed && (
+                      <Button
+                        variant="outline"
+                        onClick={() => persist({ ...state, checklistDismissed: false })}
+                      >
+                        Show setup checklist
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
             ) : (
               <SectionPanel id={section} />
             )}
@@ -393,27 +525,25 @@ function SectionPanel({ id }: { id: string }) {
   if (!nav || !copy) return null;
 
   return (
-    <section className="pa-module">
-      {/* The one large illustration this region is allowed. */}
-      <IconFrame name={SECTION_ICON[id] ?? 'next-step'} size={64} tone="large" />
-
-      <div>
-        <span className="pa-tag">Coming soon</span>
-        <h2 className="pa-title" style={{ fontSize: '1.625rem', marginTop: 12 }}>
-          {nav.label}
-        </h2>
-        <p className="pa-lede" style={{ marginTop: 10 }}>
-          {copy.blurb}
-        </p>
-        <p className="pa-micro" style={{ marginTop: 22 }}>
+    <Card className="max-w-2xl">
+      <CardContent className="flex flex-col items-start gap-4 py-8">
+        {/* The one large illustration this region is allowed. */}
+        <IconFrame name={SECTION_ICON[id] ?? 'next-step'} size={64} tone="lg" />
+        <Badge variant="soft">Coming soon</Badge>
+        <h2 className="font-display text-2xl font-extrabold tracking-tight">{nav.label}</h2>
+        <p className="text-sm leading-relaxed text-muted-foreground">{copy.blurb}</p>
+        <p className="mt-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           What it will do
         </p>
-        <ul className="pa-module__list">
+        <ul className="flex flex-col gap-2">
           {copy.bullets.map((b) => (
-            <li key={b}>{b}</li>
+            <li key={b} className="flex items-start gap-2.5 text-sm text-muted-foreground">
+              <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand" />
+              {b}
+            </li>
           ))}
         </ul>
-      </div>
-    </section>
+      </CardContent>
+    </Card>
   );
 }

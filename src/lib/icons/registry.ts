@@ -36,9 +36,9 @@ import type { LucideIcon } from 'lucide-react';
  * ## Current state: no BnbIcons assets are present
  *
  * Every `asset` below is intentionally undefined, so the UI renders the Lucide
- * fallback. That is not a placeholder oversight — it is the licensing position:
+ * fallback. That is not an oversight — it is the licensing position:
  *
- *   · bnbicons.com publishes no license terms. `/terms` and `/license` both
+ *   · bnbicons.com publishes no licence terms. `/terms` and `/license` both
  *     return 404, and neither the homepage nor the pricing page states what
  *     rights a generated icon carries.
  *   · It is a credit-based AI generation service, so assets cannot be obtained

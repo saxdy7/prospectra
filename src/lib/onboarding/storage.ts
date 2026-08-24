@@ -47,6 +47,7 @@ function reviveState(raw: unknown): WorkspaceState | null {
   const base = emptyWorkspaceState();
 
   return {
+    ownerId: typeof candidate.ownerId === 'string' ? candidate.ownerId : null,
     onboarding: {
       ...base.onboarding,
       ...onboarding,
@@ -122,3 +123,49 @@ export const localWorkspaceStore: WorkspaceStore = {
 
 /** The single instance the app talks to. Swap this to change backends. */
 export const workspaceStore: WorkspaceStore = localWorkspaceStore;
+
+/**
+ * Load the stored state only if it belongs to the current user.
+ *
+ * This is the reconciliation that keeps one account's onboarding from bleeding
+ * into another's on a shared browser — and, specifically, that makes a deleted
+ * or recreated account start onboarding clean instead of inheriting the old
+ * blob. localStorage is one bucket per browser, so ownership has to be checked
+ * on read, not assumed.
+ *
+ * Rules:
+ *   · stored owner matches the current user  → return it (resume / show app).
+ *   · stored owner is null (captured pre-auth) → claim it for this user and
+ *     return it, so answers entered right after signup are not lost.
+ *   · stored owner is a *different* user       → discard it and return null,
+ *     so the newcomer gets a fresh flow.
+ *
+ * Passing `userId: null` (no session) returns any anon-owned state as-is and
+ * leaves other-owned state untouched — an anonymous visitor should not wipe a
+ * signed-in user's saved workspace.
+ */
+export async function readForOwner(userId: string | null): Promise<WorkspaceState | null> {
+  const state = await workspaceStore.read();
+  if (!state) return null;
+
+  if (state.ownerId === null) {
+    if (userId) {
+      const claimed = { ...state, ownerId: userId };
+      await workspaceStore.write(claimed);
+      return claimed;
+    }
+    return state;
+  }
+
+  if (userId && state.ownerId === userId) return state;
+
+  if (userId && state.ownerId !== userId) {
+    // A different account owns this browser's blob. Clear it so the current
+    // user does not see someone else's workspace.
+    await workspaceStore.clear();
+    return null;
+  }
+
+  // No session, but the blob belongs to some user — leave it, do not surface it.
+  return null;
+}

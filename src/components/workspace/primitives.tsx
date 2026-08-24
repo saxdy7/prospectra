@@ -47,8 +47,8 @@ export function ChoiceCard<T extends string>({
 
       {icon && (
         <span className="pa-choice__icon" aria-hidden="true">
-          {/* Decorative: the label beside it already states the meaning. */}
-          <IconIllustration name={icon} size={26} decorative />
+          {/* Decorative — the label beside it already states the meaning. */}
+          <IconIllustration name={icon} size={24} decorative />
         </span>
       )}
 
@@ -96,8 +96,8 @@ export function MultiSelectChoice<T extends string>({
 
       {icon && (
         <span className="pa-choice__icon" aria-hidden="true">
-          {/* Decorative: the label beside it already states the meaning. */}
-          <IconIllustration name={icon} size={26} decorative />
+          {/* Decorative — the label beside it already states the meaning. */}
+          <IconIllustration name={icon} size={24} decorative />
         </span>
       )}
 

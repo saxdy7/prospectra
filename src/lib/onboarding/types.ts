@@ -103,6 +103,19 @@ export interface ChecklistItem {
 
 /** Everything the workspace persists between visits. */
 export interface WorkspaceState {
+  /**
+   * The Supabase user id this local state belongs to.
+   *
+   * localStorage is a single bucket per browser, not per account — so without
+   * this, one person's onboarding would greet the next person who logs in on
+   * the same machine (or the same person after their account was deleted and
+   * recreated). Read time reconciles: if this does not match the current
+   * session's user, the stale state is discarded and onboarding starts clean.
+   *
+   * `null` means it was captured before sign-in (e.g. the project requires
+   * email confirmation), and gets claimed by the first user who owns it.
+   */
+  ownerId: string | null;
   onboarding: OnboardingData;
   /**
    * Which step to resume on. Stored rather than derived, because the last two
@@ -128,6 +141,7 @@ export function emptyOnboarding(): OnboardingData {
 
 export function emptyWorkspaceState(): WorkspaceState {
   return {
+    ownerId: null,
     onboarding: emptyOnboarding(),
     onboardingStep: 0,
     checklistDone: {},

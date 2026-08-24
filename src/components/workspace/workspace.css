@@ -1,21 +1,35 @@
 /* ==========================================================================
-   Prospectra — Workspace surface (onboarding + app shell)
+   Prospectra — Workspace surface (onboarding + app shell) — Light theme
    --------------------------------------------------------------------------
-   Scoped under .lp, the same way auth.css is, so it inherits the landing
-   page's tokens, fluid type scale and primitives (.lp-glass, .lp-btn,
-   GradientField, Noise) rather than redefining a second design system.
-
-   This is the dark Prospectra universe continuing past the sign-up page:
-   the same void background, the same gradient field and grain, the same
-   electric-blue ramp. Nothing here switches to a light admin surface.
+   Scoped under .pa. Overrides .lp tokens so the workspace and onboarding
+   pages use a clean light surface while the landing page keeps its dark
+   void aesthetic. No component files change; only these tokens flip.
    ========================================================================== */
 
 .pa {
-  /* Workspace-only additions. Everything else comes from .lp. */
-  --pa-surface: rgba(255, 255, 255, 0.035);
-  --pa-surface-hover: rgba(255, 255, 255, 0.055);
-  --pa-surface-solid: #070c22;
-  --pa-selected: rgba(40, 95, 255, 0.14);
+  /* --- Override the dark lp tokens with light equivalents --------------- */
+  --lp-void:          #f4f6fb;      /* page background                       */
+  --lp-deep:          #eef0f8;
+  --lp-navy:          #e8ebf5;
+
+  --lp-text:          #0d1526;      /* primary ink                           */
+  --lp-text-soft:     #4b5568;      /* secondary                             */
+  --lp-text-faint:    #9ca3af;      /* muted / placeholder                   */
+
+  --lp-line:          rgba(0, 0, 0, 0.07);
+  --lp-line-strong:   rgba(0, 0, 0, 0.12);
+  --lp-line-ink:      rgba(0, 0, 0, 0.07);
+
+  --lp-glass:         rgba(0, 0, 0, 0.03);
+  --lp-glass-strong:  rgba(0, 0, 0, 0.055);
+
+  /* blue accent is kept — same brand ramp */
+
+  /* --- Workspace-only additions ----------------------------------------- */
+  --pa-surface:       #ffffff;
+  --pa-surface-hover: #f5f7ff;
+  --pa-surface-solid: #ffffff;
+  --pa-selected:      rgba(40, 95, 255, 0.07);
 
   --pa-r-sm: 10px;
   --pa-r-md: 14px;
@@ -46,6 +60,7 @@
   letter-spacing: var(--lp-track-h2);
   line-height: 1.08;
   margin: 0;
+  color: var(--lp-text);
   text-wrap: balance;
 }
 
@@ -94,16 +109,31 @@
 }
 
 @keyframes pa-spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 /* ==========================================================================
-   Buttons — same shape language as .lp-btn, sized for dense product UI
+   Buttons
    ========================================================================== */
 
+/* --- Primary button: the "graded" treatment -------------------------------
+   A port of the reference grading recipe (soft radial glow + coloured inner
+   shadow + blurred drop-glow + a glass gloss edge), rebuilt in the Prospectra
+   blue ramp rather than the reference's orange:
+
+     · gradient FILL         #5c84ff → #285fff → #0b47e6   (the light→saturated
+                             sweep the reference builds with a layer blur)
+     · top gloss highlight   inset white, the glass edge
+     · coloured inner shadow inset deep-blue at the foot, the reference's
+                             "Inner shadow" layer
+     · drop-glow             a soft blue halo, the reference's blurred
+                             "Drop shadow" reading as glow on the light surface
+   The ::after sweep is the glass gloss, sitting above the fill and below the
+   label (isolate + z-index:-1). */
 .pa-btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -112,7 +142,7 @@
   padding: 0 20px;
   border-radius: var(--pa-r-pill);
   border: 1px solid transparent;
-  background: var(--lp-blue-core);
+  background: linear-gradient(135deg, #5c84ff 0%, var(--lp-blue-core) 44%, #0b47e6 100%);
   color: #fff;
   font-family: var(--lp-body);
   font-size: var(--lp-t-sm);
@@ -121,16 +151,35 @@
   cursor: pointer;
   text-decoration: none;
   white-space: nowrap;
-  transition: background-color 0.25s ease, transform 0.3s var(--lp-ease),
-    box-shadow 0.3s var(--lp-ease), opacity 0.2s ease;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset,
-    0 10px 30px -10px rgba(40, 95, 255, 0.7);
+  transition: transform 0.3s var(--lp-ease), box-shadow 0.3s var(--lp-ease),
+    filter 0.25s ease, opacity 0.2s ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -9px 14px -6px rgba(0, 32, 120, 0.5),
+    0 10px 24px -9px rgba(40, 95, 255, 0.55),
+    0 2px 5px -1px rgba(3, 20, 80, 0.3);
+}
+
+.pa-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.42) 0%,
+    rgba(255, 255, 255, 0) 44%
+  );
+  pointer-events: none;
 }
 
 .pa-btn:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.26) inset,
-    0 16px 38px -12px rgba(40, 95, 255, 0.85);
+  filter: saturate(1.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -9px 14px -6px rgba(0, 32, 120, 0.5),
+    0 16px 34px -10px rgba(40, 95, 255, 0.7),
+    0 2px 6px -1px rgba(3, 20, 80, 0.32);
 }
 
 .pa-btn:active:not(:disabled) {
@@ -138,10 +187,18 @@
 }
 
 .pa-btn:disabled {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--lp-text-faint);
+  background: #e5e7eb;
+  color: #9ca3af;
   box-shadow: none;
   cursor: not-allowed;
+}
+
+/* The gloss and grading belong to the primary button only. Ghost and quiet
+   are flat by design, so strip the sheen and the fill from them. */
+.pa-btn:disabled::after,
+.pa-btn--ghost::after,
+.pa-btn--quiet::after {
+  display: none;
 }
 
 .pa-btn--ghost {
@@ -149,12 +206,10 @@
   color: var(--lp-text-soft);
   border-color: var(--lp-line-strong);
   box-shadow: none;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 .pa-btn--ghost:hover:not(:disabled) {
-  background: var(--lp-glass);
+  background: var(--pa-surface-hover);
   color: var(--lp-text);
   box-shadow: none;
 }
@@ -168,7 +223,7 @@
 }
 
 .pa-btn--quiet:hover:not(:disabled) {
-  color: var(--lp-text);
+  color: var(--lp-text-soft);
   background: var(--lp-glass);
 }
 
@@ -184,27 +239,28 @@
   flex-direction: column;
   isolation: isolate;
   overflow-x: clip;
+  background: var(--lp-void);
 }
 
-/* The horizon bloom, same treatment as the hero and auth showcase. */
+/* Subtle accent glow at the bottom — muted on light background */
 .pa-onboard__bloom {
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
-  bottom: -30%;
-  width: min(1400px, 150vw);
-  height: clamp(280px, 40vh, 520px);
+  bottom: -40%;
+  width: min(1200px, 130vw);
+  height: clamp(200px, 30vh, 380px);
   z-index: 0;
   pointer-events: none;
   border-radius: 50%;
   background: radial-gradient(
     ellipse at center 82%,
-    rgba(226, 238, 255, 0.4) 0%,
-    rgba(138, 168, 255, 0.24) 24%,
-    rgba(40, 95, 255, 0.14) 46%,
-    rgba(1, 3, 15, 0) 72%
+    rgba(40, 95, 255, 0.07) 0%,
+    rgba(138, 168, 255, 0.04) 36%,
+    rgba(40, 95, 255, 0.01) 60%,
+    transparent 80%
   );
-  filter: blur(64px);
+  filter: blur(48px);
   will-change: transform, opacity;
 }
 
@@ -215,7 +271,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 22px clamp(1.25rem, 4vw, 2.5rem);
+  padding: 20px clamp(1.25rem, 4vw, 2.5rem);
+  border-bottom: 1px solid var(--lp-line);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .pa-brand {
@@ -250,7 +310,7 @@
 }
 
 .pa-onboard__later:hover {
-  color: var(--lp-text);
+  color: var(--lp-text-soft);
 }
 
 .pa-onboard__saved {
@@ -258,7 +318,7 @@
   align-items: center;
   gap: 6px;
   font-size: var(--lp-t-caption);
-  color: var(--lp-blue-mid);
+  color: var(--lp-blue-core);
   transition: opacity 0.35s ease;
 }
 
@@ -273,7 +333,7 @@
 }
 
 /* ==========================================================================
-   Progress — a thin electric-blue line
+   Progress — a thin blue line
    ========================================================================== */
 
 .pa-progress {
@@ -305,9 +365,9 @@
 }
 
 .pa-progress__track {
-  height: 2px;
+  height: 3px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.08);
   overflow: hidden;
 }
 
@@ -320,7 +380,7 @@
     var(--lp-blue-core) 55%,
     var(--lp-blue-mid)
   );
-  box-shadow: 0 0 12px rgba(40, 95, 255, 0.75);
+  box-shadow: 0 0 8px rgba(40, 95, 255, 0.4);
   transition: width 0.6s var(--lp-ease);
 }
 
@@ -358,10 +418,8 @@
   height: 50px;
   padding: 0 16px;
   border-radius: var(--pa-r-md);
-  border: 1px solid var(--lp-line-strong);
+  border: 1.5px solid var(--lp-line-strong);
   background: var(--pa-surface);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
   font-family: var(--lp-body);
   font-size: var(--lp-t-base);
   color: var(--lp-text);
@@ -377,12 +435,12 @@
 .pa-input:focus {
   outline: none;
   border-color: var(--lp-blue-core);
-  background: var(--pa-surface-hover);
-  box-shadow: 0 0 0 3px rgba(40, 95, 255, 0.22);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(40, 95, 255, 0.12);
 }
 
 .pa-input[aria-invalid='true'] {
-  border-color: #ff8f8f;
+  border-color: #ef4444;
 }
 
 .pa-error {
@@ -390,14 +448,11 @@
   align-items: center;
   gap: 6px;
   font-size: var(--lp-t-caption);
-  color: #ff9c9c;
+  color: #ef4444;
 }
 
 /* ==========================================================================
    Choices
-   Each wraps a real radio/checkbox, so arrow-key navigation, Space and
-   screen-reader semantics come from the platform rather than from
-   re-implemented key handlers. :has() drives the styling off the input.
    ========================================================================== */
 
 .pa-choices {
@@ -419,33 +474,20 @@
   gap: 14px;
   padding: 17px 18px;
   border-radius: var(--pa-r-md);
-  border: 1px solid var(--lp-line);
+  border: 1.5px solid var(--lp-line-strong);
   background: var(--pa-surface);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   cursor: pointer;
   overflow: hidden;
-  transition: border-color 0.25s var(--lp-ease),
-    background-color 0.25s var(--lp-ease), transform 0.25s var(--lp-ease);
-}
-
-/* Specular sheen across the top edge, matching .lp-glass. */
-.pa-choice::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(
-    160deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(255, 255, 255, 0) 34%
-  );
-  pointer-events: none;
+  transition: border-color 0.22s var(--lp-ease),
+    background-color 0.22s var(--lp-ease),
+    box-shadow 0.22s var(--lp-ease),
+    transform 0.22s var(--lp-ease);
 }
 
 .pa-choice:hover {
-  border-color: var(--lp-line-strong);
+  border-color: rgba(40, 95, 255, 0.3);
   background: var(--pa-surface-hover);
+  box-shadow: 0 2px 12px -4px rgba(40, 95, 255, 0.12);
 }
 
 .pa-choice__input {
@@ -457,54 +499,64 @@
   pointer-events: none;
 }
 
-/* Shared frame for every illustrated slot. An isometric asset and a Lucide
-   glyph occupy the same box, so swapping one for the other shifts nothing. */
-.pa-icon,
+/* Icon frame */
 .pa-choice__icon {
   width: 36px;
   height: 36px;
   border-radius: 11px;
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--lp-line);
-  color: var(--lp-text-soft);
+  background: rgba(40, 95, 255, 0.06);
+  border: 1px solid rgba(40, 95, 255, 0.12);
+  color: var(--lp-blue-core);
   flex-shrink: 0;
   position: relative;
   z-index: 1;
   overflow: hidden;
-  transition: background-color 0.25s ease, color 0.25s ease,
-    border-color 0.25s ease, box-shadow 0.25s ease;
+  transition: background-color 0.22s ease, color 0.22s ease,
+    border-color 0.22s ease, box-shadow 0.22s ease;
 }
 
-/* Isometric art carries its own colour, so it sits on the navy well rather
-   than inheriting the glyph treatment. */
-.pa-icon img,
 .pa-choice__icon img {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-/* The larger single illustration a module empty state is allowed. */
-.pa-icon--lg {
-  border-radius: 18px;
-  background: radial-gradient(
-      circle at 50% 20%,
-      rgba(40, 95, 255, 0.22),
-      rgba(255, 255, 255, 0.04) 70%
-    );
-  border-color: rgba(40, 95, 255, 0.28);
-  box-shadow: 0 18px 44px -22px rgba(40, 95, 255, 0.8);
+/* --- Shared icon frame (dashboard) ----------------------------------------
+   Same box whether the slot renders an isometric asset or a Lucide glyph, so
+   swapping one for the other never shifts the layout. */
+.pa-icon {
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: rgba(40, 95, 255, 0.06);
+  border: 1px solid rgba(40, 95, 255, 0.12);
+  color: var(--lp-blue-core);
+  flex-shrink: 0;
+  overflow: hidden;
 }
 
-/* --- Quick actions -------------------------------------------------------- */
+.pa-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 
+/* The single larger illustration a region is allowed — a soft blue well. */
+.pa-icon--lg {
+  border-radius: 18px;
+  background: radial-gradient(circle at 50% 22%, rgba(40, 95, 255, 0.14), #ffffff 72%);
+  border-color: rgba(40, 95, 255, 0.2);
+  box-shadow: 0 12px 30px -16px rgba(40, 95, 255, 0.5);
+}
+
+/* --- Quick actions --------------------------------------------------------- */
 .pa-quick {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(224px, 1fr));
   gap: 12px;
-  margin-top: 18px;
+  margin-top: 16px;
 }
 
 .pa-quick__item {
@@ -513,22 +565,22 @@
   gap: 13px;
   padding: 14px 16px;
   border-radius: var(--pa-r-md);
-  border: 1px solid var(--lp-line);
+  border: 1px solid var(--lp-line-strong);
   background: var(--pa-surface);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   cursor: pointer;
   text-align: left;
   font-family: var(--lp-body);
   color: var(--lp-text);
-  transition: border-color 0.25s var(--lp-ease),
-    background-color 0.25s var(--lp-ease), transform 0.25s var(--lp-ease);
+  transition: border-color 0.22s var(--lp-ease),
+    background-color 0.22s var(--lp-ease), transform 0.22s var(--lp-ease),
+    box-shadow 0.22s var(--lp-ease);
 }
 
 .pa-quick__item:hover {
-  border-color: rgba(138, 168, 255, 0.42);
+  border-color: rgba(40, 95, 255, 0.35);
   background: var(--pa-surface-hover);
   transform: translateY(-2px);
+  box-shadow: 0 10px 26px -16px rgba(40, 95, 255, 0.5);
 }
 
 .pa-quick__text {
@@ -540,6 +592,7 @@
   font-size: var(--lp-t-sm);
   font-weight: 600;
   letter-spacing: -0.012em;
+  color: var(--lp-text);
 }
 
 .pa-quick__hint {
@@ -569,7 +622,7 @@
   margin-top: 4px;
   font-size: var(--lp-t-caption);
   line-height: 1.5;
-  color: var(--lp-text-faint);
+  color: var(--lp-text-soft);
 }
 
 .pa-choice__estimate {
@@ -594,7 +647,7 @@
   color: #fff;
   position: relative;
   z-index: 1;
-  transition: background-color 0.25s ease, border-color 0.25s ease;
+  transition: background-color 0.22s ease, border-color 0.22s ease;
 }
 
 .pa-choice--radio .pa-choice__mark {
@@ -603,24 +656,22 @@
 
 .pa-choice__mark svg {
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.18s ease;
 }
 
-/* --- Selected -------------------------------------------------------------
-   Blue border, a soft interior wash and the brand glow. */
+/* --- Selected state ------------------------------------------------------- */
 
 .pa-choice:has(.pa-choice__input:checked) {
   border-color: var(--lp-blue-core);
-  background: var(--pa-selected);
-  box-shadow: 0 0 0 1px var(--lp-blue-core),
-    0 14px 40px -18px rgba(40, 95, 255, 0.8);
+  background: rgba(40, 95, 255, 0.04);
+  box-shadow: 0 6px 24px -10px rgba(40, 95, 255, 0.25);
 }
 
 .pa-choice:has(.pa-choice__input:checked) .pa-choice__icon {
   background: var(--lp-blue-core);
   border-color: transparent;
   color: #fff;
-  box-shadow: 0 6px 18px -6px rgba(40, 95, 255, 0.9);
+  box-shadow: 0 4px 14px -4px rgba(40, 95, 255, 0.6);
 }
 
 .pa-choice:has(.pa-choice__input:checked) .pa-choice__mark {
@@ -637,7 +688,7 @@
   outline-offset: 3px;
 }
 
-/* --- Chips: CRMs, languages, capability interests ------------------------ */
+/* --- Chips --------------------------------------------------------------- */
 
 .pa-chips {
   display: flex;
@@ -653,9 +704,9 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 10px 16px;
+  padding: 9px 16px;
   border-radius: var(--pa-r-pill);
-  border: 1px solid var(--lp-line-strong);
+  border: 1.5px solid var(--lp-line-strong);
   background: var(--pa-surface);
   font-size: var(--lp-t-caption);
   font-weight: 500;
@@ -665,16 +716,16 @@
 }
 
 .pa-chip:hover {
-  border-color: rgba(138, 168, 255, 0.5);
+  border-color: rgba(40, 95, 255, 0.3);
   color: var(--lp-text);
+  background: var(--pa-surface-hover);
 }
 
 .pa-chip:has(input:checked) {
-  background: var(--pa-selected);
+  background: rgba(40, 95, 255, 0.07);
   border-color: var(--lp-blue-core);
-  color: #fff;
+  color: var(--lp-blue-core);
   font-weight: 600;
-  box-shadow: 0 0 18px -6px rgba(40, 95, 255, 0.8);
 }
 
 .pa-chip:has(input:focus-visible) {
@@ -697,8 +748,8 @@
   padding: 4px;
   gap: 4px;
   border-radius: var(--pa-r-md);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--lp-line);
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--lp-line-strong);
   margin: 0;
   flex-wrap: wrap;
 }
@@ -717,13 +768,14 @@
 
 .pa-segment__item:hover {
   color: var(--lp-text);
+  background: rgba(40, 95, 255, 0.05);
 }
 
 .pa-segment__item:has(input:checked) {
   background: var(--lp-blue-core);
   color: #fff;
   font-weight: 600;
-  box-shadow: 0 6px 18px -8px rgba(40, 95, 255, 0.9);
+  box-shadow: 0 3px 12px -4px rgba(40, 95, 255, 0.5);
 }
 
 .pa-segment__item:has(input:focus-visible) {
@@ -757,7 +809,7 @@
   border: 1.5px dashed var(--lp-line-strong);
   display: grid;
   place-items: center;
-  background: var(--pa-surface);
+  background: rgba(0, 0, 0, 0.03);
   color: var(--lp-text-faint);
   overflow: hidden;
   flex-shrink: 0;
@@ -802,8 +854,6 @@
   transition: grid-template-rows 0.45s var(--lp-ease), opacity 0.3s ease,
     visibility 0s linear 0.45s;
   opacity: 0;
-  /* Takes collapsed controls out of the tab order and the a11y tree, which
-     opacity alone would not do. */
   visibility: hidden;
 }
 
@@ -838,10 +888,10 @@
   left: 0;
   right: 0;
   z-index: 20;
-  border-top: 1px solid var(--lp-line);
-  background: rgba(1, 3, 15, 0.78);
-  backdrop-filter: blur(22px) saturate(160%);
-  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  border-top: 1px solid var(--lp-line-strong);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
 }
 
 .pa-actions__inner {
@@ -881,7 +931,7 @@
   background: linear-gradient(150deg, var(--lp-blue-lift), var(--lp-blue-deep));
   color: #fff;
   margin-bottom: 26px;
-  box-shadow: 0 18px 44px -14px rgba(40, 95, 255, 0.9);
+  box-shadow: 0 12px 32px -10px rgba(40, 95, 255, 0.55);
 }
 
 .pa-finish__list {
@@ -903,15 +953,13 @@
   padding: 14px 16px;
   border-radius: var(--pa-r-md);
   background: var(--pa-surface);
-  border: 1px solid var(--lp-line);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--lp-line-strong);
   font-size: var(--lp-t-sm);
   color: var(--lp-text-soft);
 }
 
 .pa-finish__item svg {
-  color: var(--lp-blue-mid);
+  color: var(--lp-blue-core);
   flex-shrink: 0;
 }
 
@@ -935,6 +983,7 @@
   isolation: isolate;
 }
 
+/* Sidebar */
 .pa-side {
   position: sticky;
   top: 0;
@@ -942,10 +991,8 @@
   height: 100dvh;
   overflow-y: auto;
   z-index: 5;
-  border-right: 1px solid var(--lp-line);
-  background: rgba(3, 7, 32, 0.6);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
+  border-right: 1px solid var(--lp-line-strong);
+  background: #ffffff;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -956,6 +1003,7 @@
   padding: 2px 8px 18px;
 }
 
+/* Workspace switcher */
 .pa-switcher {
   display: flex;
   align-items: center;
@@ -963,8 +1011,8 @@
   width: 100%;
   padding: 10px 11px;
   border-radius: var(--pa-r-md);
-  border: 1px solid var(--lp-line);
-  background: var(--pa-surface);
+  border: 1px solid var(--lp-line-strong);
+  background: rgba(0, 0, 0, 0.02);
   cursor: pointer;
   text-align: left;
   font-family: var(--lp-body);
@@ -973,8 +1021,8 @@
 }
 
 .pa-switcher:hover {
-  border-color: var(--lp-line-strong);
-  background: var(--pa-surface-hover);
+  border-color: rgba(40, 95, 255, 0.25);
+  background: rgba(40, 95, 255, 0.03);
 }
 
 .pa-switcher__mark {
@@ -990,7 +1038,7 @@
   font-family: var(--lp-display);
   font-weight: 800;
   font-size: var(--lp-t-caption);
-  box-shadow: 0 6px 16px -6px rgba(40, 95, 255, 0.9);
+  box-shadow: 0 3px 10px -3px rgba(40, 95, 255, 0.5);
 }
 
 .pa-switcher__mark img {
@@ -1021,6 +1069,7 @@
   margin-top: 1px;
 }
 
+/* Nav */
 .pa-nav {
   display: flex;
   flex-direction: column;
@@ -1050,17 +1099,16 @@
 }
 
 .pa-nav__item:hover {
-  background: var(--lp-glass);
+  background: rgba(40, 95, 255, 0.05);
   color: var(--lp-text);
 }
 
 .pa-nav__item[aria-current='page'] {
-  background: var(--pa-selected);
-  color: #fff;
+  background: rgba(40, 95, 255, 0.08);
+  color: var(--lp-blue-core);
   font-weight: 600;
 }
 
-/* The active rail, echoing the navbar's underline on the landing page. */
 .pa-nav__item[aria-current='page']::before {
   content: '';
   position: absolute;
@@ -1070,7 +1118,6 @@
   width: 2px;
   border-radius: 2px;
   background: var(--lp-blue-core);
-  box-shadow: 0 0 10px rgba(40, 95, 255, 0.9);
 }
 
 .pa-nav__item svg {
@@ -1082,8 +1129,7 @@
   min-width: 0;
 }
 
-/* Marks a section that is designed but not built. Honest, not a dead link —
-   the section still opens and explains what is coming. */
+/* "Soon" tag */
 .pa-tag {
   font-size: 0.5625rem;
   font-weight: 700;
@@ -1091,20 +1137,22 @@
   text-transform: uppercase;
   padding: 3px 7px;
   border-radius: 5px;
-  background: rgba(255, 255, 255, 0.07);
-  color: var(--lp-text-faint);
+  background: rgba(40, 95, 255, 0.07);
+  color: var(--lp-blue-core);
   white-space: nowrap;
+  opacity: 0.8;
 }
 
 .pa-tag--live {
-  background: rgba(40, 95, 255, 0.2);
-  color: var(--lp-blue-pale);
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
 }
 
+/* Sidebar footer */
 .pa-side__foot {
   margin-top: auto;
   padding-top: 16px;
-  border-top: 1px solid var(--lp-line);
+  border-top: 1px solid var(--lp-line-strong);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -1136,9 +1184,9 @@
 }
 
 .pa-meter__track {
-  height: 2px;
+  height: 3px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.08);
   overflow: hidden;
 }
 
@@ -1146,7 +1194,6 @@
   height: 100%;
   border-radius: 999px;
   background: linear-gradient(90deg, var(--lp-blue-deep), var(--lp-blue-core));
-  box-shadow: 0 0 10px rgba(40, 95, 255, 0.7);
 }
 
 /* --- Top bar -------------------------------------------------------------- */
@@ -1157,6 +1204,7 @@
   flex-direction: column;
   position: relative;
   z-index: 2;
+  background: var(--lp-void);
 }
 
 .pa-top {
@@ -1168,10 +1216,10 @@
   justify-content: space-between;
   gap: 14px;
   padding: 14px clamp(1.25rem, 3vw, 2.25rem);
-  border-bottom: 1px solid var(--lp-line);
-  background: rgba(1, 3, 15, 0.7);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border-bottom: 1px solid var(--lp-line-strong);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
 }
 
 .pa-top__title {
@@ -1195,16 +1243,17 @@
   gap: 8px;
   padding: 7px 14px;
   border-radius: var(--pa-r-pill);
-  border: 1px solid var(--lp-line);
-  background: var(--pa-surface);
+  border: 1px solid var(--lp-line-strong);
+  background: rgba(40, 95, 255, 0.05);
   font-size: var(--lp-t-caption);
-  color: var(--lp-text-soft);
+  color: var(--lp-blue-core);
   white-space: nowrap;
+  font-weight: 500;
 }
 
 .pa-credits b {
-  color: var(--lp-text);
-  font-weight: 600;
+  color: var(--lp-blue-core);
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
@@ -1244,37 +1293,23 @@
 
 .pa-panel {
   position: relative;
-  border: 1px solid var(--lp-line);
+  border: 1px solid var(--lp-line-strong);
   border-radius: var(--pa-r-lg);
   background: var(--pa-surface);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
   padding: 24px;
   overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
-/* The primary action gets the brand glow; nothing else on the page does. */
+/* The primary "recommended next step" panel — a subtle blue wash */
 .pa-panel--next {
-  border-color: rgba(40, 95, 255, 0.4);
+  border-color: rgba(40, 95, 255, 0.25);
   background: linear-gradient(
     150deg,
-    rgba(40, 95, 255, 0.16) 0%,
-    rgba(255, 255, 255, 0.03) 62%
+    rgba(40, 95, 255, 0.05) 0%,
+    #ffffff 60%
   );
-  box-shadow: 0 26px 60px -32px rgba(40, 95, 255, 0.9);
-}
-
-.pa-panel--next::after {
-  content: '';
-  position: absolute;
-  right: -18%;
-  top: -60%;
-  width: 46%;
-  height: 190%;
-  border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(77, 123, 255, 0.32), transparent 66%);
-  filter: blur(38px);
-  pointer-events: none;
+  box-shadow: 0 4px 24px -8px rgba(40, 95, 255, 0.18);
 }
 
 .pa-panel > * {
@@ -1298,7 +1333,7 @@
 }
 
 .pa-stat {
-  border: 1px solid var(--lp-line);
+  border: 1px solid var(--lp-line-strong);
   border-radius: var(--pa-r-md);
   background: var(--pa-surface);
   padding: 17px 18px;
@@ -1320,7 +1355,7 @@
   color: var(--lp-text-faint);
 }
 
-/* --- Checklists ----------------------------------------------------------- */
+/* --- Setup checklist ------------------------------------------------------ */
 
 .pa-check {
   list-style: none;
@@ -1342,7 +1377,7 @@
 }
 
 .pa-check__item:hover {
-  background: var(--lp-glass);
+  background: rgba(40, 95, 255, 0.04);
 }
 
 .pa-check__item input {
@@ -1374,7 +1409,7 @@
 .pa-check__item:has(input:checked) .pa-check__box {
   background: var(--lp-blue-core);
   border-color: var(--lp-blue-core);
-  box-shadow: 0 0 14px -3px rgba(40, 95, 255, 0.9);
+  box-shadow: 0 0 8px -2px rgba(40, 95, 255, 0.4);
 }
 
 .pa-check__item:has(input:checked) .pa-check__box svg {
@@ -1412,7 +1447,7 @@
   gap: 12px;
 }
 
-/* Calling setup — a plain list of preparation tasks, not a live dialler. */
+/* Calling setup tasks */
 .pa-tasks {
   list-style: none;
   padding: 0;
@@ -1432,7 +1467,7 @@
 }
 
 .pa-tasks svg {
-  color: var(--lp-blue-mid);
+  color: var(--lp-blue-core);
   flex-shrink: 0;
   margin-top: 3px;
 }
@@ -1445,11 +1480,10 @@
   align-items: flex-start;
   gap: 16px;
   padding: clamp(1.75rem, 4vw, 2.75rem);
-  border: 1px solid var(--lp-line);
+  border: 1px solid var(--lp-line-strong);
   border-radius: var(--pa-r-lg);
   background: var(--pa-surface);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
   max-width: 640px;
 }
 
@@ -1459,9 +1493,9 @@
   border-radius: var(--pa-r-md);
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--lp-line);
-  color: var(--lp-text-soft);
+  background: rgba(40, 95, 255, 0.07);
+  border: 1px solid rgba(40, 95, 255, 0.15);
+  color: var(--lp-blue-core);
 }
 
 .pa-module__list {
@@ -1472,8 +1506,16 @@
   line-height: 1.8;
 }
 
-.pa-module__list::marker {
-  color: var(--lp-blue-mid);
+/* ==========================================================================
+   Gradient field — hide the dark landing gradient inside workspace
+   ========================================================================== */
+
+.pa .lp-grade {
+  display: none;
+}
+
+.pa .lp-noise {
+  display: none;
 }
 
 /* ==========================================================================
@@ -1492,8 +1534,8 @@
     z-index: 40;
     transform: translateX(-100%);
     transition: transform 0.35s var(--lp-ease);
-    background: rgba(1, 3, 15, 0.96);
-    box-shadow: 0 0 60px rgba(0, 0, 0, 0.6);
+    background: #ffffff;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.12);
   }
 
   .pa-side[data-open='true'] {
@@ -1508,8 +1550,8 @@
     position: fixed;
     inset: 0;
     z-index: 35;
-    background: rgba(1, 3, 15, 0.72);
-    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.24);
+    backdrop-filter: blur(2px);
     border: none;
     cursor: pointer;
   }
@@ -1557,8 +1599,6 @@
     animation-iteration-count: 1 !important;
   }
 
-  /* The reveal animates a grid track; collapsing the duration alone would
-     still animate it. Snap instead. */
   .pa-reveal {
     transition: none;
   }
