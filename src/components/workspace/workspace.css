@@ -1287,7 +1287,9 @@
 
 .pa-content {
   padding: clamp(1.75rem, 4vw, 3rem) clamp(1.25rem, 3vw, 2.25rem) 5rem;
-  max-width: 1060px;
+  /* Wide enough to use a large monitor without letting body copy run past a
+     readable measure — the inner grid caps its own columns. */
+  max-width: 1440px;
   width: 100%;
 }
 

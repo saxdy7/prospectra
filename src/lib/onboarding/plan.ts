@@ -204,6 +204,104 @@ export function callingTasksFor(data: OnboardingData): ChecklistItem[] {
   return tasks;
 }
 
+export interface ActivityEntry {
+  id: string;
+  label: string;
+  detail: string;
+  /** ISO timestamp, or undefined when the moment was not recorded. */
+  at?: string;
+  kind: 'workspace' | 'goal' | 'source' | 'prepare' | 'calling';
+}
+
+/**
+ * Recent activity, derived from what the user actually did during setup.
+ *
+ * Every entry here corresponds to a real choice they made — nothing is
+ * invented to make the list look busy. A brand-new workspace genuinely has
+ * only these events, and the UI says so rather than padding the feed.
+ */
+export function recentActivityFor(data: OnboardingData): ActivityEntry[] {
+  const out: ActivityEntry[] = [];
+  const at = data.completedAt;
+
+  out.push({
+    id: 'created',
+    label: 'Workspace created',
+    detail: data.workspaceName.trim() || 'Untitled workspace',
+    at,
+    kind: 'workspace'
+  });
+
+  if (data.goal) {
+    const goalLabel: Record<string, string> = {
+      'local-business': 'Find local businesses',
+      'company-list': 'Build a company list',
+      'find-people': 'Find decision-makers',
+      'enrich-list': 'Enrich an existing list',
+      outreach: 'Launch outreach',
+      'voice-agent': 'Build a voice agent',
+      explore: 'Explore the workspace'
+    };
+    out.push({
+      id: 'goal',
+      label: 'Goal set',
+      detail: goalLabel[data.goal] ?? data.goal,
+      at,
+      kind: 'goal'
+    });
+  }
+
+  if (data.dataSource && data.dataSource !== 'later') {
+    const sourceLabel: Record<string, string> = {
+      'search-web': 'Search local businesses',
+      'find-companies': 'Search companies',
+      'find-people': 'Search people',
+      'import-csv': 'Import a CSV',
+      'connect-crm': 'Connect a CRM later',
+      'blank-table': 'Start with a blank table'
+    };
+    out.push({
+      id: 'source',
+      label: 'Starting point chosen',
+      detail: sourceLabel[data.dataSource] ?? data.dataSource,
+      at,
+      kind: 'source'
+    });
+  }
+
+  if (data.crmIntent.length) {
+    out.push({
+      id: 'crm',
+      label: 'CRM noted',
+      detail: `${data.crmIntent.length} to connect when integrations open`,
+      at,
+      kind: 'source'
+    });
+  }
+
+  if (data.prepare.length) {
+    out.push({
+      id: 'prepare',
+      label: 'Setup columns queued',
+      detail: `${data.prepare.length} ready for your first table`,
+      at,
+      kind: 'prepare'
+    });
+  }
+
+  if (wantsCalling(data.calling.stance)) {
+    out.push({
+      id: 'calling',
+      label: 'Calling preferences saved',
+      detail: 'Held for the voice rollout',
+      at,
+      kind: 'calling'
+    });
+  }
+
+  return out.reverse();
+}
+
 /** Pre-tick what setup genuinely completed, so the list starts honest. */
 export function initialChecklistDone(data: OnboardingData): Record<string, boolean> {
   const done: Record<string, boolean> = { 'name-workspace': true };

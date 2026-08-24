@@ -11,7 +11,12 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import type { IconName } from '@/lib/icons/registry';
-import { callingTasksFor, checklistFor, nextStepFor } from '@/lib/onboarding/plan';
+import {
+  callingTasksFor,
+  checklistFor,
+  nextStepFor,
+  recentActivityFor
+} from '@/lib/onboarding/plan';
 import { workspaceStore, readForOwner } from '@/lib/onboarding/storage';
 import { currentUser } from '@/lib/onboarding/session';
 import { GOALS } from '@/lib/onboarding/config';
@@ -170,6 +175,10 @@ export function WorkspaceApp() {
   const items = useMemo(() => (state ? checklistFor(state.onboarding) : []), [state]);
   const callingTasks = useMemo(
     () => (state ? callingTasksFor(state.onboarding) : []),
+    [state]
+  );
+  const activity = useMemo(
+    () => (state ? recentActivityFor(state.onboarding) : []),
     [state]
   );
 
@@ -339,7 +348,7 @@ export function WorkspaceApp() {
                         <span className="text-xs text-muted-foreground">Jump in</span>
                       </CardHeader>
                       <CardContent className="pt-3">
-                        <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3">
                           {QUICK_ACTIONS.map((a) => (
                             <button
                               key={a.label}
@@ -464,6 +473,66 @@ export function WorkspaceApp() {
                       </CardContent>
                     </Card>
 
+                    {/* Recent activity — a chronological list, not a card grid.
+                        Every entry is a real choice the user made; nothing is
+                        invented to pad the feed. */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base">Recent activity</CardTitle>
+                        <span className="text-xs text-muted-foreground">
+                          {activity.length ? 'Setup' : 'Nothing yet'}
+                        </span>
+                      </CardHeader>
+                      <CardContent className="pt-2">
+                        {activity.length ? (
+                          <ol className="relative flex flex-col gap-4 pl-5">
+                            {/* The spine the markers sit on. */}
+                            <span
+                              aria-hidden="true"
+                              className="absolute left-[5px] top-1.5 bottom-1.5 w-px bg-border"
+                            />
+                            {activity.map((a) => (
+                              <li key={a.id} className="relative">
+                                <span
+                                  aria-hidden="true"
+                                  className="absolute -left-5 top-1.5 size-[9px] rounded-full border-2 border-card bg-brand"
+                                />
+                                <div className="text-sm font-medium leading-snug">
+                                  {a.label}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {a.detail}
+                                </div>
+                                {a.at && (
+                                  <time
+                                    dateTime={a.at}
+                                    className="mt-0.5 block text-[11px] text-muted-foreground/70"
+                                  >
+                                    {formatWhen(a.at)}
+                                  </time>
+                                )}
+                              </li>
+                            ))}
+                          </ol>
+                        ) : (
+                          <div className="py-2">
+                            <p className="text-sm text-muted-foreground">
+                              Nothing has run yet. Your first search or import will
+                              show up here.
+                            </p>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="mt-3"
+                              onClick={() => setSection(recommended.section)}
+                            >
+                              {recommended.cta}
+                            </Button>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+
                     {/* Calling setup — only where asked for */}
                     {callingTasks.length > 0 && (
                       <Card>
@@ -512,6 +581,37 @@ export function WorkspaceApp() {
       </div>
     </div>
   );
+}
+
+/**
+ * Relative timestamp for the activity feed.
+ *
+ * Only ever called after hydration — the component renders a neutral shell
+ * until storage is read — so there is no server/client formatting mismatch to
+ * reconcile.
+ */
+function formatWhen(iso: string): string {
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return '';
+
+  const seconds = Math.round((then - Date.now()) / 1000);
+  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+
+  const steps: [Intl.RelativeTimeFormatUnit, number][] = [
+    ['second', 60],
+    ['minute', 60],
+    ['hour', 24],
+    ['day', 7],
+    ['week', 4.35],
+    ['month', 12]
+  ];
+
+  let value = seconds;
+  for (const [unit, size] of steps) {
+    if (Math.abs(value) < size) return rtf.format(Math.round(value), unit);
+    value /= size;
+  }
+  return rtf.format(Math.round(value), 'year');
 }
 
 /**
