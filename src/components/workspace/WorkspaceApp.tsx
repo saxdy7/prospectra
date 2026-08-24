@@ -6,6 +6,8 @@ import { ArrowRight, Circle, Menu, Sparkles } from 'lucide-react';
 import { AppSidebar, NAV } from './AppSidebar';
 import { SetupChecklist } from './SetupChecklist';
 import { GradientField } from '../landing/primitives';
+import { IconFrame } from './IconIllustration';
+import type { IconName } from '@/lib/icons/registry';
 import { callingTasksFor, checklistFor, nextStepFor } from '@/lib/onboarding/plan';
 import { workspaceStore } from '@/lib/onboarding/storage';
 import { GOALS } from '@/lib/onboarding/config';
@@ -77,6 +79,62 @@ const SECTION_COPY: Record<string, { blurb: string; bullets: string[] }> = {
       'Manage balances and usage alerts'
     ]
   }
+};
+
+/** Quick actions on the workspace home. Each opens the relevant section. */
+const QUICK_ACTIONS: {
+  icon: IconName;
+  label: string;
+  hint: string;
+  section: string;
+}[] = [
+  {
+    icon: 'action-find-leads',
+    label: 'Find leads',
+    hint: 'Search the map or a B2B database',
+    section: 'find-leads'
+  },
+  {
+    icon: 'action-import-data',
+    label: 'Import data',
+    hint: 'Bring a CSV you already keep',
+    section: 'tables'
+  },
+  {
+    icon: 'action-build-table',
+    label: 'Build a table',
+    hint: 'Start from an empty grid',
+    section: 'tables'
+  },
+  {
+    icon: 'action-enrich-contacts',
+    label: 'Enrich contacts',
+    hint: 'Fill the gaps across every row',
+    section: 'tables'
+  },
+  {
+    icon: 'action-campaign-draft',
+    label: 'Create campaign draft',
+    hint: 'Sketch an audience and a first message',
+    section: 'campaigns'
+  },
+  {
+    icon: 'action-voice-draft',
+    label: 'Create voice-agent draft',
+    hint: 'Write the role and opening line',
+    section: 'voice'
+  }
+];
+
+/** One larger illustration per section empty state. */
+const SECTION_ICON: Record<string, IconName> = {
+  'find-leads': 'empty-find-leads',
+  tables: 'empty-tables',
+  campaigns: 'empty-campaigns',
+  voice: 'empty-voice',
+  audiences: 'empty-audiences',
+  analytics: 'empty-analytics',
+  settings: 'empty-settings'
 };
 
 export function WorkspaceApp() {
@@ -210,8 +268,11 @@ export function WorkspaceApp() {
                   style={{ marginTop: 26 }}
                   aria-labelledby="next-heading"
                 >
-                  <p className="pa-micro">Recommended next step</p>
-                  <h3 className="pa-h3" id="next-heading" style={{ marginTop: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <IconFrame name="next-step" size={38} />
+                    <p className="pa-micro">Recommended next step</p>
+                  </div>
+                  <h3 className="pa-h3" id="next-heading" style={{ marginTop: 14 }}>
                     {recommended.cta}
                   </h3>
                   <p className="pa-lede" style={{ marginTop: 8 }}>
@@ -227,6 +288,26 @@ export function WorkspaceApp() {
                     <ArrowRight size={15} strokeWidth={2.2} />
                   </button>
                 </section>
+
+                <h3 className="pa-micro" style={{ marginTop: 34 }}>
+                  Quick actions
+                </h3>
+                <div className="pa-quick">
+                  {QUICK_ACTIONS.map((a) => (
+                    <button
+                      key={a.label}
+                      type="button"
+                      className="pa-quick__item"
+                      onClick={() => setSection(a.section)}
+                    >
+                      <IconFrame name={a.icon} size={38} />
+                      <span className="pa-quick__text">
+                        <span className="pa-quick__label">{a.label}</span>
+                        <span className="pa-quick__hint">{a.hint}</span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
 
                 <div className="pa-grid pa-grid--two">
                   {!checklistDismissed && (
@@ -313,9 +394,8 @@ function SectionPanel({ id }: { id: string }) {
 
   return (
     <section className="pa-module">
-      <span className="pa-module__icon" aria-hidden="true">
-        <nav.icon size={20} strokeWidth={1.9} />
-      </span>
+      {/* The one large illustration this region is allowed. */}
+      <IconFrame name={SECTION_ICON[id] ?? 'next-step'} size={64} tone="large" />
 
       <div>
         <span className="pa-tag">Coming soon</span>

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AlertCircle, ArrowRight, Check, PartyPopper, Phone } from 'lucide-react';
+import { AlertCircle, ArrowRight, Check, PartyPopper } from 'lucide-react';
 import {
   CALLING_INTERESTS,
   CALLING_LANGUAGES,
@@ -355,7 +355,6 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
                 label={g.label}
                 blurb={g.blurb}
                 icon={g.icon}
-                tone={g.id === 'voice-agent' ? 'voice' : 'blue'}
               />
             ))}
           </fieldset>
@@ -437,7 +436,6 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
                 blurb={p.blurb}
                 icon={p.icon}
                 estimate={p.estimate}
-                tone={data.goal === 'voice-agent' ? 'voice' : 'blue'}
               />
             ))}
           </fieldset>
@@ -475,8 +473,7 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
                 }
                 label={s.label}
                 blurb={s.blurb}
-                icon={s.id === 'not-now' ? undefined : Phone}
-                tone={s.id === 'not-now' ? 'blue' : 'voice'}
+                icon={s.icon}
               />
             ))}
           </fieldset>
@@ -492,7 +489,6 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
                   checked={data.calling.useCase === u.id}
                   onChange={(v) => patch({ calling: { ...data.calling, useCase: v } })}
                   label={u.label}
-                  tone="voice"
                 />
               ))}
             </Group>
@@ -507,7 +503,6 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
                   checked={data.calling.language === l.id}
                   onChange={(v) => patch({ calling: { ...data.calling, language: v } })}
                   label={l.label}
-                  tone="voice"
                 />
               ))}
             </Group>
@@ -528,7 +523,6 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
                     })
                   }
                   label={c.label}
-                  tone="voice"
                 />
               ))}
             </Group>

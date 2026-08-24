@@ -2,7 +2,8 @@
 
 import type { ReactNode } from 'react';
 import { Check } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { IconIllustration } from './IconIllustration';
+import type { IconName } from '@/lib/icons/registry';
 
 /* ==========================================================================
    Choice controls
@@ -14,8 +15,6 @@ import type { LucideIcon } from 'lucide-react';
    focusable, and CSS :has() drives the selected styling from its state.
    ========================================================================== */
 
-export type ChoiceTone = 'blue' | 'voice';
-
 export function ChoiceCard<T extends string>({
   name,
   value,
@@ -23,9 +22,8 @@ export function ChoiceCard<T extends string>({
   onSelect,
   label,
   blurb,
-  icon: Icon,
-  estimate,
-  tone = 'blue'
+  icon,
+  estimate
 }: {
   name: string;
   value: T;
@@ -33,12 +31,11 @@ export function ChoiceCard<T extends string>({
   onSelect: (value: T) => void;
   label: string;
   blurb?: string;
-  icon?: LucideIcon;
+  icon?: IconName;
   estimate?: string;
-  tone?: ChoiceTone;
 }) {
   return (
-    <label className={`pa-choice pa-choice--radio${tone === 'voice' ? ' pa-choice--voice' : ''}`}>
+    <label className="pa-choice pa-choice--radio">
       <input
         className="pa-choice__input"
         type="radio"
@@ -48,9 +45,10 @@ export function ChoiceCard<T extends string>({
         onChange={() => onSelect(value)}
       />
 
-      {Icon && (
+      {icon && (
         <span className="pa-choice__icon" aria-hidden="true">
-          <Icon size={17} strokeWidth={1.9} />
+          {/* Decorative: the label beside it already states the meaning. */}
+          <IconIllustration name={icon} size={26} decorative />
         </span>
       )}
 
@@ -75,21 +73,19 @@ export function MultiSelectChoice<T extends string>({
   onToggle,
   label,
   blurb,
-  icon: Icon,
-  estimate,
-  tone = 'blue'
+  icon,
+  estimate
 }: {
   value: T;
   checked: boolean;
   onToggle: (value: T) => void;
   label: string;
   blurb?: string;
-  icon?: LucideIcon;
+  icon?: IconName;
   estimate?: string;
-  tone?: ChoiceTone;
 }) {
   return (
-    <label className={`pa-choice${tone === 'voice' ? ' pa-choice--voice' : ''}`}>
+    <label className="pa-choice">
       <input
         className="pa-choice__input"
         type="checkbox"
@@ -98,9 +94,10 @@ export function MultiSelectChoice<T extends string>({
         onChange={() => onToggle(value)}
       />
 
-      {Icon && (
+      {icon && (
         <span className="pa-choice__icon" aria-hidden="true">
-          <Icon size={17} strokeWidth={1.9} />
+          {/* Decorative: the label beside it already states the meaning. */}
+          <IconIllustration name={icon} size={26} decorative />
         </span>
       )}
 
@@ -126,8 +123,7 @@ export function Chip<T extends string>({
   value,
   checked,
   onChange,
-  label,
-  tone = 'blue'
+  label
 }: {
   type: 'radio' | 'checkbox';
   name?: string;
@@ -135,10 +131,9 @@ export function Chip<T extends string>({
   checked: boolean;
   onChange: (value: T) => void;
   label: string;
-  tone?: ChoiceTone;
 }) {
   return (
-    <label className={`pa-chip${tone === 'voice' ? ' pa-chip--voice' : ''}`}>
+    <label className="pa-chip">
       <input
         type={type}
         name={name}

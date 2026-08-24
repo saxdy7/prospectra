@@ -1,25 +1,4 @@
-import {
-  Binoculars,
-  Building2,
-  Compass,
-  Cpu,
-  Database,
-  FileSpreadsheet,
-  Headphones,
-  Layers,
-  MapPin,
-  Mic,
-  PenLine,
-  Plug,
-  Search,
-  Send,
-  ShieldCheck,
-  Sparkles,
-  Table2,
-  UserSearch,
-  Users
-} from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import type { IconName } from '@/lib/icons/registry';
 import type {
   CallingInterest,
   CallingLanguage,
@@ -36,7 +15,8 @@ export interface Option<T extends string> {
   id: T;
   label: string;
   blurb?: string;
-  icon?: LucideIcon;
+  /** Registry key. The registry decides asset-vs-Lucide, not this file. */
+  icon?: IconName;
   /**
    * Illustrative scale only, shown under an "Estimated setup usage" label.
    * Nothing here is a price, a rate, or a live credit balance.
@@ -70,43 +50,43 @@ export const GOALS: Option<GoalId>[] = [
     id: 'local-business',
     label: 'Find local businesses',
     blurb: 'Pull shops, clinics and contractors from the map, with phone and rating.',
-    icon: MapPin
+    icon: 'goal-local-business'
   },
   {
     id: 'company-list',
     label: 'Build a company list',
     blurb: 'Filter by industry, headcount and technology into one working table.',
-    icon: Building2
+    icon: 'goal-company-list'
   },
   {
     id: 'find-people',
     label: 'Find decision-makers',
     blurb: 'Reach the person who signs off, not a shared inbox.',
-    icon: UserSearch
+    icon: 'goal-find-people'
   },
   {
     id: 'enrich-list',
     label: 'Enrich an existing list',
     blurb: 'Fill the gaps in rows you already have, and flag what has gone stale.',
-    icon: Layers
+    icon: 'goal-enrich-list'
   },
   {
     id: 'outreach',
     label: 'Launch outreach',
     blurb: 'Sequence email now; add voice and messaging as those channels land.',
-    icon: Send
+    icon: 'goal-outreach'
   },
   {
     id: 'voice-agent',
     label: 'Build a voice agent',
     blurb: 'Draft the agent today, ready for when calling opens up.',
-    icon: Mic
+    icon: 'goal-voice-agent'
   },
   {
     id: 'explore',
     label: 'Explore the workspace',
     blurb: 'Look around first, and decide once you have seen it work.',
-    icon: Compass
+    icon: 'goal-explore'
   }
 ];
 
@@ -119,43 +99,43 @@ const DATA_SOURCES: Record<DataSourceId, Option<DataSourceId>> = {
     id: 'search-web',
     label: 'Search local businesses',
     blurb: 'Name a category and a place, and rows arrive as they are found.',
-    icon: Search
+    icon: 'source-local-search'
   },
   'find-companies': {
     id: 'find-companies',
     label: 'Search companies',
     blurb: 'Start from firmographic filters rather than a list you already own.',
-    icon: Building2
+    icon: 'source-company-search'
   },
   'find-people': {
     id: 'find-people',
     label: 'Search people',
     blurb: 'Start from roles and seniority across the accounts you care about.',
-    icon: Users
+    icon: 'source-people-search'
   },
   'import-csv': {
     id: 'import-csv',
     label: 'Import a CSV',
     blurb: 'Bring a list you already keep, and map the columns once.',
-    icon: FileSpreadsheet
+    icon: 'source-csv-import'
   },
   'connect-crm': {
     id: 'connect-crm',
     label: 'Connect a CRM later',
     blurb: 'Tell us what you use — we will help you connect it when it is ready.',
-    icon: Plug
+    icon: 'source-crm-connect'
   },
   'blank-table': {
     id: 'blank-table',
     label: 'Start with a blank table',
     blurb: 'Build the columns yourself and add rows as you go.',
-    icon: Table2
+    icon: 'source-blank-table'
   },
   later: {
     id: 'later',
     label: 'Decide later',
     blurb: 'Set the workspace up now and bring data in when you are ready.',
-    icon: Compass
+    icon: 'source-later'
   }
 };
 
@@ -200,77 +180,77 @@ const PREPARE: Record<PrepareId, Option<PrepareId>> = {
     id: 'verify-contacts',
     label: 'Verify business or contact details',
     blurb: 'Check numbers and addresses before anyone tries to use them.',
-    icon: ShieldCheck,
+    icon: 'prep-verify',
     estimate: 'light'
   },
   'company-enrichment': {
     id: 'company-enrichment',
     label: 'Enrich company profiles',
     blurb: 'Industry, headcount, revenue band and location on every row.',
-    icon: Building2,
+    icon: 'prep-company-enrichment',
     estimate: 'moderate'
   },
   'decision-makers': {
     id: 'decision-makers',
     label: 'Find decision-makers',
     blurb: 'Surface who actually owns the budget at each account.',
-    icon: UserSearch,
+    icon: 'prep-decision-makers',
     estimate: 'moderate'
   },
   'tech-signals': {
     id: 'tech-signals',
     label: 'Detect technology stack',
     blurb: 'What each company runs, so you can lead with something relevant.',
-    icon: Cpu,
+    icon: 'prep-tech-signals',
     estimate: 'heavier'
   },
   'ai-research': {
     id: 'ai-research',
     label: 'Research companies with AI',
     blurb: 'Read each site and pull out what is worth mentioning.',
-    icon: Binoculars,
+    icon: 'prep-ai-research',
     estimate: 'moderate'
   },
   'email-personalisation': {
     id: 'email-personalisation',
     label: 'Write personalized outreach',
     blurb: 'Draft a per-row opening line your sequence can pull from.',
-    icon: PenLine,
+    icon: 'prep-personalisation',
     estimate: 'moderate'
   },
   'call-ready-audience': {
     id: 'call-ready-audience',
     label: 'Build a call-ready audience',
     blurb: 'Shape a contact list for calling, ready for when telephony lands.',
-    icon: Headphones,
+    icon: 'prep-call-ready',
     estimate: 'light'
   },
   'hiring-signals': {
     id: 'hiring-signals',
     label: 'Track job openings and hiring signals',
     blurb: 'Open roles often say more about spend than a headcount figure.',
-    icon: Sparkles,
+    icon: 'prep-hiring-signals',
     estimate: 'light'
   },
   'voice-agent-draft': {
     id: 'voice-agent-draft',
     label: 'Draft a voice agent',
     blurb: 'Role, objective and opening line, saved for you to refine.',
-    icon: Mic,
+    icon: 'prep-voice-draft',
     estimate: 'none'
   },
   'knowledge-base': {
     id: 'knowledge-base',
     label: 'Set aside a knowledge base',
     blurb: 'Somewhere to drop the documents an agent should answer from.',
-    icon: Database,
+    icon: 'prep-knowledge-base',
     estimate: 'none'
   },
   'audience-segments': {
     id: 'audience-segments',
     label: 'Split the list into segments',
     blurb: 'Group rows worth saying different things to.',
-    icon: Layers,
+    icon: 'prep-segments',
     estimate: 'none'
   }
 };
@@ -328,27 +308,32 @@ export const CALLING_STANCES: Option<CallingStance>[] = [
   {
     id: 'not-now',
     label: 'Not right now',
-    blurb: 'Keep calling out of the way until you ask for it.'
+    blurb: 'Keep calling out of the way until you ask for it.',
+    icon: 'call-none'
   },
   {
     id: 'test-web-call',
     label: 'Test a web call',
-    blurb: 'Try an agent in the browser before anything touches a phone line.'
+    blurb: 'Try an agent in the browser before anything touches a phone line.',
+    icon: 'call-web-test'
   },
   {
     id: 'outbound',
     label: 'Plan outbound calls',
-    blurb: 'Reach a list of contacts once telephony is available.'
+    blurb: 'Reach a list of contacts once telephony is available.',
+    icon: 'call-outbound'
   },
   {
     id: 'inbound',
     label: 'Handle inbound calls',
-    blurb: 'Answer and route the calls that come to you.'
+    blurb: 'Answer and route the calls that come to you.',
+    icon: 'call-inbound'
   },
   {
     id: 'exploring',
     label: 'Still exploring',
-    blurb: 'Curious about it, with no firm plan yet.'
+    blurb: 'Curious about it, with no firm plan yet.',
+    icon: 'call-analytics'
   }
 ];
 
