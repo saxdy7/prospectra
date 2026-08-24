@@ -134,9 +134,12 @@ export function Pricing() {
                   ))}
                 </ul>
 
-                <button type="button" className="lp-pricing-card__cta">
-                  Choose Plan
-                </button>
+                {/* Every plan starts the same way — create the account first.
+                    There is no checkout to send paid plans to yet, so this
+                    does not pretend otherwise. */}
+                <a className="lp-pricing-card__cta" href="/signup">
+                  {plan.monthly === 0 ? 'Start free' : 'Get started'}
+                </a>
               </article>
             );
           })}

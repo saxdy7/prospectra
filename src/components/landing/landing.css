@@ -2421,6 +2421,11 @@
 }
 
 .lp-pricing-card__cta {
+  /* An anchor now, not a button: needs the link defaults reset. */
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 46px;
   margin-top: 26px;
@@ -3010,4 +3015,20 @@
     opacity: 1 !important;
     transform: none !important;
   }
+}
+
+/* ==========================================================================
+   In-page anchor targets
+   The navbar is fixed, so a bare #hash jump would tuck the section heading
+   underneath it. scroll-margin-top offsets the landing position by the bar's
+   height plus a little breathing room.
+   ========================================================================== */
+
+.lp section[id] {
+  scroll-margin-top: 92px;
+}
+
+/* The feature CTA is an anchor now, not a button. */
+.lp-feat-cta__btn {
+  text-decoration: none;
 }

@@ -29,7 +29,7 @@ const SOCIALS = [
   { icon: MessageCircle, label: 'Updates', href: '#home' }
 ];
 
-export function Footer({ onLaunch }: { onLaunch: () => void }) {
+export function Footer() {
   const scope = useGsap(({ scope: el, reduced }) => {
     revealOnScroll(el.querySelectorAll('.lp-reveal'), { trigger: el, reduced });
 
@@ -84,8 +84,10 @@ export function Footer({ onLaunch }: { onLaunch: () => void }) {
               <Button chip href="/signup">
                 Start Prospecting Free
               </Button>
-              <Button variant="ghost" onClick={onLaunch}>
-                Talk to the team
+              {/* No contact form or inbox exists to route this to, so it
+                  offers the answers that are actually on the page. */}
+              <Button variant="ghost" href="#faq">
+                Read the FAQ
               </Button>
             </div>
           </div>

@@ -19,7 +19,7 @@ const HEADLINE = [
   { text: 'Autopilot', accent: false }
 ];
 
-export function Hero({ onLaunch }: { onLaunch: () => void }) {
+export function Hero() {
   const scope = useGsap(({ reduced }) => {
     if (reduced) {
       gsap.set(
@@ -155,8 +155,10 @@ export function Hero({ onLaunch }: { onLaunch: () => void }) {
             <Button chip href="/signup">
               Start Prospecting Free
             </Button>
-            <Button variant="ghost" onClick={onLaunch}>
-              Watch 2-min demo
+            {/* There is no demo video to play, so this points at the section
+                that actually explains the product rather than promising one. */}
+            <Button variant="ghost" href="#how">
+              See how it works
             </Button>
           </div>
         </div>

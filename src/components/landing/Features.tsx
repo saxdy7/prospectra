@@ -35,7 +35,7 @@ function useCycle(length: number, ms: number) {
   return i;
 }
 
-export function Features({ onLaunch }: { onLaunch: () => void }) {
+export function Features() {
   const leadIndex = useCycle(LEADS.length, 3200);
   const queueIndex = useCycle(QUEUE_POOL.length, 2600);
   const [seconds, setSeconds] = useState(12);
@@ -313,11 +313,11 @@ export function Features({ onLaunch }: { onLaunch: () => void }) {
             >
               500 free credits, no card required.
             </p>
-            <button type="button" className="lp-feat-cta__btn" onClick={onLaunch}>
+            <a className="lp-feat-cta__btn" href="/signup">
               <span className="lp-feat-cta__shine" aria-hidden="true" />
               Get Started
               <ArrowUpRight size={14} strokeWidth={2.5} />
-            </button>
+            </a>
           </article>
         </div>
       </div>

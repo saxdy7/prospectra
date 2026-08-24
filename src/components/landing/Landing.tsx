@@ -14,7 +14,7 @@ import { BRAND } from './brand';
 import { ScrollTrigger, useLenis } from './motion';
 import './landing.css';
 
-export function Landing({ onLaunch = () => {} }: { onLaunch?: () => void }) {
+export function Landing() {
   useLenis();
 
   useEffect(() => {
@@ -39,15 +39,15 @@ export function Landing({ onLaunch = () => {} }: { onLaunch?: () => void }) {
       <main>
         {/* The hero's halftone bloom grades into the light About section, so
             no scallop shoulder is needed between them. */}
-        <Hero onLaunch={onLaunch} />
+        <Hero />
         <About />
-        <Features onLaunch={onLaunch} />
+        <Features />
         <HowItWorks />
         <Proof />
         <Pricing />
         <Faq />
       </main>
-      <Footer onLaunch={onLaunch} />
+      <Footer />
     </div>
   );
 }
