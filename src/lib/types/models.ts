@@ -124,7 +124,7 @@ export interface UsageEvent extends WorkspaceScoped {
    Lead sourcing  [P3 / P4]
    ========================================================================== */
 
-export type SearchKind = 'local_business' | 'company' | 'people' | 'job';
+export type SearchKind = 'local_business' | 'company' | 'people' | 'job' | 'lookalike';
 
 export interface SearchJob extends WorkspaceScoped {
   projectId?: string;

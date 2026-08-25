@@ -1,20 +1,25 @@
 /* ==========================================================================
-   Prospectra — Workspace surface (onboarding + app shell) — Light theme
+   Prospectra â€” Workspace surface (onboarding + app shell) â€” Light / Dark
    --------------------------------------------------------------------------
-   Scoped under .pa. Overrides .lp tokens so the workspace and onboarding
-   pages use a clean light surface while the landing page keeps its dark
-   void aesthetic. No component files change; only these tokens flip.
+   Scoped under .pa, nested inside .lp (the two classes are applied to the
+   same root element). Two full token sets live here: the LIGHT set on the
+   bare `.pa` selector (the default), and the DARK set on
+   `.pa[data-theme="dark"]`, toggled at runtime by AppShell/OnboardingShell
+   reading the persisted choice from `lib/demo-storage/preferences.ts`
+   (`preferences.getTheme()`), defaulting to light for a first-time visitor.
+   Every component rule below reads a token â€” never a literal colour â€” so
+   the toggle needs no component edits, only the two blocks below it.
    ========================================================================== */
 
 .pa {
-  /* --- Override the dark lp tokens with light equivalents --------------- */
-  --lp-void:          #f4f6fb;      /* page background                       */
+  /* --- Light theme (default) --------------------------------------------- */
+  --lp-void:          #f5f7fc;
   --lp-deep:          #eef0f8;
   --lp-navy:          #e8ebf5;
 
-  --lp-text:          #0d1526;      /* primary ink                           */
-  --lp-text-soft:     #4b5568;      /* secondary                             */
-  --lp-text-faint:    #9ca3af;      /* muted / placeholder                   */
+  --lp-text:          #0d1526;
+  --lp-text-soft:     #4b5568;
+  --lp-text-faint:    #9ca3af;
 
   --lp-line:          rgba(0, 0, 0, 0.07);
   --lp-line-strong:   rgba(0, 0, 0, 0.12);
@@ -23,13 +28,69 @@
   --lp-glass:         rgba(0, 0, 0, 0.03);
   --lp-glass-strong:  rgba(0, 0, 0, 0.055);
 
-  /* blue accent is kept — same brand ramp */
+  /* --- shadcn token bridge -----------------------------------------------
+     shadcn components (Card, Badge, Button, Avatar, Progressâ€¦) read
+     --background/--card/--border/etc. from globals.css's :root by default,
+     entirely separate from the --lp-* tokens above. Redefining the same
+     variable names here â€” mapped onto whichever --lp-* ramp is active â€”
+     makes every shadcn component follow the theme automatically, with no
+     changes needed in the component files themselves. */
+  --background: var(--lp-void);
+  --foreground: var(--lp-text);
+  --card: #ffffff;
+  --card-foreground: var(--lp-text);
+  --popover: #ffffff;
+  --popover-foreground: var(--lp-text);
+  --primary: var(--lp-blue-core);
+  --primary-foreground: #ffffff;
+  --secondary: #eef1fb;
+  --secondary-foreground: var(--lp-text);
+  --muted: #eef1fb;
+  --muted-foreground: var(--lp-text-faint);
+  --accent: #e8eeff;
+  --accent-foreground: var(--lp-blue-core);
+  --destructive: #c8324b;
+  --border: var(--lp-line-strong);
+  --input: var(--lp-line-strong);
+  --ring: var(--lp-blue-mid);
 
-  /* --- Workspace-only additions ----------------------------------------- */
+  /* --- Workspace-only additions -------------------------------------------
+     Every one of these is read by a specific component rule further down â€”
+     see the comment at each call site if the name alone isn't obvious. */
   --pa-surface:       #ffffff;
   --pa-surface-hover: #f5f7ff;
   --pa-surface-solid: #ffffff;
   --pa-selected:      rgba(40, 95, 255, 0.07);
+
+  --pa-track-bg:      rgba(0, 0, 0, 0.08);
+  --pa-focus-bg:      #ffffff;
+  --pa-error:         #ef4444;
+  --pa-icon-lg-bg:      radial-gradient(circle at 50% 22%, rgba(40, 95, 255, 0.14), #ffffff 72%);
+  --pa-icon-lg-border:  rgba(40, 95, 255, 0.2);
+  --pa-icon-lg-shadow:  0 12px 30px -16px rgba(40, 95, 255, 0.5);
+  --pa-chip-track-bg: rgba(0, 0, 0, 0.04);
+  --pa-dashed-bg:     rgba(0, 0, 0, 0.03);
+  --pa-blur-bg:         rgba(255, 255, 255, 0.9);
+  --pa-blur-bg-strong:  rgba(255, 255, 255, 0.92);
+  --pa-side-bg:       #ffffff;
+  --pa-switcher-bg:   rgba(0, 0, 0, 0.02);
+  --pa-tag-live-bg:   rgba(16, 185, 129, 0.1);
+  --pa-tag-live-fg:   #059669;
+  --pa-panel-shadow:      0 1px 4px rgba(0, 0, 0, 0.04);
+  --pa-panel-next-bg:     linear-gradient(150deg, rgba(40, 95, 255, 0.05) 0%, #ffffff 60%);
+  --pa-panel-next-shadow: 0 4px 24px -8px rgba(40, 95, 255, 0.18);
+  --pa-mobile-side-bg:     #ffffff;
+  --pa-mobile-side-shadow: 0 0 40px rgba(0, 0, 0, 0.12);
+  --pa-btn-disabled-bg: #e5e7eb;
+  --pa-btn-disabled-fg: #9ca3af;
+  --pa-bloom-gradient: radial-gradient(
+    ellipse at center 82%,
+    rgba(40, 95, 255, 0.07) 0%,
+    rgba(138, 168, 255, 0.04) 36%,
+    rgba(40, 95, 255, 0.01) 60%,
+    transparent 80%
+  );
+  --pa-scrim-bg: rgba(0, 0, 0, 0.24);
 
   --pa-r-sm: 10px;
   --pa-r-md: 14px;
@@ -42,6 +103,85 @@
   color: var(--lp-text);
 }
 
+/* --- Dark theme â€” toggled at runtime, see the header comment above ------- */
+.pa[data-theme='dark'] {
+  --lp-void:          #01030f;
+  --lp-deep:          #030720;
+  --lp-navy:          #04102f;
+
+  --lp-text:          #ffffff;
+  --lp-text-soft:     rgba(255, 255, 255, 0.66);
+  --lp-text-faint:    rgba(255, 255, 255, 0.42);
+
+  --lp-line:          rgba(255, 255, 255, 0.1);
+  --lp-line-strong:   rgba(255, 255, 255, 0.18);
+  --lp-line-ink:      rgba(7, 11, 28, 0.08);
+
+  --lp-glass:         rgba(255, 255, 255, 0.06);
+  --lp-glass-strong:  rgba(255, 255, 255, 0.1);
+
+  --background: var(--lp-void);
+  --foreground: var(--lp-text);
+  --card: rgba(255, 255, 255, 0.035);
+  --card-foreground: var(--lp-text);
+  --popover: #0a1024;
+  --popover-foreground: var(--lp-text);
+  --primary: var(--lp-blue-core);
+  --primary-foreground: #ffffff;
+  --secondary: rgba(255, 255, 255, 0.06);
+  --secondary-foreground: var(--lp-text);
+  --muted: rgba(255, 255, 255, 0.045);
+  --muted-foreground: var(--lp-text-faint);
+  --accent: rgba(40, 95, 255, 0.12);
+  --accent-foreground: var(--lp-blue-mid);
+  --destructive: #c8324b;
+  --border: var(--lp-line-strong);
+  --input: var(--lp-line-strong);
+  --ring: var(--lp-blue-mid);
+
+  --pa-surface:       rgba(255, 255, 255, 0.035);
+  --pa-surface-hover: rgba(255, 255, 255, 0.065);
+  --pa-surface-solid: #0a1024;
+  --pa-selected:      rgba(40, 95, 255, 0.14);
+
+  --pa-track-bg:      rgba(255, 255, 255, 0.1);
+  --pa-focus-bg:      rgba(255, 255, 255, 0.06);
+  --pa-error:         #ff9c9c;
+  --pa-icon-lg-bg:      radial-gradient(circle at 50% 22%, rgba(40, 95, 255, 0.22), transparent 72%);
+  --pa-icon-lg-border:  rgba(40, 95, 255, 0.28);
+  --pa-icon-lg-shadow:  0 12px 30px -16px rgba(40, 95, 255, 0.6);
+  --pa-chip-track-bg: rgba(255, 255, 255, 0.04);
+  --pa-dashed-bg:     rgba(255, 255, 255, 0.04);
+  --pa-blur-bg:         rgba(3, 7, 32, 0.75);
+  --pa-blur-bg-strong:  rgba(3, 7, 32, 0.82);
+  --pa-side-bg:       rgba(3, 7, 32, 0.6);
+  --pa-switcher-bg:   rgba(255, 255, 255, 0.035);
+  --pa-tag-live-bg:   rgba(16, 185, 129, 0.16);
+  --pa-tag-live-fg:   #34d399;
+  --pa-panel-shadow:      0 1px 0 rgba(255, 255, 255, 0.06) inset;
+  --pa-panel-next-bg:     linear-gradient(150deg, rgba(40, 95, 255, 0.16) 0%, rgba(255, 255, 255, 0.03) 60%);
+  --pa-panel-next-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset, 0 24px 48px -24px rgba(40, 95, 255, 0.4);
+  --pa-mobile-side-bg:     rgba(3, 7, 32, 0.97);
+  --pa-mobile-side-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+  --pa-btn-disabled-bg: rgba(255, 255, 255, 0.08);
+  --pa-btn-disabled-fg: var(--lp-text-faint);
+  --pa-bloom-gradient: radial-gradient(
+    ellipse at center 82%,
+    rgba(40, 95, 255, 0.3) 0%,
+    rgba(138, 168, 255, 0.16) 36%,
+    rgba(40, 95, 255, 0.05) 60%,
+    transparent 80%
+  );
+  --pa-scrim-bg: rgba(0, 0, 0, 0.5);
+}
+
+/* Cards, inputs and panels below use var(--pa-surface) as a translucent fill,
+   so they need a backdrop-filter to read as glass rather than a flat tint â€”
+   applied per-component below rather than globally, since a handful (choice
+   marks, avatars) must stay opaque. Glass reads fine over a solid light
+   surface too (a blur with nothing but flat colour behind it is a no-op),
+   so these rules are left in place for both themes rather than conditioned. */
+
 /* One visible focus treatment across the whole product surface. */
 .pa :focus-visible {
   outline: 2px solid var(--lp-blue-mid);
@@ -50,7 +190,7 @@
 }
 
 /* ==========================================================================
-   Type — reuses the landing scale, adds only what the product needs
+   Type â€” reuses the landing scale, adds only what the product needs
    ========================================================================== */
 
 .pa-title {
@@ -121,12 +261,12 @@
    shadow + blurred drop-glow + a glass gloss edge), rebuilt in the Prospectra
    blue ramp rather than the reference's orange:
 
-     · gradient FILL         #5c84ff → #285fff → #0b47e6   (the light→saturated
+     Â· gradient FILL         #5c84ff â†’ #285fff â†’ #0b47e6   (the lightâ†’saturated
                              sweep the reference builds with a layer blur)
-     · top gloss highlight   inset white, the glass edge
-     · coloured inner shadow inset deep-blue at the foot, the reference's
+     Â· top gloss highlight   inset white, the glass edge
+     Â· coloured inner shadow inset deep-blue at the foot, the reference's
                              "Inner shadow" layer
-     · drop-glow             a soft blue halo, the reference's blurred
+     Â· drop-glow             a soft blue halo, the reference's blurred
                              "Drop shadow" reading as glow on the light surface
    The ::after sweep is the glass gloss, sitting above the fill and below the
    label (isolate + z-index:-1). */
@@ -187,8 +327,8 @@
 }
 
 .pa-btn:disabled {
-  background: #e5e7eb;
-  color: #9ca3af;
+  background: var(--pa-btn-disabled-bg);
+  color: var(--pa-btn-disabled-fg);
   box-shadow: none;
   cursor: not-allowed;
 }
@@ -242,7 +382,7 @@
   background: var(--lp-void);
 }
 
-/* Subtle accent glow at the bottom — muted on light background */
+/* Accent glow at the bottom â€” intensity flips with --pa-bloom-gradient */
 .pa-onboard__bloom {
   position: fixed;
   left: 50%;
@@ -253,13 +393,7 @@
   z-index: 0;
   pointer-events: none;
   border-radius: 50%;
-  background: radial-gradient(
-    ellipse at center 82%,
-    rgba(40, 95, 255, 0.07) 0%,
-    rgba(138, 168, 255, 0.04) 36%,
-    rgba(40, 95, 255, 0.01) 60%,
-    transparent 80%
-  );
+  background: var(--pa-bloom-gradient);
   filter: blur(48px);
   will-change: transform, opacity;
 }
@@ -273,7 +407,7 @@
   gap: 16px;
   padding: 20px clamp(1.25rem, 4vw, 2.5rem);
   border-bottom: 1px solid var(--lp-line);
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--pa-blur-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
@@ -333,7 +467,7 @@
 }
 
 /* ==========================================================================
-   Progress — a thin blue line
+   Progress â€” a thin blue line
    ========================================================================== */
 
 .pa-progress {
@@ -367,7 +501,7 @@
 .pa-progress__track {
   height: 3px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.08);
+  background: var(--pa-track-bg);
   overflow: hidden;
 }
 
@@ -435,12 +569,12 @@
 .pa-input:focus {
   outline: none;
   border-color: var(--lp-blue-core);
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(40, 95, 255, 0.12);
+  background: var(--pa-focus-bg);
+  box-shadow: 0 0 0 3px rgba(40, 95, 255, 0.22);
 }
 
 .pa-input[aria-invalid='true'] {
-  border-color: #ef4444;
+  border-color: var(--pa-error);
 }
 
 .pa-error {
@@ -448,7 +582,7 @@
   align-items: center;
   gap: 6px;
   font-size: var(--lp-t-caption);
-  color: #ef4444;
+  color: var(--pa-error);
 }
 
 /* ==========================================================================
@@ -543,12 +677,12 @@
   object-fit: contain;
 }
 
-/* The single larger illustration a region is allowed — a soft blue well. */
+/* The single larger illustration a region is allowed â€” a soft blue well. */
 .pa-icon--lg {
   border-radius: 18px;
-  background: radial-gradient(circle at 50% 22%, rgba(40, 95, 255, 0.14), #ffffff 72%);
-  border-color: rgba(40, 95, 255, 0.2);
-  box-shadow: 0 12px 30px -16px rgba(40, 95, 255, 0.5);
+  background: var(--pa-icon-lg-bg);
+  border-color: var(--pa-icon-lg-border);
+  box-shadow: var(--pa-icon-lg-shadow);
 }
 
 /* --- Quick actions --------------------------------------------------------- */
@@ -748,7 +882,7 @@
   padding: 4px;
   gap: 4px;
   border-radius: var(--pa-r-md);
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--pa-chip-track-bg);
   border: 1px solid var(--lp-line-strong);
   margin: 0;
   flex-wrap: wrap;
@@ -809,7 +943,7 @@
   border: 1.5px dashed var(--lp-line-strong);
   display: grid;
   place-items: center;
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--pa-dashed-bg);
   color: var(--lp-text-faint);
   overflow: hidden;
   flex-shrink: 0;
@@ -889,7 +1023,7 @@
   right: 0;
   z-index: 20;
   border-top: 1px solid var(--lp-line-strong);
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--pa-blur-bg-strong);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
 }
@@ -992,7 +1126,9 @@
   overflow-y: auto;
   z-index: 5;
   border-right: 1px solid var(--lp-line-strong);
-  background: #ffffff;
+  background: var(--pa-side-bg);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -1012,7 +1148,7 @@
   padding: 10px 11px;
   border-radius: var(--pa-r-md);
   border: 1px solid var(--lp-line-strong);
-  background: rgba(0, 0, 0, 0.02);
+  background: var(--pa-switcher-bg);
   cursor: pointer;
   text-align: left;
   font-family: var(--lp-body);
@@ -1079,12 +1215,32 @@
   margin: 0;
 }
 
+.pa-nav__group {
+  margin-top: 16px;
+}
+
+.pa-nav__group:first-child {
+  margin-top: 0;
+}
+
+.pa-nav__group-label {
+  padding: 0 11px;
+  margin-bottom: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lp-text-faint);
+  opacity: 0.7;
+}
+
 .pa-nav__item {
   position: relative;
   display: flex;
   align-items: center;
   gap: 11px;
   width: 100%;
+  min-height: 44px;
   padding: 10px 11px;
   border-radius: var(--pa-r-sm);
   border: none;
@@ -1129,6 +1285,114 @@
   min-width: 0;
 }
 
+/* A nav row with children (e.g. Find leads) â€” the label navigates, the
+   chevron expands. Split into two independently-clickable regions rather
+   than nesting a button inside a link. */
+.pa-nav__item--parent {
+  padding: 0;
+  gap: 0;
+}
+
+.pa-nav__parent-link {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0 4px 0 11px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.pa-nav__expand {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 44px;
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  color: var(--lp-text-faint);
+  cursor: pointer;
+}
+
+.pa-nav__expand:hover {
+  color: var(--lp-text);
+}
+
+.pa-nav__expand svg {
+  transition: transform 0.2s ease;
+}
+
+.pa-nav__expand-icon--open {
+  transform: rotate(180deg);
+}
+
+.pa-nav--sub {
+  margin: 2px 0 4px 22px;
+  padding-left: 14px;
+  border-left: 1px solid var(--lp-line);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.pa-nav__item--sub {
+  min-height: 38px;
+  padding: 8px 10px;
+  font-size: 0.8125rem;
+}
+
+/* A whole section header (e.g. "Lead workspace") as one clickable, expandable
+   row — every group opens onto its items the same way Find leads opens onto
+   its five search kinds, rather than sitting under a passive caption. */
+.pa-nav__group-toggle {
+  font-weight: 600;
+}
+
+.pa-nav__group-toggle[data-parent-active] {
+  color: var(--lp-blue-mid);
+}
+
+.pa-nav__group-chevron {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--lp-text-faint);
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.18s ease;
+}
+
+.pa-nav__group-toggle:hover .pa-nav__group-chevron {
+  color: var(--lp-text);
+}
+
+.pa-nav--group-items {
+  margin: 1px 0 4px 4px;
+  padding-left: 18px;
+  border-left: 1px solid var(--lp-line);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+/* Shared animated disclosure — grid-rows 0fr→1fr tweens height without
+   measuring content, and truly collapses to zero rather than just fading,
+   so collapsed rows never trap keyboard focus. */
+.pa-nav__collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.pa-nav__collapse[data-expanded='true'] {
+  grid-template-rows: 1fr;
+}
+
+.pa-nav__collapse-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
 /* "Soon" tag */
 .pa-tag {
   font-size: 0.5625rem;
@@ -1144,8 +1408,114 @@
 }
 
 .pa-tag--live {
-  background: rgba(16, 185, 129, 0.1);
-  color: #059669;
+  background: var(--pa-tag-live-bg);
+  color: var(--pa-tag-live-fg);
+}
+
+/* Getting-started progress card, pinned above the footer until every item
+   is done â€” then it steps aside rather than sitting there stale. */
+.pa-getting-started {
+  display: block;
+  margin: 4px 0 0;
+  padding: 12px;
+  border-radius: var(--pa-r-md);
+  border: 1px solid var(--lp-line-strong);
+  background: var(--pa-surface);
+  text-decoration: none;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.pa-getting-started:hover {
+  border-color: var(--lp-blue-mid);
+  background: var(--pa-surface-hover);
+}
+
+.pa-getting-started__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pa-getting-started__title {
+  font-size: var(--lp-t-sm);
+  font-weight: 700;
+  color: var(--lp-text);
+}
+
+.pa-getting-started__count {
+  font-size: var(--lp-t-caption);
+  color: var(--lp-text-faint);
+  white-space: nowrap;
+}
+
+.pa-getting-started__list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pa-getting-started__list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--lp-t-caption);
+  color: var(--lp-text-soft);
+}
+
+.pa-getting-started__list li[data-done='true'] {
+  color: var(--lp-text-faint);
+  text-decoration: line-through;
+}
+
+.pa-getting-started__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--lp-line-strong);
+  flex-shrink: 0;
+}
+
+.pa-getting-started__list li[data-done='true'] .pa-getting-started__dot {
+  background: var(--lp-blue-core);
+}
+
+/* Secondary footer links â€” Request a feature / Upgrade */
+.pa-side__links {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 10px;
+}
+
+.pa-side__link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 38px;
+  padding: 8px 11px;
+  border-radius: var(--pa-r-sm);
+  font-size: var(--lp-t-caption);
+  font-weight: 500;
+  color: var(--lp-text-faint);
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.pa-side__link:hover {
+  background: var(--lp-glass);
+  color: var(--lp-text-soft);
+}
+
+.pa-side__link--upgrade {
+  color: var(--lp-blue-mid);
+  font-weight: 600;
+}
+
+.pa-side__link--upgrade:hover {
+  background: rgba(40, 95, 255, 0.08);
+  color: var(--lp-blue-core);
 }
 
 /* Sidebar footer */
@@ -1186,7 +1556,7 @@
 .pa-meter__track {
   height: 3px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.08);
+  background: var(--pa-track-bg);
   overflow: hidden;
 }
 
@@ -1217,7 +1587,7 @@
   gap: 14px;
   padding: 14px clamp(1.25rem, 3vw, 2.25rem);
   border-bottom: 1px solid var(--lp-line-strong);
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--pa-blur-bg);
   backdrop-filter: blur(16px) saturate(150%);
   -webkit-backdrop-filter: blur(16px) saturate(150%);
 }
@@ -1259,8 +1629,8 @@
 
 .pa-burger {
   display: none;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--pa-r-sm);
   border: 1px solid var(--lp-line-strong);
   background: var(--pa-surface);
@@ -1288,7 +1658,7 @@
 .pa-content {
   padding: clamp(1.75rem, 4vw, 3rem) clamp(1.25rem, 3vw, 2.25rem) 5rem;
   /* Wide enough to use a large monitor without letting body copy run past a
-     readable measure — the inner grid caps its own columns. */
+     readable measure â€” the inner grid caps its own columns. */
   max-width: 1440px;
   width: 100%;
 }
@@ -1298,20 +1668,21 @@
   border: 1px solid var(--lp-line-strong);
   border-radius: var(--pa-r-lg);
   background: var(--pa-surface);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
   padding: 24px;
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  /* On dark this is a top-edge glass highlight (a black drop shadow would
+     disappear against a near-black page); on light it's an ordinary drop
+     shadow. --pa-panel-shadow carries whichever is correct per theme. */
+  box-shadow: var(--pa-panel-shadow);
 }
 
-/* The primary "recommended next step" panel — a subtle blue wash */
+/* The primary "recommended next step" panel â€” a subtle blue wash */
 .pa-panel--next {
-  border-color: rgba(40, 95, 255, 0.25);
-  background: linear-gradient(
-    150deg,
-    rgba(40, 95, 255, 0.05) 0%,
-    #ffffff 60%
-  );
-  box-shadow: 0 4px 24px -8px rgba(40, 95, 255, 0.18);
+  border-color: rgba(40, 95, 255, 0.35);
+  background: var(--pa-panel-next-bg);
+  box-shadow: var(--pa-panel-next-shadow);
 }
 
 .pa-panel > * {
@@ -1332,6 +1703,24 @@
 .pa-grid--two {
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   align-items: start;
+}
+
+/* A fixed rail + main-content split (search filters, knowledge-base panes,
+   agent studio side nav) that collapses to one column on narrow viewports â€”
+   set --pa-rail on the element to size the rail per use. Plain CSS grid
+   templates on an inline style can't be media-queried since inline styles
+   always win, so every page that needs this responsive behaviour uses this
+   class instead of an inline gridTemplateColumns. */
+.pa-grid--split {
+  display: grid;
+  grid-template-columns: var(--pa-rail, 280px) 1fr;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .pa-grid--split {
+    grid-template-columns: 1fr;
+  }
 }
 
 .pa-stat {
@@ -1485,7 +1874,9 @@
   border: 1px solid var(--lp-line-strong);
   border-radius: var(--pa-r-lg);
   background: var(--pa-surface);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  box-shadow: var(--pa-panel-shadow);
   max-width: 640px;
 }
 
@@ -1509,7 +1900,7 @@
 }
 
 /* ==========================================================================
-   Gradient field — hide the dark landing gradient inside workspace
+   Gradient field â€” hide the dark landing gradient inside workspace
    ========================================================================== */
 
 .pa .lp-grade {
@@ -1536,8 +1927,8 @@
     z-index: 40;
     transform: translateX(-100%);
     transition: transform 0.35s var(--lp-ease);
-    background: #ffffff;
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.12);
+    background: var(--pa-mobile-side-bg);
+    box-shadow: var(--pa-mobile-side-shadow);
   }
 
   .pa-side[data-open='true'] {
@@ -1552,7 +1943,7 @@
     position: fixed;
     inset: 0;
     z-index: 35;
-    background: rgba(0, 0, 0, 0.24);
+    background: var(--pa-scrim-bg);
     backdrop-filter: blur(2px);
     border: none;
     cursor: pointer;
@@ -1592,6 +1983,758 @@
    Motion preferences
    ========================================================================== */
 
+/* ==========================================================================
+   App shell â€” shared product components
+   --------------------------------------------------------------------------
+   PageHeader, EmptyState, Tabs, DemoTag, Skeleton, DataTable, Drawer,
+   ConfirmDialog, Toast, and the extra form controls the route pages share.
+   Everything below inherits .pa's dark tokens (no separate .pa nesting,
+   same convention as the rest of this file).
+   ========================================================================== */
+
+/* --- Page header ------------------------------------------------------ */
+
+.pa-pagehead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.pa-pagehead__crumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--lp-t-caption);
+  color: var(--lp-text-faint);
+  margin-bottom: 8px;
+}
+
+.pa-pagehead__crumb a {
+  color: var(--lp-text-faint);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.pa-pagehead__crumb a:hover {
+  color: var(--lp-text-soft);
+}
+
+.pa-pagehead__text {
+  min-width: 0;
+}
+
+.pa-pagehead__title {
+  font-family: var(--lp-display);
+  font-size: clamp(1.375rem, 1.1rem + 1vw, 1.75rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  margin: 0;
+  color: var(--lp-text);
+}
+
+.pa-pagehead__desc {
+  margin: 6px 0 0;
+  font-size: var(--lp-t-sm);
+  line-height: 1.55;
+  color: var(--lp-text-faint);
+  max-width: 60ch;
+}
+
+.pa-pagehead__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.pa-pagehead__tabs {
+  flex-basis: 100%;
+  margin-top: 18px;
+}
+
+/* --- Tabs --------------------------------------------------------------- */
+
+.pa-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--lp-line-strong);
+  overflow-x: auto;
+}
+
+.pa-tab {
+  position: relative;
+  padding: 10px 14px;
+  font-family: var(--lp-body);
+  font-size: var(--lp-t-sm);
+  font-weight: 500;
+  color: var(--lp-text-faint);
+  background: none;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.pa-tab:hover {
+  color: var(--lp-text-soft);
+}
+
+.pa-tab[aria-selected='true'] {
+  color: var(--lp-text);
+  font-weight: 600;
+}
+
+.pa-tab[aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--lp-blue-core);
+}
+
+.pa-tab:focus-visible {
+  outline: 2px solid var(--lp-blue-mid);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* --- Demo / status tags -------------------------------------------------- */
+
+.pa-demo-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.pa-demo-tag--demo {
+  background: rgba(40, 95, 255, 0.14);
+  color: var(--lp-blue-mid);
+}
+
+.pa-demo-tag--simulation {
+  background: rgba(245, 181, 68, 0.16);
+  color: #f5b544;
+}
+
+.pa-demo-tag--coming-soon {
+  background: var(--lp-glass-strong);
+  color: var(--lp-text-faint);
+}
+
+.pa-demo-tag--not-connected {
+  background: var(--lp-glass);
+  color: var(--lp-text-faint);
+  border: 1px solid var(--lp-line-strong);
+}
+
+/* --- Empty state ---------------------------------------------------------- */
+
+.pa-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  padding: clamp(2.75rem, 6vw, 4.5rem) 1.5rem;
+  border: 1px dashed var(--lp-line-strong);
+  border-radius: var(--pa-r-lg);
+  background: var(--lp-glass);
+}
+
+.pa-empty__title {
+  font-family: var(--lp-display);
+  font-weight: 700;
+  font-size: 1.0625rem;
+  color: var(--lp-text);
+  margin: 0;
+}
+
+.pa-empty__desc {
+  font-size: var(--lp-t-sm);
+  line-height: 1.55;
+  color: var(--lp-text-faint);
+  max-width: 42ch;
+  margin: 0;
+}
+
+.pa-empty__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* --- Skeleton --------------------------------------------------------- */
+
+.pa-skel {
+  position: relative;
+  overflow: hidden;
+  background: var(--lp-glass-strong);
+  border-radius: 8px;
+}
+
+.pa-skel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.08),
+    transparent
+  );
+  animation: pa-shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes pa-shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* --- Status pill --------------------------------------------------------- */
+
+.pa-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--pa-r-pill);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pa-status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.pa-status--muted {
+  background: var(--lp-glass-strong);
+  color: var(--lp-text-faint);
+}
+
+.pa-status--soft {
+  background: rgba(40, 95, 255, 0.14);
+  color: var(--lp-blue-mid);
+}
+
+.pa-status--success {
+  background: rgba(16, 185, 129, 0.16);
+  color: #34d399;
+}
+
+.pa-status--warn {
+  background: rgba(255, 122, 122, 0.16);
+  color: #ff8a8a;
+}
+
+/* --- Data table ----------------------------------------------------------- */
+
+.pa-table-wrap {
+  border: 1px solid var(--lp-line-strong);
+  border-radius: var(--pa-r-lg);
+  overflow: hidden;
+  background: var(--pa-surface);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+}
+
+.pa-table-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--lp-line-strong);
+  flex-wrap: wrap;
+}
+
+.pa-table-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 38px;
+  border-radius: var(--pa-r-sm);
+  border: 1px solid var(--lp-line-strong);
+  background: var(--lp-glass);
+  flex: 1;
+  min-width: 180px;
+  max-width: 320px;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.pa-table-search:focus-within {
+  border-color: var(--lp-blue-core);
+  background: var(--lp-glass-strong);
+  box-shadow: 0 0 0 3px rgba(40, 95, 255, 0.16);
+}
+
+.pa-table-search input {
+  border: none;
+  background: none;
+  outline: none;
+  color: var(--lp-text);
+  font-family: var(--lp-body);
+  font-size: var(--lp-t-sm);
+  width: 100%;
+}
+
+.pa-table-search input::placeholder {
+  color: var(--lp-text-faint);
+}
+
+.pa-table-search svg {
+  color: var(--lp-text-faint);
+  flex-shrink: 0;
+}
+
+.pa-table-toolbar__spacer {
+  flex: 1;
+}
+
+.pa-table-scroll {
+  overflow-x: auto;
+}
+
+.pa-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+}
+
+.pa-table thead th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--lp-text-faint);
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--lp-line-strong);
+  white-space: nowrap;
+}
+
+.pa-table tbody td {
+  padding: 13px 16px;
+  font-size: var(--lp-t-sm);
+  color: var(--lp-text-soft);
+  border-bottom: 1px solid var(--lp-line);
+  white-space: nowrap;
+}
+
+.pa-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.pa-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.pa-table tbody tr:hover {
+  background: var(--lp-glass);
+}
+
+.pa-table tbody tr[data-clickable='true'] {
+  cursor: pointer;
+}
+
+.pa-table-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--lp-line-strong);
+  font-size: var(--lp-t-caption);
+  color: var(--lp-text-faint);
+}
+
+/* --- Profile menu ----------------------------------------------------- */
+
+.pa-profile {
+  position: relative;
+}
+
+.pa-profile__trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: var(--pa-r-md);
+  border: 1px solid transparent;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.pa-profile__trigger:hover {
+  background: var(--lp-glass);
+  border-color: var(--lp-line-strong);
+}
+
+.pa-profile__name {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--lp-t-caption);
+  font-weight: 600;
+  color: var(--lp-text-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pa-profile__menu {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 15;
+  padding: 6px;
+  border-radius: var(--pa-r-md);
+  border: 1px solid var(--lp-line-strong);
+  background: var(--pa-surface-solid);
+  box-shadow: 0 20px 50px -18px rgba(0, 0, 0, 0.6);
+}
+
+.pa-profile__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 10px;
+  border-radius: var(--pa-r-sm);
+  border: none;
+  background: none;
+  color: var(--lp-text-soft);
+  font-size: var(--lp-t-sm);
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.pa-profile__item:hover {
+  background: var(--lp-glass-strong);
+  color: var(--lp-text);
+}
+
+.pa-profile__item--danger:hover {
+  color: #ff8a8a;
+}
+
+/* --- Icon-only button (with tooltip via title attr) ----------------------- */
+
+.pa-icon-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 9px;
+  border: 1px solid var(--lp-line-strong);
+  background: var(--lp-glass);
+  color: var(--lp-text-soft);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.pa-icon-btn:hover {
+  background: var(--lp-glass-strong);
+  color: var(--lp-text);
+  border-color: var(--lp-line-strong);
+}
+
+/* --- Extra form controls --------------------------------------------------- */
+
+.pa-textarea {
+  min-height: 96px;
+  padding: 12px 16px;
+  resize: vertical;
+  font-family: var(--lp-body);
+  line-height: 1.5;
+}
+
+.pa-select {
+  appearance: none;
+  padding-right: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  cursor: pointer;
+}
+
+/* --- Drawer --------------------------------------------------------------- */
+
+.pa-drawer-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(1, 3, 15, 0.6);
+  backdrop-filter: blur(2px);
+  border: none;
+  cursor: pointer;
+}
+
+.pa-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 61;
+  width: min(480px, 100vw);
+  background: var(--pa-surface-solid);
+  border-left: 1px solid var(--lp-line-strong);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -20px 0 60px rgba(0, 0, 0, 0.5);
+  animation: pa-drawer-in 0.3s var(--lp-ease);
+}
+
+@keyframes pa-drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.pa-drawer__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--lp-line-strong);
+}
+
+.pa-drawer__title {
+  font-family: var(--lp-display);
+  font-weight: 700;
+  font-size: 1.0625rem;
+  color: var(--lp-text);
+  margin: 0;
+}
+
+.pa-drawer__desc {
+  margin-top: 5px;
+  font-size: var(--lp-t-caption);
+  color: var(--lp-text-faint);
+}
+
+.pa-drawer__close {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: none;
+  color: var(--lp-text-faint);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.pa-drawer__close:hover {
+  background: var(--lp-glass-strong);
+  color: var(--lp-text);
+}
+
+.pa-drawer__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 22px;
+}
+
+.pa-drawer__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 22px;
+  border-top: 1px solid var(--lp-line-strong);
+}
+
+/* --- Confirm dialog --------------------------------------------------------- */
+
+.pa-dialog-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: rgba(1, 3, 15, 0.65);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border: none;
+}
+
+.pa-dialog {
+  width: 100%;
+  max-width: 400px;
+  text-align: left;
+  background: var(--pa-surface-solid);
+  border: 1px solid var(--lp-line-strong);
+  border-radius: var(--pa-r-lg);
+  padding: 22px;
+  box-shadow: 0 30px 70px -20px rgba(0, 0, 0, 0.6);
+  animation: pa-dialog-in 0.22s var(--lp-ease);
+}
+
+@keyframes pa-dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.pa-dialog__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 14px;
+  background: rgba(255, 122, 122, 0.16);
+  color: #ff8a8a;
+}
+
+.pa-dialog__icon--neutral {
+  background: rgba(40, 95, 255, 0.14);
+  color: var(--lp-blue-mid);
+}
+
+.pa-dialog__title {
+  font-family: var(--lp-display);
+  font-weight: 700;
+  font-size: 1.0625rem;
+  color: var(--lp-text);
+  margin: 0;
+}
+
+.pa-dialog__desc {
+  margin-top: 8px;
+  font-size: var(--lp-t-sm);
+  color: var(--lp-text-soft);
+  line-height: 1.55;
+}
+
+.pa-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* --- Toast ------------------------------------------------------------- */
+
+.pa-toast-region {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 80;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+  max-width: min(360px, calc(100vw - 40px));
+}
+
+.pa-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 13px 15px;
+  border-radius: var(--pa-r-md);
+  border: 1px solid var(--lp-line-strong);
+  background: var(--pa-surface-solid);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 50px -18px rgba(0, 0, 0, 0.6);
+  animation: pa-toast-in 0.25s var(--lp-ease);
+  font-family: var(--lp-body);
+  font-size: var(--lp-t-sm);
+  color: var(--lp-text);
+}
+
+@keyframes pa-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pa-toast__icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--lp-blue-mid);
+}
+
+.pa-toast--success .pa-toast__icon {
+  color: #34d399;
+}
+
+.pa-toast--error .pa-toast__icon {
+  color: #ff8a8a;
+}
+
+.pa-toast__msg {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.pa-toast__close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--lp-text-faint);
+  cursor: pointer;
+  padding: 2px;
+}
+
+.pa-toast__close:hover {
+  color: var(--lp-text);
+}
+
+@media (max-width: 640px) {
+  .pa-drawer {
+    width: 100vw;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pa *,
   .pa *::before,
@@ -1605,3 +2748,4 @@
     transition: none;
   }
 }
+

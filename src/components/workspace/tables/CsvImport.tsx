@@ -24,13 +24,19 @@ const MAX_BYTES = 5 * 1024 * 1024;
 
 type Stage = 'pick' | 'map' | 'done';
 
+export interface CsvImportSummary {
+  fileName: string;
+  mapping: Record<string, string>;
+  rowCounts: { total: number; imported: number; duplicate: number; invalid: number };
+}
+
 export function CsvImport({
   workspaceId,
   onImported,
   onCancel
 }: {
   workspaceId: string;
-  onImported: (table: DemoTable, rows: DemoRow[]) => void;
+  onImported: (table: DemoTable, rows: DemoRow[], summary: CsvImportSummary) => void;
   onCancel: () => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
@@ -139,9 +145,10 @@ export function CsvImport({
     });
 
     table.rowCount = rows.length;
-    setResult({ imported: rows.length, duplicate, invalid });
+    const rowCounts = { total: parsed.rows.length, imported: rows.length, duplicate, invalid };
+    setResult(rowCounts);
     setStage('done');
-    onImported(table, rows);
+    onImported(table, rows, { fileName, mapping, rowCounts });
   };
 
   /* ---------------- Pick ---------------- */

@@ -54,6 +54,28 @@ const NEXT_BY_GOAL: Record<GoalId, NextStep> = {
   }
 };
 
+/**
+ * Maps a `NextStep.section` id to the real `/app/*` route it now lives at.
+ * These ids predate the real routes (they were section keys in a single-page
+ * switcher); kept as plain strings above since NextStep is also read by
+ * copy-only surfaces that never navigate, and centralised here rather than
+ * duplicated at every call site.
+ */
+export const SECTION_ROUTES: Record<string, string> = {
+  home: '/app',
+  'find-leads': '/app/find-leads',
+  tables: '/app/tables',
+  campaigns: '/app/campaigns',
+  voice: '/app/voice-agents',
+  audiences: '/app/audiences',
+  analytics: '/app/analytics',
+  settings: '/app/settings'
+};
+
+export function sectionRoute(section: string): string {
+  return SECTION_ROUTES[section] ?? '/app';
+}
+
 export function nextStepFor(data: OnboardingData): NextStep {
   /* An explicit import beats the goal default: someone who said "CSV" wants
      to see their own rows before anything else. */

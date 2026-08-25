@@ -58,13 +58,18 @@ export interface DemoCampaignStep {
   body: string;
 }
 
-/** Drafts only. Sending needs a provider and a verified sender. */
+export type DemoCampaignChannel = 'email' | 'voice' | 'whatsapp';
+
+/** Sending needs a provider and a verified sender, so status only ever
+ *  reaches 'completed' if a user marks a draft as sent by hand — see the
+ *  campaign detail page. Nothing here fires on its own. */
 export interface DemoCampaign {
   id: string;
   workspaceId: string;
   name: string;
+  channel: DemoCampaignChannel;
   audienceId?: string;
-  status: 'draft';
+  status: 'draft' | 'completed';
   steps: DemoCampaignStep[];
   createdAt: string;
   updatedAt: string;

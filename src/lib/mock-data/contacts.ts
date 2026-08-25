@@ -1,0 +1,39 @@
+/**
+ * Demo contacts — fictional people, tied to DEMO_COMPANIES by companyId.
+ * No real personal information. Used for the people-search builder,
+ * audiences, and campaign member previews.
+ */
+
+import type { Contact } from '../types/models';
+
+const stamp = { createdAt: '2026-07-05T09:00:00.000Z', updatedAt: '2026-07-05T09:00:00.000Z' };
+
+export interface DemoContactDisplay extends Contact {
+  companyName: string;
+  location: string;
+  seniority: 'ic' | 'manager' | 'director' | 'vp' | 'c_suite';
+  department: string;
+}
+
+export const DEMO_CONTACTS: DemoContactDisplay[] = [
+  { id: 'ct-1', workspaceId: 'demo', companyId: 'co-1', fullName: 'Ananya Rao', title: 'VP of Engineering', email: 'ananya.rao@hyperscale.io', phone: '+91 98450 11223', consentState: 'unknown', companyName: 'HyperScale Cloud', location: 'Bengaluru, IN', seniority: 'vp', department: 'Engineering', provenance: { source: 'search', provider: 'demo' }, ...stamp },
+  { id: 'ct-2', workspaceId: 'demo', companyId: 'co-1', fullName: 'Marcus Feld', title: 'VP of Sales', email: 'marcus.feld@hyperscale.io', phone: '+1 415 555 0142', consentState: 'unknown', companyName: 'HyperScale Cloud', location: 'San Francisco, US', seniority: 'vp', department: 'Sales', provenance: { source: 'search', provider: 'demo' }, ...stamp },
+  { id: 'ct-3', workspaceId: 'demo', companyId: 'co-2', fullName: 'Priya Raghavan', title: 'Head of Growth', email: 'priya@neuralglow.ai', phone: '+1 628 555 0198', consentState: 'unknown', companyName: 'NeuralGlow AI', location: 'San Francisco, US', seniority: 'director', department: 'Marketing', provenance: { source: 'search', provider: 'demo' }, ...stamp },
+  { id: 'ct-4', workspaceId: 'demo', companyId: 'co-3', fullName: 'Dana Whitfield', title: 'Founder & CEO', email: 'dana@cedarand.co', phone: '+44 20 7946 0958', consentState: 'unknown', companyName: 'Cedar & Co', location: 'London, UK', seniority: 'c_suite', department: 'Executive', provenance: { source: 'search', provider: 'demo' }, ...stamp },
+  { id: 'ct-5', workspaceId: 'demo', companyId: 'co-4', fullName: 'Rohan Mehta', title: 'Director of Product', email: 'rohan.mehta@rupeeledger.in', phone: '+91 99201 44567', consentState: 'unknown', companyName: 'Rupee Ledger', location: 'Mumbai, IN', seniority: 'director', department: 'Product', provenance: { source: 'search', provider: 'demo' }, ...stamp },
+  { id: 'ct-6', workspaceId: 'demo', companyId: 'co-5', fullName: 'Claire Dubois', title: 'Operations Manager', email: 'claire.dubois@northwindlog.com', phone: '+1 416 555 0176', consentState: 'unknown', companyName: 'Northwind Logistics', location: 'Toronto, CA', seniority: 'manager', department: 'Operations', provenance: { source: 'search', provider: 'demo' }, ...stamp },
+  { id: 'ct-7', workspaceId: 'demo', companyId: 'co-6', fullName: 'Samuel Okafor', title: 'CTO', email: 'samuel.okafor@vertexbio.com', phone: '+1 617 555 0134', consentState: 'unknown', companyName: 'Vertex Biosciences', location: 'Boston, US', seniority: 'c_suite', department: 'Engineering', provenance: { source: 'search', provider: 'demo' }, ...stamp },
+  { id: 'ct-8', workspaceId: 'demo', companyId: 'co-7', fullName: 'Kavya Iyer', title: 'Senior Product Manager', email: 'kavya.iyer@sundialrobotics.com', phone: '+91 98220 33812', consentState: 'unknown', companyName: 'Sundial Robotics', location: 'Pune, IN', seniority: 'manager', department: 'Product', provenance: { source: 'search', provider: 'demo' }, ...stamp },
+  { id: 'ct-9', workspaceId: 'demo', companyId: 'co-8', fullName: 'James Whitmore', title: 'VP of Revenue Operations', email: 'j.whitmore@meridianhealth.com', phone: '+1 312 555 0187', consentState: 'unknown', companyName: 'Meridian Health Group', location: 'Chicago, US', seniority: 'vp', department: 'Sales', provenance: { source: 'search', provider: 'demo' }, ...stamp },
+  { id: 'ct-10', workspaceId: 'demo', companyId: 'co-9', fullName: 'Wei Ling Tan', title: 'Head of Partnerships', email: 'weiling.tan@loopcommerce.io', phone: '+65 8123 4567', consentState: 'unknown', companyName: 'Loop Commerce', location: 'Singapore, SG', seniority: 'director', department: 'Business Development', provenance: { source: 'search', provider: 'demo' }, ...stamp },
+  { id: 'ct-11', workspaceId: 'demo', companyId: 'co-10', fullName: 'Arjun Nair', title: 'Plant Operations Director', email: 'arjun.nair@terracore.com', phone: '+91 97250 66710', consentState: 'unknown', companyName: 'Terracore Materials', location: 'Ahmedabad, IN', seniority: 'director', department: 'Operations', provenance: { source: 'search', provider: 'demo' }, ...stamp },
+  { id: 'ct-12', workspaceId: 'demo', companyId: 'co-11', fullName: 'Lukas Weber', title: 'Creative Director', email: 'lukas@halcyonstudios.co', phone: '+49 30 5557 0192', consentState: 'unknown', companyName: 'Halcyon Studios', location: 'Berlin, DE', seniority: 'director', department: 'Creative', provenance: { source: 'search', provider: 'demo' }, ...stamp },
+  { id: 'ct-13', workspaceId: 'demo', companyId: 'co-12', fullName: 'Fatima Al-Sayed', title: 'Head of Sales', email: 'fatima@palmfern.com', phone: '+971 4 555 0163', consentState: 'unknown', companyName: 'Palm & Fern Realty', location: 'Dubai, AE', seniority: 'director', department: 'Sales', provenance: { source: 'search', provider: 'demo' }, ...stamp },
+  { id: 'ct-14', workspaceId: 'demo', companyId: 'co-13', fullName: 'Grace Liu', title: 'VP of Supply Chain', email: 'grace.liu@orbitalfreight.com', phone: '+1 512 555 0121', consentState: 'unknown', companyName: 'Orbital Freight', location: 'Austin, US', seniority: 'vp', department: 'Operations', provenance: { source: 'search', provider: 'demo' }, ...stamp },
+  { id: 'ct-15', workspaceId: 'demo', companyId: 'co-14', fullName: 'Devansh Choudhary', title: 'Founder', email: 'devansh@indigofabrics.in', phone: '+91 94140 22981', consentState: 'unknown', companyName: 'Indigo Fabrics', location: 'Jaipur, IN', seniority: 'c_suite', department: 'Executive', provenance: { source: 'search', provider: 'demo' }, ...stamp },
+  { id: 'ct-16', workspaceId: 'demo', companyId: 'co-15', fullName: 'Oliver Bennett', title: 'Data Science Lead', email: 'oliver.bennett@kestrelanalytics.com', phone: '+61 2 5550 1987', consentState: 'unknown', companyName: 'Kestrel Analytics', location: 'Sydney, AU', seniority: 'manager', department: 'Engineering', provenance: { source: 'search', provider: 'demo' }, ...stamp },
+  { id: 'ct-17', workspaceId: 'demo', companyId: 'co-16', fullName: 'Sneha Patil', title: 'Regional Sales Director', email: 'sneha.patil@southbankcap.com', phone: '+91 90000 12456', consentState: 'unknown', companyName: 'Southbank Capital', location: 'Hyderabad, IN', seniority: 'director', department: 'Sales', provenance: { source: 'search', provider: 'demo' }, ...stamp },
+  { id: 'ct-18', workspaceId: 'demo', companyId: 'co-17', fullName: 'Henry Osei', title: 'Brand Marketing Manager', email: 'henry.osei@bramblewood.com', phone: '+1 872 555 0155', consentState: 'unknown', companyName: 'Bramblewood Foods', location: 'Chennai, IN', seniority: 'manager', department: 'Marketing', provenance: { source: 'search', provider: 'demo' }, ...stamp },
+  { id: 'ct-19', workspaceId: 'demo', companyId: 'co-18', fullName: 'Ishaan Kapoor', title: 'VP of Manufacturing', email: 'ishaan.kapoor@arcline.com', phone: '+91 98110 77234', consentState: 'unknown', companyName: 'Arcline Semiconductors', location: 'Delhi NCR, IN', seniority: 'vp', department: 'Operations', provenance: { source: 'search', provider: 'demo' }, ...stamp },
+  { id: 'ct-20', workspaceId: 'demo', companyId: 'co-2', fullName: 'Elena Petrova', title: 'ML Engineer', email: 'elena.petrova@neuralglow.ai', phone: '+1 628 555 0210', consentState: 'unknown', companyName: 'NeuralGlow AI', location: 'San Francisco, US', seniority: 'ic', department: 'Engineering', provenance: { source: 'search', provider: 'demo' }, ...stamp }
+];

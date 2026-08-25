@@ -1,23 +1,37 @@
 import {
+  Activity,
   ArrowUpRight,
   BarChart3,
   Binoculars,
+  Bot,
+  BookOpen,
   Building2,
+  Cable,
   Compass,
   Cpu,
   Database,
   FileSpreadsheet,
+  FunctionSquare,
+  Gauge,
   Headphones,
+  HelpCircle,
+  Receipt,
   Layers,
   MapPin,
+  MessageCircle,
   Mic,
   PenLine,
+  Phone,
   PhoneIncoming,
   PhoneOutgoing,
   Plug,
+  Puzzle,
   Search,
   Send,
   ShieldCheck,
+  UploadCloud,
+  Webhook,
+  Workflow,
   Sparkles,
   Table2,
   UserSearch,
@@ -107,6 +121,20 @@ export type IconName =
   | 'empty-find-leads'
   | 'empty-analytics'
   | 'empty-settings'
+  | 'empty-imports'
+  | 'empty-claygents'
+  | 'empty-functions'
+  | 'empty-workflows'
+  | 'empty-mcp'
+  | 'empty-knowledge-base'
+  | 'empty-concurrency'
+  | 'empty-phone-numbers'
+  | 'empty-whatsapp'
+  | 'empty-integrations'
+  | 'empty-webhooks'
+  | 'empty-activity'
+  | 'empty-help'
+  | 'empty-invoices'
   | 'next-step';
 
 export interface IconSpec {
@@ -352,6 +380,76 @@ export const ICONS: Record<IconName, IconSpec> = {
     fallback: Plug,
     suggestedFile: 'empty-settings.png',
     brief: 'Larger isometric control panel, for an empty state'
+  },
+  'empty-imports': {
+    fallback: UploadCloud,
+    suggestedFile: 'empty-imports.png',
+    brief: 'Larger isometric file uploading into a grid, for an empty state'
+  },
+  'empty-claygents': {
+    fallback: Bot,
+    suggestedFile: 'empty-claygents.png',
+    brief: 'Larger isometric research-agent bot reading a document, for an empty state'
+  },
+  'empty-functions': {
+    fallback: FunctionSquare,
+    suggestedFile: 'empty-functions.png',
+    brief: 'Larger isometric formula block, for an empty state'
+  },
+  'empty-workflows': {
+    fallback: Workflow,
+    suggestedFile: 'empty-workflows.png',
+    brief: 'Larger isometric connected node graph, for an empty state'
+  },
+  'empty-mcp': {
+    fallback: Cable,
+    suggestedFile: 'empty-mcp.png',
+    brief: 'Larger isometric plug connecting two panels, for an empty state'
+  },
+  'empty-knowledge-base': {
+    fallback: BookOpen,
+    suggestedFile: 'empty-knowledge-base.png',
+    brief: 'Larger isometric open book with document stack, for an empty state'
+  },
+  'empty-concurrency': {
+    fallback: Gauge,
+    suggestedFile: 'empty-concurrency.png',
+    brief: 'Larger isometric capacity gauge, for an empty state'
+  },
+  'empty-phone-numbers': {
+    fallback: Phone,
+    suggestedFile: 'empty-phone-numbers.png',
+    brief: 'Larger isometric phone handset, for an empty state'
+  },
+  'empty-whatsapp': {
+    fallback: MessageCircle,
+    suggestedFile: 'empty-whatsapp.png',
+    brief: 'Larger isometric chat bubble, for an empty state'
+  },
+  'empty-integrations': {
+    fallback: Puzzle,
+    suggestedFile: 'empty-integrations.png',
+    brief: 'Larger isometric puzzle pieces connecting, for an empty state'
+  },
+  'empty-webhooks': {
+    fallback: Webhook,
+    suggestedFile: 'empty-webhooks.png',
+    brief: 'Larger isometric webhook signal, for an empty state'
+  },
+  'empty-activity': {
+    fallback: Activity,
+    suggestedFile: 'empty-activity.png',
+    brief: 'Larger isometric activity pulse line, for an empty state'
+  },
+  'empty-help': {
+    fallback: HelpCircle,
+    suggestedFile: 'empty-help.png',
+    brief: 'Larger isometric question mark on a card, for an empty state'
+  },
+  'empty-invoices': {
+    fallback: Receipt,
+    suggestedFile: 'empty-invoices.png',
+    brief: 'Larger isometric receipt/invoice sheet, for an empty state'
   },
   'next-step': {
     fallback: ArrowUpRight,

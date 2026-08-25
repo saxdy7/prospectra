@@ -16,7 +16,7 @@ import {
   prepareOptionsFor,
   wantsCalling
 } from '@/lib/onboarding/config';
-import { nextStepFor, setupSummary, initialChecklistDone } from '@/lib/onboarding/plan';
+import { nextStepFor, sectionRoute, setupSummary, initialChecklistDone } from '@/lib/onboarding/plan';
 import { workspaceStore, readForOwner } from '@/lib/onboarding/storage';
 import { currentUser } from '@/lib/onboarding/session';
 import { syncWorkspaceToSupabase } from '@/lib/onboarding/supabaseSync';
@@ -261,16 +261,12 @@ export function OnboardingFlow({ suggestedName }: { suggestedName?: string }) {
             <button
               type="button"
               className="pa-btn"
-              onClick={() => router.push(`/app?start=${recommended.section}`)}
+              onClick={() => router.push(sectionRoute(recommended.section))}
             >
               {recommended.cta}
               <ArrowRight size={15} strokeWidth={2.2} />
             </button>
-            <button
-              type="button"
-              className="pa-btn pa-btn--ghost"
-              onClick={() => router.push('/app?panel=checklist')}
-            >
+            <button type="button" className="pa-btn pa-btn--ghost" onClick={() => router.push('/app')}>
               View setup checklist
             </button>
           </div>
