@@ -24,76 +24,11 @@ import type { WorkspaceState } from '@/lib/onboarding/types';
 import { TablesSection } from './tables/TablesSection';
 import { SearchPanel } from './search/SearchPanel';
 import { AudiencesSection, CampaignsSection, VoiceSection } from './modules/Modules';
+import { AnalyticsSection, SettingsSection } from './modules/AnalyticsSettings';
 import { dataStore, type WorkspaceData } from '@/lib/workspace/store';
 import type { SearchJob } from '@/lib/types/models';
 import '../landing/landing.css';
 import './workspace.css';
-
-/** What each section will do, drawn from the platform specification. */
-const SECTION_COPY: Record<string, { blurb: string; bullets: string[] }> = {
-  'find-leads': {
-    blurb:
-      'Sourcing brings rows in from the open web and from B2B databases, streaming them into a table as they are found.',
-    bullets: [
-      'Local businesses by category and place, with phone, rating and site',
-      'Companies filtered by industry, headcount and technology',
-      'People by role and seniority, with lookalike expansion'
-    ]
-  },
-  tables: {
-    blurb:
-      'The reactive table is where a list becomes work: columns that compute, a status per cell, and enrichment that reruns as rows arrive.',
-    bullets: [
-      'Column types for text, links, phone, email, numbers and AI prompts',
-      'Waterfall enrichment that falls through providers until one answers',
-      'An auto-run queue, so new rows are processed without being asked'
-    ]
-  },
-  campaigns: {
-    blurb:
-      'Campaigns turn an audience into a sequence — email first, with voice and messaging as those channels land.',
-    bullets: [
-      'Multi-step email with per-row personalisation',
-      'Sending windows and rate limits that respect time zones',
-      'Replies and outcomes written back to the source table'
-    ]
-  },
-  voice: {
-    blurb:
-      'The voice studio is where an agent gets its role, objective, opening line and voice — drafted now, live once telephony is connected.',
-    bullets: [
-      'Role and objective prompts, with variables drawn from table columns',
-      'Multilingual handling, including switching mid-conversation',
-      'A browser test call, before anything touches a phone line'
-    ]
-  },
-  audiences: {
-    blurb:
-      'Audiences are saved slices of your tables, shaped for one campaign or one agent.',
-    bullets: [
-      'Build a segment from any table view',
-      'Map which column holds the number an agent should dial',
-      'Reuse the same audience across channels'
-    ]
-  },
-  analytics: {
-    blurb:
-      'Analytics covers what happened after you reached out — deliverability now, call outcomes once calling exists.',
-    bullets: [
-      'Volume, answer rates and outcome breakdowns',
-      'Best-time-to-reach patterns by region',
-      'Per-agent and per-number performance'
-    ]
-  },
-  settings: {
-    blurb: 'Workspace, team and billing settings.',
-    bullets: [
-      'Rename the workspace and change its image',
-      'Invite teammates and set their access',
-      'Manage balances and usage alerts'
-    ]
-  }
-};
 
 /** Quick actions on the workspace home. Each opens the relevant section. */
 const QUICK_ACTIONS: {
@@ -618,6 +553,25 @@ export function WorkspaceApp() {
               <CampaignsSection workspaceId={workspaceId} data={data} onChange={persistData} />
             ) : section === 'voice' ? (
               <VoiceSection workspaceId={workspaceId} data={data} onChange={persistData} />
+            ) : section === 'analytics' ? (
+              <AnalyticsSection data={data} />
+            ) : section === 'settings' ? (
+              <SettingsSection
+                state={state}
+                onChange={persist}
+                onResetData={() =>
+                  persistData({
+                    version: 1,
+                    tables: [],
+                    rows: {},
+                    searchJobs: [],
+                    importJobs: [],
+                    audiences: [],
+                    campaigns: [],
+                    agents: []
+                  })
+                }
+              />
             ) : (
               <SectionPanel id={section} />
             )}
@@ -660,34 +614,24 @@ function formatWhen(iso: string): string {
 }
 
 /**
- * A section that is designed but not built. It says what the section will do
- * and what is missing, rather than presenting an empty version of a feature
- * that does not exist.
+ * Fallback for a section id that has no implementation.
+ *
+ * Every entry in NAV is handled above, so this is unreachable through the UI.
+ * It stays as a guard against a hand-typed `?start=` naming something unknown,
+ * which should show a plain message rather than an empty page.
  */
 function SectionPanel({ id }: { id: string }) {
   const nav = NAV.find((n) => n.id === id);
-  const copy = SECTION_COPY[id];
-  if (!nav || !copy) return null;
-
   return (
-    <Card className="max-w-2xl">
-      <CardContent className="flex flex-col items-start gap-4 py-8">
-        {/* The one large illustration this region is allowed. */}
-        <IconFrame name={SECTION_ICON[id] ?? 'next-step'} size={64} tone="lg" />
-        <Badge variant="soft">Coming soon</Badge>
-        <h2 className="font-display text-2xl font-extrabold tracking-tight">{nav.label}</h2>
-        <p className="text-sm leading-relaxed text-muted-foreground">{copy.blurb}</p>
-        <p className="mt-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          What it will do
+    <Card>
+      <CardContent className="flex flex-col items-center gap-3 py-14 text-center">
+        <IconFrame name={SECTION_ICON[id] ?? 'next-step'} size={60} tone="lg" />
+        <p className="mt-1 font-display text-base font-bold">
+          {nav?.label ?? 'Unknown section'}
         </p>
-        <ul className="flex flex-col gap-2">
-          {copy.bullets.map((b) => (
-            <li key={b} className="flex items-start gap-2.5 text-sm text-muted-foreground">
-              <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand" />
-              {b}
-            </li>
-          ))}
-        </ul>
+        <p className="max-w-sm text-sm text-muted-foreground">
+          There is nothing to show here. Pick a section from the sidebar.
+        </p>
       </CardContent>
     </Card>
   );

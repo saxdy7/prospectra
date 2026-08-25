@@ -19,7 +19,12 @@ search result is not.
 | Supabase Auth | **Connected** — signup/signin/callback live |
 | `workspaces`, `workspace_onboarding`, `workspace_checklist` | **Created with RLS** |
 | Onboarding → Supabase write | Wired (`syncWorkspaceToSupabase`), best-effort on finish |
-| Everything below §Phase 3 | Not started |
+| Tables, CSV import, search jobs | Shipped (phase 3) |
+| Audiences | Shipped — no gate |
+| Campaign drafts | Shipped — sending gated on a provider |
+| Voice-agent drafts + versions | Shipped — calling gated |
+| Analytics, Settings | Shipped — real counts, real workspace editing |
+| Enrichment runs, live sends, real calls, credit balances | **Blocked on credentials** |
 
 > The original instruction said "prepare for Supabase but do not connect until
 > env vars are available." They became available and were connected at the
@@ -278,10 +283,10 @@ calling window, compliance.
 |---|---|---|
 | **1** ✅ | Onboarding, local persistence, dashboard, checklist, icon system | Flow completes; state survives reload; build clean |
 | **2** ◑ | Supabase Auth, workspaces/members/RLS, real persistence, protected routes | Auth ✅, workspaces + RLS ✅, sync ✅, protected routes ✅, per-user state reconciliation ✅. Migration `0002_workspace_members.sql` **written and committed, pending a run** against the Prospectra project |
-| **3** | Tables/columns/rows, CSV import, search UI, job architecture | A demo table renders 1k rows; import maps and validates; jobs show real state |
+| **3** ✅ | Tables/columns/rows, CSV import, search UI, job architecture | Import maps, validates, dedupes and reports malformed lines; jobs show real state |
 | **4** | Approved provider integration, enrichment jobs, credit ledger | A real provider returns normalised rows; ledger balances; retry works |
-| **5** | Audiences, campaign drafts, email integration | Draft built from an audience; send blocked without verified sender |
-| **6** | Voice studio, KB, sandbox, telephony + compliance | Agent draft + version history; **no live call until every gate passes** |
+| **5** ◑ | Audiences, campaign drafts, email integration | Audiences ✅, drafts ✅, send correctly blocked. **Integration blocked on a provider** |
+| **6** ◑ | Voice studio, KB, sandbox, telephony + compliance | Draft studio + version history ✅, no call control exists. **Telephony blocked on a provider and compliance** |
 
 Per phase: identify pages, components, tables, API contracts and acceptance
 criteria; label demo behaviour visibly; preserve the visual theme; run

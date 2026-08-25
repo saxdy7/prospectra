@@ -361,6 +361,22 @@ stat strip) + form card. **Do not restyle.** Collapses to a single column at
 Unchanged and out of scope for product work. Any change here requires its own
 entry in this document.
 
+### Implemented sections
+
+All eight sidebar entries now render a real implementation. `SectionPanel`
+remains only as a guard for a hand-typed `?start=` naming an unknown id.
+
+| Section | State |
+|---|---|
+| Home | Tailored dashboard |
+| Find leads | Job builder, provider-gated |
+| Tables | Grid, CSV import |
+| Campaigns | Draft sequences, send gated |
+| Voice agents | Draft studio, versions, calling gated |
+| Audiences | Fully real |
+| Analytics | Real counts; outreach metrics honestly empty |
+| Settings | Workspace editing, destructive reset |
+
 ### Planned routes
 
 `/app/find-leads`, `/app/tables`, `/app/imports`, `/app/audiences`,
@@ -564,3 +580,6 @@ Run before declaring any UI milestone complete:
 | 2026-08-25 | Recent-activity rail added; content cap 1060→1440px | tsc, lint, build; 1440/1638px used at 1900px |
 | 2026-08-25 | §0 resolved — product stays light, marketing stays dark | Recorded |
 | 2026-08-25 | §4 gradient-hero deviation resolved — kept, rule narrowed | Recorded |
+| 2026-08-25 | Phase 3 — tables, CSV import, search jobs | tsc, lint, build; CSV torture test passed |
+| 2026-08-25 | Audiences, campaign drafts, voice studio | Verified end to end; gates hold |
+| 2026-08-25 | Analytics + Settings; every nav entry now live | Counts correct; destructive reset confirmed |

@@ -41,8 +41,8 @@ export const NAV: NavItem[] = [
   { id: 'campaigns', label: 'Campaigns', icon: Send, maturity: 'live' },
   { id: 'voice', label: 'Voice agents', icon: Mic, maturity: 'live' },
   { id: 'audiences', label: 'Audiences', icon: Users, maturity: 'live' },
-  { id: 'analytics', label: 'Analytics', icon: BarChart3, maturity: 'soon' },
-  { id: 'settings', label: 'Settings', icon: Settings, maturity: 'soon' }
+  { id: 'analytics', label: 'Analytics', icon: BarChart3, maturity: 'live' },
+  { id: 'settings', label: 'Settings', icon: Settings, maturity: 'live' }
 ];
 
 export function AppSidebar({
