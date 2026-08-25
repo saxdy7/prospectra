@@ -38,6 +38,7 @@ const PLANS: Plan[] = [
     tagline: 'For founders and small teams who need more reach and freedom.',
     featured: true,
     features: [
+      'Up to 3 workspaces',
       'Up to 25,000 rows in the workspace',
       '5,000 enrichment credits / month',
       'Full waterfall enrichment',
@@ -53,6 +54,7 @@ const PLANS: Plan[] = [
     yearly: 6399,
     tagline: 'For agencies and sales floors running outbound at volume.',
     features: [
+      'Unlimited workspaces',
       'Unlimited rows',
       '25,000 enrichment credits / month',
       'AI web researcher & auto-icebreakers',

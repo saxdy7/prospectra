@@ -71,7 +71,9 @@ export default function CampaignsPage() {
               key: 'name',
               label: 'Campaign',
               render: (c) => {
-                const Icon = CHANNEL_ICON[c.channel];
+                // Falls back for any record saved under an older channel
+                // set — legacy localStorage should degrade, never crash.
+                const Icon = CHANNEL_ICON[c.channel] ?? Mail;
                 return (
                   <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600, color: 'var(--lp-text)' }}>
                     <Icon size={14} />

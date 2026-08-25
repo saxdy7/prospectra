@@ -12,6 +12,7 @@ export const INTEGRATIONS: IntegrationListing[] = [
   { id: 'pipedrive', name: 'Pipedrive', category: 'crm', blurb: 'Push enriched rows into Pipedrive as deals or people.', status: 'coming_soon' },
   { id: 'zoho', name: 'Zoho CRM', category: 'crm', blurb: 'Sync workspace tables with Zoho CRM modules.', status: 'coming_soon' },
   { id: 'attio', name: 'Attio', category: 'crm', blurb: 'Mirror Prospectra tables as Attio records.', status: 'coming_soon' },
+  { id: 'apify', name: 'Apify', category: 'enrichment', blurb: 'Scraping actors for local businesses, jobs, and lookalikes — the provider behind Find leads.', status: 'not_connected' },
   { id: 'clearbit', name: 'Clearbit', category: 'enrichment', blurb: 'Company and contact enrichment provider.', status: 'not_connected' },
   { id: 'apollo', name: 'Apollo', category: 'enrichment', blurb: 'B2B contact database and email-finding provider.', status: 'not_connected' },
   { id: 'hunter', name: 'Hunter.io', category: 'enrichment', blurb: 'Email-finding and verification provider.', status: 'coming_soon' },

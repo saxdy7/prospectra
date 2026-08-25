@@ -1,6 +1,9 @@
 /** Barrel for the shared /app component library — import from '@/components/app'. */
 
+export { AiAssistant } from './AiAssistant';
+export { FeatureRequestModal } from './FeatureRequestModal';
 export { PageHeader } from './PageHeader';
+export { ProfileMenu } from './ProfileMenu';
 export type { Crumb } from './PageHeader';
 export { EmptyState, EmptyTableRow } from './EmptyState';
 export { DemoTag, JobStatusPill, StatusPill } from './Tags';

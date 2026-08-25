@@ -56,7 +56,7 @@ export default function VoiceAgentsPage() {
             {
               key: 'language',
               label: 'Languages',
-              render: (a) => a.versions[a.versions.length - 1]?.languages.join(', ') || '—'
+              render: (a) => a.versions[a.versions.length - 1]?.languages?.join(', ') || '—'
             },
             {
               key: 'voice',

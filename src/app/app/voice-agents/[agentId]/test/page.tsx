@@ -202,7 +202,7 @@ export default function VoiceAgentTestPage({ params }: { params: Promise<{ agent
 
             <div style={{ width: '100%', paddingTop: 14, borderTop: '1px solid var(--lp-line)', fontSize: 'var(--lp-t-caption)', color: 'var(--lp-text-faint)' }}>
               <p style={{ margin: 0 }}>Voice: {latest?.voice ?? '—'}</p>
-              <p style={{ margin: '4px 0 0' }}>Languages: {latest?.languages.join(', ') || '—'}</p>
+              <p style={{ margin: '4px 0 0' }}>Languages: {latest?.languages?.join(', ') || '—'}</p>
             </div>
           </div>
 

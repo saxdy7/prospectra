@@ -891,7 +891,10 @@
 .pa-segment__item {
   position: relative;
   padding: 9px 18px;
+  border: none;
   border-radius: 10px;
+  background: none;
+  font-family: var(--lp-body);
   font-size: var(--lp-t-caption);
   font-weight: 500;
   color: var(--lp-text-soft);
@@ -905,7 +908,8 @@
   background: rgba(40, 95, 255, 0.05);
 }
 
-.pa-segment__item:has(input:checked) {
+.pa-segment__item:has(input:checked),
+.pa-segment__item[data-active] {
   background: var(--lp-blue-core);
   color: #fff;
   font-weight: 600;
@@ -915,6 +919,91 @@
 .pa-segment__item:has(input:focus-visible) {
   outline: 2px solid var(--lp-blue-mid);
   outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Settings — left mini-nav + content, instead of top tabs
+   ========================================================================== */
+
+.pa-settings {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.pa-settings__nav {
+  width: 180px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 24px;
+}
+
+.pa-settings__nav-group {
+  margin-bottom: 18px;
+}
+
+.pa-settings__nav-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lp-text-faint);
+  margin: 0 0 6px;
+  padding: 0 10px;
+}
+
+.pa-settings__nav-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border: none;
+  border-radius: var(--pa-r-sm);
+  background: none;
+  font-family: var(--lp-body);
+  font-size: var(--lp-t-sm);
+  font-weight: 500;
+  color: var(--lp-text-soft);
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.pa-settings__nav-item:hover {
+  background: var(--lp-glass);
+  color: var(--lp-text);
+}
+
+.pa-settings__nav-item[aria-current='page'] {
+  background: rgba(40, 95, 255, 0.08);
+  color: var(--lp-blue-core);
+  font-weight: 600;
+}
+
+.pa-settings__content {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  .pa-settings {
+    flex-direction: column;
+  }
+
+  .pa-settings__nav {
+    width: 100%;
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .pa-settings__nav-group {
+    display: contents;
+  }
+
+  .pa-settings__nav-label {
+    display: none;
+  }
 }
 
 .pa-segment__item input {
@@ -1113,7 +1202,7 @@
   min-height: 100vh;
   min-height: 100dvh;
   display: grid;
-  grid-template-columns: 256px 1fr;
+  grid-template-columns: 280px 1fr;
   isolation: isolate;
 }
 
@@ -1133,10 +1222,55 @@
   flex-direction: column;
   gap: 6px;
   padding: 22px 14px 18px;
+  /* Sane inheritance fallback for any link below that resets to `inherit`
+     rather than restating a token — see the :visited rule immediately below. */
+  color: var(--lp-text-soft);
+}
+
+/* Every nav row is an <a> once you've clicked it, and browsers apply a
+   default :visited colour (purple-ish) with MORE specificity than a single
+   class — `.pa-nav__item{color:X}` (0,1,0) loses to the UA's `a:visited`
+   (0,1,1). That made every page you'd already opened stay tinted regardless
+   of whether it was the current one.
+   The first pass at this fix (`.pa-side a:visited{color:inherit}`, at
+   (0,2,1)) over-corrected: it also beat `.pa-nav__item[aria-current='page']`
+   (0,2,0), so the page you're actually ON — which is obviously visited too —
+   could lose its own blue highlight. `:not([aria-current='page'])` excludes
+   exactly that element from the reset, so the active rule stays in sole
+   control of anything that carries the attribute itself, while everything
+   else still loses its browser-default visited colour. */
+.pa-side a:visited:not([aria-current='page']) {
+  color: inherit;
 }
 
 .pa-side__brand {
   padding: 2px 8px 18px;
+}
+
+/* The scrollable nav list — a slim, themed scrollbar instead of the bulky
+   OS default, and only really visible while actually scrolling/hovering. */
+.pa-side__nav {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--lp-line-strong) transparent;
+}
+
+.pa-side__nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pa-side__nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.pa-side__nav::-webkit-scrollbar-thumb {
+  background: var(--lp-line-strong);
+  border-radius: 999px;
+}
+
+.pa-side__nav::-webkit-scrollbar-thumb:hover {
+  background: var(--lp-text-faint);
 }
 
 /* Workspace switcher */
@@ -1205,6 +1339,59 @@
   margin-top: 1px;
 }
 
+.pa-switcher-wrap {
+  position: relative;
+}
+
+.pa-switcher__chevron {
+  color: var(--lp-text-faint);
+  flex-shrink: 0;
+}
+
+.pa-switcher-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 15;
+  padding: 6px;
+  border-radius: var(--pa-r-md);
+  border: 1px solid var(--lp-line-strong);
+  background: var(--pa-surface-solid);
+  box-shadow: 0 20px 50px -18px rgba(0, 0, 0, 0.6);
+}
+
+.pa-switcher-menu__current {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+}
+
+.pa-switcher-menu__check {
+  margin-left: auto;
+  color: var(--lp-blue-mid);
+  flex-shrink: 0;
+}
+
+.pa-switcher-menu__upgrade {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px;
+  border-radius: var(--pa-r-sm);
+  color: var(--lp-blue-mid);
+  font-size: var(--lp-t-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.18s ease;
+}
+
+.pa-switcher-menu__upgrade:hover {
+  background: rgba(40, 95, 255, 0.08);
+}
+
 /* Nav */
 .pa-nav {
   display: flex;
@@ -1263,17 +1450,6 @@
   background: rgba(40, 95, 255, 0.08);
   color: var(--lp-blue-core);
   font-weight: 600;
-}
-
-.pa-nav__item[aria-current='page']::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 9px;
-  bottom: 9px;
-  width: 2px;
-  border-radius: 2px;
-  background: var(--lp-blue-core);
 }
 
 .pa-nav__item svg {
@@ -1393,6 +1569,31 @@
   min-height: 0;
 }
 
+/* Tree-connector arrow on every nested row — a faint corner glyph tracing
+   from the branch line into the item, echoing the parent it hangs off. */
+.pa-nav--sub .pa-nav__item,
+.pa-nav--group-items .pa-nav__item,
+.pa-nav--group-items .pa-nav__parent-link {
+  gap: 7px;
+}
+
+.pa-nav__connector {
+  flex-shrink: 0;
+  color: var(--lp-text-faint);
+  opacity: 0.75;
+  transition: opacity 0.22s ease 0.06s, transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) 0.06s;
+}
+
+.pa-nav__collapse:not([data-expanded='true']) .pa-nav__connector {
+  opacity: 0;
+  transform: translateX(-4px);
+}
+
+.pa-nav__item[aria-current='page'] .pa-nav__connector {
+  color: var(--lp-blue-mid);
+  opacity: 1;
+}
+
 /* "Soon" tag */
 .pa-tag {
   font-size: 0.5625rem;
@@ -1493,13 +1694,19 @@
   display: flex;
   align-items: center;
   gap: 9px;
+  width: 100%;
   min-height: 38px;
   padding: 8px 11px;
+  border: none;
   border-radius: var(--pa-r-sm);
+  background: none;
+  font-family: var(--lp-body);
   font-size: var(--lp-t-caption);
   font-weight: 500;
   color: var(--lp-text-faint);
   text-decoration: none;
+  text-align: left;
+  cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
@@ -1657,9 +1864,9 @@
 
 .pa-content {
   padding: clamp(1.75rem, 4vw, 3rem) clamp(1.25rem, 3vw, 2.25rem) 5rem;
-  /* Wide enough to use a large monitor without letting body copy run past a
-     readable measure â€” the inner grid caps its own columns. */
-  max-width: 1440px;
+  /* No hard cap on width — unlike marketing prose, a dashboard should use
+     whatever room the viewport gives it; each page's own grid decides its
+     column counts, so widening this just gives those columns more space. */
   width: 100%;
 }
 
@@ -1923,7 +2130,7 @@
   .pa-side {
     position: fixed;
     inset: 0 auto 0 0;
-    width: 272px;
+    width: 280px;
     z-index: 40;
     transform: translateX(-100%);
     transition: transform 0.35s var(--lp-ease);
@@ -2449,6 +2656,82 @@
   color: #ff8a8a;
 }
 
+.pa-profile__plan {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px;
+  border-radius: var(--pa-r-sm);
+  background: rgba(40, 95, 255, 0.06);
+}
+
+.pa-profile__plan-label {
+  display: block;
+  font-size: 10.5px;
+  color: var(--lp-text-faint);
+}
+
+.pa-profile__plan-value {
+  display: block;
+  font-size: var(--lp-t-sm);
+  font-weight: 700;
+  color: var(--lp-text);
+  margin-top: 1px;
+}
+
+.pa-profile__upgrade {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--lp-blue-core);
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 0.18s ease;
+}
+
+.pa-profile__upgrade:hover {
+  background: var(--lp-blue-deep);
+}
+
+.pa-profile__who {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+}
+
+.pa-profile__who-text {
+  min-width: 0;
+}
+
+.pa-profile__who-name {
+  display: block;
+  font-size: var(--lp-t-sm);
+  font-weight: 600;
+  color: var(--lp-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pa-profile__who-email {
+  display: block;
+  font-size: 11px;
+  color: var(--lp-text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pa-profile__divider {
+  height: 1px;
+  margin: 4px 4px;
+  background: var(--lp-line);
+}
+
 /* --- Icon-only button (with tooltip via title attr) ----------------------- */
 
 .pa-icon-btn {
@@ -2635,6 +2918,46 @@
   color: var(--lp-blue-mid);
 }
 
+.pa-dialog--form {
+  max-width: 460px;
+}
+
+.pa-dialog__head-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.pa-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pa-chip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--lp-line-strong);
+  background: var(--lp-glass);
+  color: var(--lp-text-soft);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+
+.pa-chip:hover {
+  border-color: var(--lp-blue-mid);
+  color: var(--lp-text);
+}
+
+.pa-chip[data-active] {
+  border-color: var(--lp-blue-core);
+  background: rgba(40, 95, 255, 0.12);
+  color: var(--lp-blue-mid);
+}
+
 .pa-dialog__title {
   font-family: var(--lp-display);
   font-weight: 700;
@@ -2668,6 +2991,490 @@
   flex-direction: column-reverse;
   gap: 10px;
   max-width: min(360px, calc(100vw - 40px));
+}
+
+/* ==========================================================================
+   AI assistant — persistent bottom dock
+   ========================================================================== */
+
+/* Centred, always visible above the content — not a launcher you have to
+   click to discover. Sits well clear of the toast region (bottom-right) so
+   the two never overlap. */
+.pa-ai-dock {
+  position: fixed;
+  /* Centred on the content area (right of the 280px sidebar), not the full
+     viewport — centring on the whole window meant the dock crept left into
+     the sidebar itself on anything narrower than a very wide monitor. Only
+     valid above the 900px breakpoint where the sidebar is actually
+     permanent — below that it's an off-canvas drawer, so the dock reverts
+     to centring on the full viewport (see the 900px query below). */
+  left: calc(280px + (100vw - 280px) / 2);
+  bottom: 22px;
+  transform: translateX(-50%);
+  z-index: 50;
+  width: min(640px, calc(100vw - 280px - 32px));
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 900px) {
+  .pa-ai-dock {
+    left: 50%;
+    width: min(640px, calc(100vw - 32px));
+  }
+}
+
+.pa-ai-dock__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--lp-line-strong);
+  border-bottom: none;
+  border-radius: var(--pa-r-lg) var(--pa-r-lg) 0 0;
+  background: var(--pa-surface-solid);
+}
+
+.pa-ai-dock__toggle {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  padding: 6px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--lp-text-faint);
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.pa-ai-dock__toggle:hover {
+  background: var(--lp-glass);
+  color: var(--lp-text);
+}
+
+.pa-ai-dock__toggle svg:last-child {
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.pa-ai-panel {
+  padding: 16px;
+  border: 1px solid var(--lp-line-strong);
+  border-bottom: none;
+  border-radius: var(--pa-r-lg) var(--pa-r-lg) 0 0;
+  background: var(--pa-surface-solid);
+  box-shadow: 0 -12px 32px -20px rgba(0, 0, 0, 0.3);
+  animation: pa-ai-panel-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.pa-ai-dock__toolbar--attached {
+  border-radius: 0;
+  border-top: none;
+}
+
+@keyframes pa-ai-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pa-ai-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.pa-ai-panel__head-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pa-ai-panel__title {
+  font-family: var(--lp-display);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--lp-text);
+}
+
+.pa-ai-panel__desc {
+  font-size: var(--lp-t-caption);
+  color: var(--lp-text-faint);
+  line-height: 1.55;
+  margin-bottom: 12px;
+}
+
+/* Grouped capability preview — what the assistant will do once connected,
+   not a log of things it already did. Scrolls independently so the panel
+   itself never grows past a sane height. */
+.pa-ai-panel__capabilities {
+  max-height: 220px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+  padding-right: 4px;
+  border-top: 1px solid var(--lp-line);
+  border-bottom: 1px solid var(--lp-line);
+}
+
+.pa-ai-panel__capabilities > div {
+  padding: 10px 0;
+}
+
+.pa-ai-panel__capabilities > div + div {
+  border-top: 1px solid var(--lp-line);
+}
+
+.pa-ai-panel__group {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--lp-text);
+  margin-bottom: 6px;
+}
+
+.pa-ai-panel__capabilities ul {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pa-ai-panel__capabilities li {
+  position: relative;
+  padding-left: 14px;
+  font-size: 12.5px;
+  color: var(--lp-text-soft);
+  line-height: 1.5;
+}
+
+.pa-ai-panel__capabilities li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 8px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--lp-blue-mid);
+}
+
+.pa-ai-panel__capabilities::-webkit-scrollbar {
+  width: 5px;
+}
+
+.pa-ai-panel__capabilities::-webkit-scrollbar-thumb {
+  background: var(--lp-line-strong);
+  border-radius: 999px;
+}
+
+.pa-ai-quick-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.pa-ai-dock__toolbar .pa-ai-quick-row {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.pa-ai-dock__toolbar .pa-ai-quick-row::-webkit-scrollbar {
+  display: none;
+}
+
+.pa-ai-dock__toolbar .pa-ai-quick {
+  flex-shrink: 0;
+}
+
+.pa-ai-quick {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--lp-line-strong);
+  background: var(--lp-glass);
+  color: var(--lp-text-soft);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+
+.pa-ai-quick:hover {
+  border-color: var(--lp-blue-mid);
+  background: rgba(40, 95, 255, 0.08);
+  color: var(--lp-blue-mid);
+}
+
+.pa-ai-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 14px;
+  border: 1.5px solid rgba(40, 95, 255, 0.3);
+  border-radius: 0 0 var(--pa-r-lg) var(--pa-r-lg);
+  background: rgba(40, 95, 255, 0.04);
+  box-shadow: 0 24px 48px -20px rgba(0, 0, 0, 0.35);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.pa-ai-bar:focus-within {
+  border-color: var(--lp-blue-core);
+  box-shadow: 0 24px 48px -20px rgba(0, 0, 0, 0.35), 0 0 0 3px rgba(40, 95, 255, 0.15);
+}
+
+.pa-ai-bar__icon {
+  color: var(--lp-blue-core);
+  flex-shrink: 0;
+}
+
+.pa-ai-bar__input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-family: var(--lp-body);
+  font-size: 13.5px;
+  color: var(--lp-text);
+  outline: none;
+}
+
+.pa-ai-bar__input::placeholder {
+  color: var(--lp-text-faint);
+}
+
+.pa-ai-bar__send {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  border: none;
+  background: var(--lp-blue-core);
+  color: #ffffff;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.pa-ai-bar__send:hover {
+  background: var(--lp-blue-deep);
+  transform: translateX(1px);
+}
+
+/* ==========================================================================
+   AI assistant — maximized full-screen view
+   ========================================================================== */
+
+.pa-ai-max {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  /* Fully opaque — this is a takeover, not a translucent overlay panel.
+     --pa-blur-bg-strong is only ~92% opaque (right for a small dropdown
+     with a blur to soften what peeks through); on a full-screen surface
+     that 8% was enough for the whole page underneath — sidebar included —
+     to bleed through and visually collide with this view's own content. */
+  background: var(--lp-void);
+}
+
+.pa-ai-max__sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 14px;
+  border-right: 1px solid var(--lp-line-strong);
+  background: var(--pa-surface-solid);
+  overflow-y: auto;
+}
+
+.pa-ai-max__brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--lp-display);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--lp-text);
+  margin-bottom: 18px;
+  padding: 0 2px;
+}
+
+.pa-ai-max__new {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 12px;
+  border-radius: var(--pa-r-sm);
+  border: 1px solid var(--lp-line-strong);
+  background: var(--lp-glass);
+  color: var(--lp-text-soft);
+  font-family: var(--lp-body);
+  font-size: var(--lp-t-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  margin-bottom: 22px;
+}
+
+.pa-ai-max__new:hover {
+  border-color: var(--lp-blue-mid);
+  color: var(--lp-text);
+}
+
+.pa-ai-max__history-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lp-text-faint);
+  margin: 0 0 8px;
+  padding: 0 2px;
+}
+
+.pa-ai-max__history-empty {
+  font-size: var(--lp-t-caption);
+  color: var(--lp-text-faint);
+  padding: 0 2px;
+}
+
+.pa-ai-max__history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pa-ai-max__history-list button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border: none;
+  border-radius: var(--pa-r-sm);
+  background: none;
+  color: var(--lp-text-soft);
+  font-family: var(--lp-body);
+  font-size: var(--lp-t-sm);
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.pa-ai-max__history-list button:hover {
+  background: var(--lp-glass);
+  color: var(--lp-text);
+}
+
+.pa-ai-max__history-list button[aria-current='page'] {
+  background: rgba(40, 95, 255, 0.1);
+  color: var(--lp-blue-core);
+  font-weight: 600;
+}
+
+.pa-ai-max__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px 24px;
+  background: var(--lp-void);
+}
+
+.pa-ai-max__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+  flex-shrink: 0;
+}
+
+.pa-ai-max__content {
+  flex: 1;
+  overflow-y: auto;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  padding-bottom: 20px;
+}
+
+.pa-ai-max__prompt {
+  font-family: var(--lp-display);
+  font-size: 1.1875rem;
+  font-weight: 700;
+  color: var(--lp-text);
+  margin: 0 0 16px;
+}
+
+.pa-ai-max__reply {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-radius: var(--pa-r-lg);
+  border: 1px solid var(--lp-line-strong);
+  background: var(--lp-glass);
+}
+
+.pa-ai-max__reply p {
+  font-size: var(--lp-t-sm);
+  color: var(--lp-text-soft);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.pa-ai-max__main > .pa-ai-dock__toolbar,
+.pa-ai-max__main > .pa-ai-bar {
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  flex-shrink: 0;
+}
+
+@media (max-width: 760px) {
+  .pa-ai-max__sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .pa-ai-dock {
+    bottom: 12px;
+    width: calc(100vw - 20px);
+  }
+
+  .pa-ai-quick-row {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pa-ai-panel {
+    animation: none;
+  }
 }
 
 .pa-toast {

@@ -2,10 +2,13 @@
 
 import { useState, useSyncExternalStore } from 'react';
 import type { ReactNode } from 'react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, Moon, Sparkles, Sun } from 'lucide-react';
 import { AppSidebar, NAV } from '@/components/workspace/AppSidebar';
+import { AiAssistant } from './AiAssistant';
 import { PageSkeleton } from './Skeleton';
+import { ProfileMenu } from './ProfileMenu';
 import { ToastProvider } from './Toast';
 import { useWorkspace } from './useWorkspace';
 import { preferences } from '@/lib/demo-storage/preferences';
@@ -21,6 +24,7 @@ import '@/components/workspace/workspace.css';
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const ctx = useWorkspace();
 
   /* Server and first paint always see 'light'; useSyncExternalStore swaps
@@ -110,6 +114,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             <main className="pa-content">{children}</main>
           </div>
         </div>
+
+        <AiAssistant />
       </div>
     </ToastProvider>
   );

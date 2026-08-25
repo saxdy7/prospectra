@@ -116,11 +116,10 @@ export default function VoiceAgentStudioPage({ params }: { params: Promise<{ age
                 <label key={l} className="pa-chip">
                   <input
                     type="checkbox"
-                    checked={latest?.languages.includes(l) ?? false}
+                    checked={latest?.languages?.includes(l) ?? false}
                     onChange={() => {
-                      const next = latest?.languages.includes(l)
-                        ? latest.languages.filter((x) => x !== l)
-                        : [...(latest?.languages ?? []), l];
+                      const current = latest?.languages ?? [];
+                      const next = current.includes(l) ? current.filter((x) => x !== l) : [...current, l];
                       saveVersion({ languages: next });
                     }}
                   />
