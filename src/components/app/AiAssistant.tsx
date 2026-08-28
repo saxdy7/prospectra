@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import type { FormEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
+import { preferences } from '@/lib/demo-storage/preferences';
 import {
   ArrowUp,
   ChevronUp,
@@ -92,6 +93,18 @@ let historyCounter = 0;
  */
 export function AiAssistant() {
   const router = useRouter();
+  // The --lp- and --pa- token families (background colours included) are
+  // only defined inside the .pa class scope. createPortal(..., document.body)
+  // moves this modal's DOM node to be a sibling of the .lp.pa root, not a
+  // descendant — so without re-declaring that scope here, every var() lookup
+  // below resolves to nothing and every background was silently rendering as
+  // transparent, letting the whole real page show through no matter how much
+  // !important was piled onto the rule.
+  const theme = useSyncExternalStore(
+    preferences.subscribeTheme,
+    preferences.getTheme,
+    preferences.getThemeServerSnapshot
+  );
   const [expanded, setExpanded] = useState(false);
   const [maximized, setMaximized] = useState(false);
   const [prompt, setPrompt] = useState('');
@@ -213,7 +226,7 @@ export function AiAssistant() {
       {maximized &&
         typeof document !== 'undefined' &&
         createPortal(
-          <div className="pa-ai-max" role="dialog" aria-modal="true" aria-label="Prospectra AI">
+          <div className="lp pa pa-ai-max" data-theme={theme} role="dialog" aria-modal="true" aria-label="Prospectra AI">
             <aside className="pa-ai-max__sidebar">
               <div className="pa-ai-max__brand">
                 <Sparkles size={15} className="pa-ai-bar__icon" />

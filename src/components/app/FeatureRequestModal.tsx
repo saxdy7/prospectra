@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { Lightbulb, X } from 'lucide-react';
 import { useToast } from './Toast';
+import { preferences } from '@/lib/demo-storage/preferences';
 
 export type FeatureRequestCategory = 'feature' | 'integration' | 'bug' | 'other';
 
@@ -33,6 +34,15 @@ export function FeatureRequestModal({
   const [text, setText] = useState('');
   const panelRef = useRef<HTMLDivElement>(null);
   const { push } = useToast();
+  // The --lp- and --pa- token families are only defined inside the .pa
+  // class scope, and createPortal(..., document.body) makes this a sibling
+  // of .lp.pa, not a descendant — without re-declaring that scope here,
+  // every var() lookup resolves to nothing and renders transparent.
+  const theme = useSyncExternalStore(
+    preferences.subscribeTheme,
+    preferences.getTheme,
+    preferences.getThemeServerSnapshot
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -79,7 +89,7 @@ export function FeatureRequestModal({
   };
 
   return createPortal(
-    <div className="pa-dialog-scrim" role="presentation" onClick={onClose}>
+    <div className="lp pa pa-dialog-scrim" data-theme={theme} role="presentation" onClick={onClose}>
       <div
         ref={panelRef}
         className="pa-dialog pa-dialog--form"

@@ -27,11 +27,11 @@ export function OnboardingShell({
   actions?: ReactNode;
 }) {
   return (
-    <div className="lp pa">
+    <div className="lp pa" data-theme="dark">
       <div className="pa-onboard">
-        {/* A restrained blue bloom at the foot — the light surface's only
-            ambient treatment. No dark gradient field here; that belongs to
-            the landing page, not the product's light workspace. */}
+        {/* Onboarding always renders dark — it has no theme toggle and was
+            never asked to have one. A restrained blue bloom at the foot is
+            its only ambient treatment. */}
         <span className="pa-onboard__bloom" aria-hidden="true" />
 
         <header className="pa-onboard__bar">

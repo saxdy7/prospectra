@@ -17,7 +17,7 @@ Lives in `localStorage`, written only when the user does something:
 | `lib/onboarding/storage.ts` | `prospectra:workspace:v1` | Onboarding answers, checklist state, workspace name/logo/team size |
 | `lib/workspace/store.ts` | `prospectra:data:v1` | Tables, rows, columns, search jobs, import jobs, audiences, campaigns, voice agents |
 | `lib/demo-storage/store.ts` | `prospectra:product:v1` | Claygents, functions (custom), workflows, webhooks, MCP settings, concurrency reservations, WhatsApp deployment, phone numbers, knowledge-base collections/documents, integration "intent" clicks, activity log, API keys |
-| `lib/demo-storage/preferences.ts` | `prospectra:pref:*` | Sidebar collapsed, table view mode — UI preference only, never workspace content |
+| `lib/demo-storage/preferences.ts` | `prospectra:pref:*` | Sidebar collapsed, table view mode, theme (`'light' \| 'dark'`, defaults to `'dark'`) — UI preference only, never workspace content |
 
 **Nothing in these stores is pre-seeded.** A brand-new workspace starts at
 genuine zero across every one of them. This was already the rule for the
@@ -60,7 +60,7 @@ A third category that is easy to mis-file as either of the above:
 |---|---|
 | `functions.ts` (16 built-ins) | These are the actual formula catalog — like Excel's function list. They aren't standing in for a future live feature; a `SUM`-style function registry is inherently static reference content |
 | `claygent-templates.ts` (4) | Real starter prompts a user can copy and edit. The *template* is real; only *running* it against live data needs a provider |
-| `integrations.ts` (18) | Real, accurate metadata about what Prospectra can eventually connect to. Every single row is honestly `not_connected`/`coming_soon` — see below |
+| `integrations.ts` (19) | Real, accurate metadata about what Prospectra can eventually connect to. Every single row is honestly `not_connected`/`coming_soon` — see below |
 | `workflow-templates.ts` (3) | Real starter graphs a user can load into the (also real, also non-executing) canvas |
 
 These are never tagged `DemoTag`, because tagging them "demo" would

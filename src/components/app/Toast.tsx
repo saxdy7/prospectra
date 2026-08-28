@@ -1,9 +1,10 @@
 'use client';
 
-import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { CheckCircle2, Info, X, XCircle } from 'lucide-react';
+import { preferences } from '@/lib/demo-storage/preferences';
 
 type ToastTone = 'default' | 'success' | 'error';
 
@@ -28,6 +29,15 @@ const ToastContext = createContext<ToastContextValue | null>(null);
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<ToastItem[]>([]);
   const counter = useRef(0);
+  // The --lp- and --pa- token families are only defined inside the .pa
+  // class scope, and createPortal(..., document.body) makes this a sibling
+  // of .lp.pa, not a descendant — without re-declaring that scope here,
+  // every var() lookup resolves to nothing and renders transparent.
+  const theme = useSyncExternalStore(
+    preferences.subscribeTheme,
+    preferences.getTheme,
+    preferences.getThemeServerSnapshot
+  );
 
   const push = useCallback((message: string, tone: ToastTone = 'default') => {
     counter.current += 1;
@@ -49,7 +59,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       {typeof document !== 'undefined' &&
         createPortal(
-          <div className="pa-toast-region" role="status" aria-live="polite">
+          <div className="lp pa pa-toast-region" data-theme={theme} role="status" aria-live="polite">
             {items.map((t) => (
               <div key={t.id} className={`pa-toast pa-toast--${t.tone}`}>
                 <span className="pa-toast__icon" aria-hidden="true">

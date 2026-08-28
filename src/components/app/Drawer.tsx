@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useSyncExternalStore } from 'react';
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
+import { preferences } from '@/lib/demo-storage/preferences';
 
 /**
  * The slide-in side panel used for "add column", "create webhook", "create
@@ -26,6 +27,15 @@ export function Drawer({
   footer?: ReactNode;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
+  // The --lp- and --pa- token families are only defined inside the .pa
+  // class scope, and createPortal(..., document.body) makes this a sibling
+  // of .lp.pa, not a descendant — without re-declaring that scope here,
+  // every var() lookup resolves to nothing and renders transparent.
+  const theme = useSyncExternalStore(
+    preferences.subscribeTheme,
+    preferences.getTheme,
+    preferences.getThemeServerSnapshot
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -64,7 +74,7 @@ export function Drawer({
   if (!open || typeof document === 'undefined') return null;
 
   return createPortal(
-    <>
+    <div className="lp pa" data-theme={theme} style={{ minHeight: 0 }}>
       <button className="pa-drawer-scrim" aria-label="Close panel" onClick={onClose} />
       <div
         ref={panelRef}
@@ -85,7 +95,7 @@ export function Drawer({
         <div className="pa-drawer__body">{children}</div>
         {footer && <div className="pa-drawer__foot">{footer}</div>}
       </div>
-    </>,
+    </div>,
     document.body
   );
 }

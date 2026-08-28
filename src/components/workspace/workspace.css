@@ -1,13 +1,14 @@
 /* ==========================================================================
-   Prospectra â€” Workspace surface (onboarding + app shell) â€” Light / Dark
+   Prospectra — Workspace surface (onboarding + app shell) — Light / Dark
    --------------------------------------------------------------------------
    Scoped under .pa, nested inside .lp (the two classes are applied to the
    same root element). Two full token sets live here: the LIGHT set on the
    bare `.pa` selector (the default), and the DARK set on
    `.pa[data-theme="dark"]`, toggled at runtime by AppShell/OnboardingShell
    reading the persisted choice from `lib/demo-storage/preferences.ts`
-   (`preferences.getTheme()`), defaulting to light for a first-time visitor.
-   Every component rule below reads a token â€” never a literal colour â€” so
+   (`preferences.getTheme()`), defaulting to DARK for a first-time visitor —
+   light is opt-in only, never the initial presentation.
+   Every component rule below reads a token — never a literal colour — so
    the toggle needs no component edits, only the two blocks below it.
    ========================================================================== */
 
@@ -29,10 +30,10 @@
   --lp-glass-strong:  rgba(0, 0, 0, 0.055);
 
   /* --- shadcn token bridge -----------------------------------------------
-     shadcn components (Card, Badge, Button, Avatar, Progressâ€¦) read
+     shadcn components (Card, Badge, Button, Avatar, Progress…) read
      --background/--card/--border/etc. from globals.css's :root by default,
      entirely separate from the --lp-* tokens above. Redefining the same
-     variable names here â€” mapped onto whichever --lp-* ramp is active â€”
+     variable names here — mapped onto whichever --lp-* ramp is active —
      makes every shadcn component follow the theme automatically, with no
      changes needed in the component files themselves. */
   --background: var(--lp-void);
@@ -55,7 +56,7 @@
   --ring: var(--lp-blue-mid);
 
   /* --- Workspace-only additions -------------------------------------------
-     Every one of these is read by a specific component rule further down â€”
+     Every one of these is read by a specific component rule further down —
      see the comment at each call site if the name alone isn't obvious. */
   --pa-surface:       #ffffff;
   --pa-surface-hover: #f5f7ff;
@@ -103,7 +104,7 @@
   color: var(--lp-text);
 }
 
-/* --- Dark theme â€” toggled at runtime, see the header comment above ------- */
+/* --- Dark theme — the product default, see the header comment above ----- */
 .pa[data-theme='dark'] {
   --lp-void:          #01030f;
   --lp-deep:          #030720;
@@ -176,7 +177,7 @@
 }
 
 /* Cards, inputs and panels below use var(--pa-surface) as a translucent fill,
-   so they need a backdrop-filter to read as glass rather than a flat tint â€”
+   so they need a backdrop-filter to read as glass rather than a flat tint —
    applied per-component below rather than globally, since a handful (choice
    marks, avatars) must stay opaque. Glass reads fine over a solid light
    surface too (a blur with nothing but flat colour behind it is a no-op),
@@ -190,7 +191,7 @@
 }
 
 /* ==========================================================================
-   Type â€” reuses the landing scale, adds only what the product needs
+   Type — reuses the landing scale, adds only what the product needs
    ========================================================================== */
 
 .pa-title {
@@ -261,12 +262,12 @@
    shadow + blurred drop-glow + a glass gloss edge), rebuilt in the Prospectra
    blue ramp rather than the reference's orange:
 
-     Â· gradient FILL         #5c84ff â†’ #285fff â†’ #0b47e6   (the lightâ†’saturated
+     · gradient FILL         #5c84ff → #285fff → #0b47e6   (the light→saturated
                              sweep the reference builds with a layer blur)
-     Â· top gloss highlight   inset white, the glass edge
-     Â· coloured inner shadow inset deep-blue at the foot, the reference's
+     · top gloss highlight   inset white, the glass edge
+     · coloured inner shadow inset deep-blue at the foot, the reference's
                              "Inner shadow" layer
-     Â· drop-glow             a soft blue halo, the reference's blurred
+     · drop-glow             a soft blue halo, the reference's blurred
                              "Drop shadow" reading as glow on the light surface
    The ::after sweep is the glass gloss, sitting above the fill and below the
    label (isolate + z-index:-1). */
@@ -382,7 +383,7 @@
   background: var(--lp-void);
 }
 
-/* Accent glow at the bottom â€” intensity flips with --pa-bloom-gradient */
+/* Accent glow at the bottom — intensity flips with --pa-bloom-gradient */
 .pa-onboard__bloom {
   position: fixed;
   left: 50%;
@@ -467,7 +468,7 @@
 }
 
 /* ==========================================================================
-   Progress â€” a thin blue line
+   Progress — a thin blue line
    ========================================================================== */
 
 .pa-progress {
@@ -677,7 +678,7 @@
   object-fit: contain;
 }
 
-/* The single larger illustration a region is allowed â€” a soft blue well. */
+/* The single larger illustration a region is allowed — a soft blue well. */
 .pa-icon--lg {
   border-radius: 18px;
   background: var(--pa-icon-lg-bg);
@@ -1461,7 +1462,7 @@
   min-width: 0;
 }
 
-/* A nav row with children (e.g. Find leads) â€” the label navigates, the
+/* A nav row with children (e.g. Find leads) — the label navigates, the
    chevron expands. Split into two independently-clickable regions rather
    than nesting a button inside a link. */
 .pa-nav__item--parent {
@@ -1614,7 +1615,7 @@
 }
 
 /* Getting-started progress card, pinned above the footer until every item
-   is done â€” then it steps aside rather than sitting there stale. */
+   is done — then it steps aside rather than sitting there stale. */
 .pa-getting-started {
   display: block;
   margin: 4px 0 0;
@@ -1682,7 +1683,7 @@
   background: var(--lp-blue-core);
 }
 
-/* Secondary footer links â€” Request a feature / Upgrade */
+/* Secondary footer links — Request a feature / Upgrade */
 .pa-side__links {
   display: flex;
   flex-direction: column;
@@ -1826,6 +1827,14 @@
   color: var(--lp-blue-core);
   white-space: nowrap;
   font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.pa-credits:hover {
+  border-color: var(--lp-blue-mid);
+  background: rgba(40, 95, 255, 0.1);
 }
 
 .pa-credits b {
@@ -1860,6 +1869,17 @@
   flex-shrink: 0;
 }
 
+.pa-avatar--button {
+  border: none;
+  cursor: pointer;
+  transition: box-shadow 0.18s ease;
+}
+
+.pa-avatar--button:hover,
+.pa-avatar--button[aria-expanded='true'] {
+  box-shadow: 0 0 0 3px rgba(40, 95, 255, 0.22);
+}
+
 /* --- Content -------------------------------------------------------------- */
 
 .pa-content {
@@ -1885,7 +1905,7 @@
   box-shadow: var(--pa-panel-shadow);
 }
 
-/* The primary "recommended next step" panel â€” a subtle blue wash */
+/* The primary "recommended next step" panel — a subtle blue wash */
 .pa-panel--next {
   border-color: rgba(40, 95, 255, 0.35);
   background: var(--pa-panel-next-bg);
@@ -1913,7 +1933,7 @@
 }
 
 /* A fixed rail + main-content split (search filters, knowledge-base panes,
-   agent studio side nav) that collapses to one column on narrow viewports â€”
+   agent studio side nav) that collapses to one column on narrow viewports —
    set --pa-rail on the element to size the rail per use. Plain CSS grid
    templates on an inline style can't be media-queried since inline styles
    always win, so every page that needs this responsive behaviour uses this
@@ -2107,7 +2127,7 @@
 }
 
 /* ==========================================================================
-   Gradient field â€” hide the dark landing gradient inside workspace
+   Gradient field — hide the dark landing gradient inside workspace
    ========================================================================== */
 
 .pa .lp-grade {
@@ -2191,7 +2211,7 @@
    ========================================================================== */
 
 /* ==========================================================================
-   App shell â€” shared product components
+   App shell — shared product components
    --------------------------------------------------------------------------
    PageHeader, EmptyState, Tabs, DemoTag, Skeleton, DataTable, Drawer,
    ConfirmDialog, Toast, and the extra form controls the route pages share.
@@ -2629,6 +2649,27 @@
   box-shadow: 0 20px 50px -18px rgba(0, 0, 0, 0.6);
 }
 
+/* Opens downward from the header avatar instead of upward from the
+   sidebar's bottom row — same panel, positioned for where its trigger
+   actually sits on screen. */
+.pa-profile__menu--down {
+  top: calc(100% + 8px);
+  bottom: auto;
+}
+
+/* The header trigger is a small circular avatar, not a full-width row, so
+   its menu is a fixed width anchored to the right edge rather than
+   stretching to match the trigger. */
+.pa-profile--header {
+  position: relative;
+}
+
+.pa-profile--header .pa-profile__menu {
+  left: auto;
+  right: 0;
+  width: 260px;
+}
+
 .pa-profile__item {
   display: flex;
   align-items: center;
@@ -2752,6 +2793,12 @@
   background: var(--lp-glass-strong);
   color: var(--lp-text);
   border-color: var(--lp-line-strong);
+}
+
+/* Fully round, for sitting between a pill and a circular avatar in the
+   header — matches the shape rhythm instead of breaking it with a square. */
+.pa-icon-btn--round {
+  border-radius: 50%;
 }
 
 /* --- Extra form controls --------------------------------------------------- */
@@ -3282,26 +3329,56 @@
    ========================================================================== */
 
 .pa-ai-max {
-  position: fixed;
-  inset: 0;
-  z-index: 90;
+  /* Belt-and-suspenders sizing: `inset: 0` alone should be enough on a
+     `position: fixed` box, but explicit vw/vh plus `!important` on the
+     properties that actually contain it removes any way for something
+     else in this very large stylesheet to accidentally leave a gap the
+     real page shows through. */
+  position: fixed !important;
+  inset: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  z-index: 999 !important;
+  isolation: isolate;
   display: flex;
+  overflow: hidden;
   /* Fully opaque — this is a takeover, not a translucent overlay panel.
      --pa-blur-bg-strong is only ~92% opaque (right for a small dropdown
      with a blur to soften what peeks through); on a full-screen surface
      that 8% was enough for the whole page underneath — sidebar included —
      to bleed through and visually collide with this view's own content. */
-  background: var(--lp-void);
+  background: var(--lp-void) !important;
+  animation: pa-ai-max-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes pa-ai-max-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pa-ai-max {
+    animation: none;
+  }
 }
 
 .pa-ai-max__sidebar {
   width: 260px;
+  height: 100%;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   padding: 20px 14px;
   border-right: 1px solid var(--lp-line-strong);
-  background: var(--pa-surface-solid);
+  background: var(--pa-surface-solid) !important;
   overflow-y: auto;
 }
 
@@ -3398,10 +3475,12 @@
 .pa-ai-max__main {
   flex: 1;
   min-width: 0;
+  height: 100%;
   display: flex;
   flex-direction: column;
   padding: 0 24px 24px;
-  background: var(--lp-void);
+  background: var(--lp-void) !important;
+  overflow: hidden;
 }
 
 .pa-ai-max__topbar {

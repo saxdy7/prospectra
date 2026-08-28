@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useSyncExternalStore } from 'react';
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { AlertTriangle, Info } from 'lucide-react';
+import { preferences } from '@/lib/demo-storage/preferences';
 
 /**
  * The confirmation every destructive demo action goes through — delete a
@@ -29,6 +30,15 @@ export function ConfirmDialog({
   tone?: 'destructive' | 'neutral';
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
+  // The --lp- and --pa- token families are only defined inside the .pa
+  // class scope, and createPortal(..., document.body) makes this a sibling
+  // of .lp.pa, not a descendant — without re-declaring that scope here,
+  // every var() lookup resolves to nothing and renders transparent.
+  const theme = useSyncExternalStore(
+    preferences.subscribeTheme,
+    preferences.getTheme,
+    preferences.getThemeServerSnapshot
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -69,7 +79,7 @@ export function ConfirmDialog({
   if (!open || typeof document === 'undefined') return null;
 
   return createPortal(
-    <div className="pa-dialog-scrim" role="presentation" onClick={onClose}>
+    <div className="lp pa pa-dialog-scrim" data-theme={theme} role="presentation" onClick={onClose}>
       <div
         ref={panelRef}
         className="pa-dialog"

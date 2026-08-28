@@ -62,7 +62,9 @@ function writeString(key: string, value: string) {
 // Theme has a subscriber list so components can read it with
 // useSyncExternalStore — that's what lets the toggle button update the
 // header instantly without a "setState in an effect" render cascade, and
-// keeps the server/first-paint snapshot ('light') consistent for hydration.
+// keeps the server/first-paint snapshot ('dark') consistent for hydration.
+// Dark is the product default; light remains available as an explicit,
+// user-chosen toggle — it must never be what a first-time visitor sees.
 type Listener = () => void;
 let themeListeners: Listener[] = [];
 
@@ -80,8 +82,8 @@ export const preferences = {
   getTablesLayout: () => readString<TableViewMode>(KEYS.tablesLayout, 'grid'),
   setTablesLayout: (v: TableViewMode) => writeString(KEYS.tablesLayout, v),
 
-  getTheme: () => readString<Theme>(KEYS.theme, 'light'),
-  getThemeServerSnapshot: (): Theme => 'light',
+  getTheme: () => readString<Theme>(KEYS.theme, 'dark'),
+  getThemeServerSnapshot: (): Theme => 'dark',
   setTheme: (v: Theme) => {
     writeString(KEYS.theme, v);
     notifyThemeChange();

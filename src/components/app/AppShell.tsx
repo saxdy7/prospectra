@@ -27,9 +27,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [profileOpen, setProfileOpen] = useState(false);
   const ctx = useWorkspace();
 
-  /* Server and first paint always see 'light'; useSyncExternalStore swaps
-     in the persisted choice right after hydration and re-renders whenever
-     the toggle below calls preferences.setTheme(). */
+  /* Server and first paint always see 'dark' — the product default;
+     useSyncExternalStore swaps in the persisted choice right after
+     hydration and re-renders whenever the toggle below calls
+     preferences.setTheme(). Light stays available, but only as an
+     explicit, remembered opt-in — never the initial presentation. */
   const theme = useSyncExternalStore(
     preferences.subscribeTheme,
     preferences.getTheme,
@@ -93,21 +95,38 @@ export function AppShell({ children }: { children: ReactNode }) {
               </div>
 
               <div className="pa-top__right">
-                <span className="pa-credits">
+                <Link href="/app/settings?tab=credits" className="pa-credits">
                   <Sparkles size={13} strokeWidth={2} />
                   <b>500</b> setup credits
-                </span>
+                </Link>
                 <button
                   type="button"
-                  className="pa-icon-btn"
+                  className="pa-icon-btn pa-icon-btn--round"
                   aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
                   onClick={toggleTheme}
                 >
                   {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
                 </button>
-                <span className="pa-avatar" aria-hidden="true">
-                  {ctx.firstName.charAt(0).toUpperCase()}
-                </span>
+                <div className="pa-profile pa-profile--header">
+                  {profileOpen && (
+                    <ProfileMenu
+                      name={ctx.firstName}
+                      initial={ctx.firstName.charAt(0).toUpperCase()}
+                      align="down"
+                      onNavigate={() => setProfileOpen(false)}
+                    />
+                  )}
+                  <button
+                    type="button"
+                    className="pa-avatar pa-avatar--button"
+                    aria-haspopup="menu"
+                    aria-expanded={profileOpen}
+                    aria-label="Account menu"
+                    onClick={() => setProfileOpen((v) => !v)}
+                  >
+                    {ctx.firstName.charAt(0).toUpperCase()}
+                  </button>
+                </div>
               </div>
             </header>
 

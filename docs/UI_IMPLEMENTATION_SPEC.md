@@ -20,19 +20,59 @@ iconography and component composition are explicitly out of scope for copying.
 
 ---
 
-## 0. DECIDED — product app ships **both themes**, light by default
+## 0. DECIDED — product app ships **both themes**, dark by default
 
-> **Status: current, 2026-08-25 (third ruling, same day).** Marketing, auth,
-> and onboarding stay dark — unchanged. `/app` is a real light/dark **toggle**:
-> the workspace renders light on first load, and a header control switches to
-> the dark ramp and back, persisted per browser. Neither the all-dark ruling
-> nor the light-only ruling below this line is current; both are kept for the
-> reasoning trail.
+> **Status: current, 2026-08-27 (fourth ruling).** Marketing, auth, and
+> onboarding stay dark — unchanged. `/app` is a real light/dark **toggle**,
+> same mechanism as the third ruling below, but the polarity is reversed
+> again: the workspace now renders **dark** on first load, and the header
+> control switches to the light ramp and back, persisted per browser. Every
+> ruling below this line is historical reasoning, not current behaviour.
+
+Direct instruction: "The product app must default to the dark Prospectra
+theme. Do not make light mode the default product experience. If a
+light-mode preference remains, it must be optional, polished, and never
+override the initial dark presentation." This reverses the third ruling
+immediately below without touching its mechanism — the toggle, persistence,
+and token architecture are all unchanged; only which value each of the two
+defaults resolves to at first paint flips.
+
+**What changed, mechanically — two defaults flipped, nothing else:**
+
+- `src/lib/demo-storage/preferences.ts`: `getTheme`'s fallback and
+  `getThemeServerSnapshot`'s return value both changed from `'light'` to
+  `'dark'`. That is the entire behavioural change — every consumer
+  (`AppShell.tsx`, and the portaled `AiAssistant`/`Drawer`/`ConfirmDialog`/
+  `FeatureRequestModal`/`Toast`, all of which read theme via the same
+  `useSyncExternalStore(preferences.subscribeTheme, preferences.getTheme,
+  preferences.getThemeServerSnapshot)` call) picks up the new default with no
+  further edits, because none of them hardcode a polarity.
+- The dark token ramp in `workspace.css`'s `.pa[data-theme='dark']` block was
+  already complete and polished from the third ruling below (it was the
+  toggle's dark option, fully themed, not a stub) — it needed no touch-up to
+  serve as the default presentation.
+- The light ramp on bare `.pa` is unchanged and remains available — still a
+  full, polished token set, just no longer what a first-time visitor sees.
+- `OnboardingShell.tsx` is unaffected: it still renders `.pa` with no
+  `data-theme` attribute, resolving the light base block. This was already
+  inconsistent with "onboarding stays dark" in the third ruling's own text
+  and remains an open item, not something this ruling introduced or fixed.
+
+<details>
+<summary>Historical: the light-by-default ruling this replaces (superseded 2026-08-27)</summary>
+
+> **Status at the time: current, 2026-08-25 (third ruling, same day).**
+> Marketing, auth, and onboarding stay dark — unchanged. `/app` is a real
+> light/dark **toggle**: the workspace renders light on first load, and a
+> header control switches to the dark ramp and back, persisted per browser.
+> Neither the all-dark ruling nor the light-only ruling below this line is
+> current; both are kept for the reasoning trail.
 
 The all-dark reversal (kept verbatim further down) was itself reversed by a
 direct instruction: the dark conversion had gone further than intended — the
 user wants the white version available as the default for `/app`, with the
 dark version reachable as an explicit user choice, not the other way round.
+(A later instruction, recorded above, reversed this again.)
 
 **What changed, mechanically:**
 
@@ -131,6 +171,8 @@ This reasoning is preserved because it was sound *given what was known at the
 time* — the next explicit instruction simply settled the ambiguity the other
 way. Treat a future "make it light again" instruction as a third reversal,
 not evidence this analysis was wrong.
+
+</details>
 
 </details>
 
@@ -534,7 +576,7 @@ highlights its parent ("Tables") correctly.
 
 **Top bar right side** (`.pa-top__right`, left to right): setup-credits pill,
 theme toggle (Sun/Moon icon button, `.pa-icon-btn`), avatar. The theme toggle
-flips `/app` between the light default and the dark ramp — see §0.
+flips `/app` between the dark default and the light ramp — see §0.
 
 ---
 
@@ -698,6 +740,8 @@ Run before declaring any UI milestone complete:
 | 2026-08-25 | Audiences, campaign drafts, voice studio | Verified end to end; gates hold |
 | 2026-08-25 | Analytics + Settings; every nav entry now live | Counts correct; destructive reset confirmed |
 | 2026-08-25 | Frontend milestone: §0 reversed to dark (superseding the light ruling above); shadcn-token bridge added to `.pa`; `WorkspaceApp.tsx` switcher retired in favour of ~38 real routes under `src/app/app/**`; new `@/components/app` shared library (`useWorkspace`, `PageHeader`, `DataTable`, `EmptyState`, `Drawer`, `ConfirmDialog`, `Toast`, `Tabs`, `DemoTag`/`StatusPill`, `FormControls`, `SearchResultsPanel`, `WorkflowCanvas`); `lib/mock-data/` and `lib/demo-storage/` added; `docs/FRONTEND_ROUTE_INVENTORY.md` and `docs/MOCK_DATA_BOUNDARIES.md` created | tsc clean, lint clean, build: 42/42 routes compiled, all 200 on a live curl sweep incl. placeholder dynamic-route ids |
+| 2026-08-25/26 | §0 reversed a third time — light default with a real header toggle (`preferences.ts` theme API, `.pa`/`.pa[data-theme='dark']` split); `AppSidebar.tsx` rebuilt after unrelated corruption; fixed a systemic bug where every portaled component (`AiAssistant`, `Drawer`, `ConfirmDialog`, `FeatureRequestModal`, `Toast`) rendered transparent because `--lp-*`/`--pa-*` tokens are scoped to `.pa` and `createPortal(..., document.body)` moves the node outside that scope; `ProfileMenu` extracted and reused in header + sidebar; `settings` restructured to a left mini-nav with real pricing cards; `Home` restructured with real stats/checklist/guide links; two legacy-data runtime crashes fixed (`campaign.channel`, `voiceAgent.languages`) | tsc, lint clean |
+| 2026-08-27 | §0 reversed a fourth time — dark is the product default again, light is opt-in only (`preferences.ts` defaults flipped; `OnboardingShell.tsx` given explicit `data-theme="dark"`, closing a gap where onboarding silently rendered light despite every ruling in §0 calling for it to stay dark); fixed mangled UTF-8 (`â€”`/`â†’`/`Â·`) in `workspace.css` and `FRONTEND_ROUTE_INVENTORY.md` comments; route inventory corrected to 46 total routes (was undercounting `/app/invoices`) and its stale `href="#"` claim about `/app/help` corrected — that page already shows a toast, not a dead link; full dead-control sweep (`href="#"`, no-op `onClick`, `TODO`/`FIXME`) found nothing outstanding in `src/app/app/**` | tsc clean, lint clean, curl sweep of 16 representative + edge-case routes all 200, server-rendered HTML confirmed `data-theme="dark"` on first paint with no prior localStorage |
 
 ## 1. NAVIGATION ROUTING
 > **Status: current, 2026-08-25.**
