@@ -74,7 +74,7 @@ export function Drawer({
   if (!open || typeof document === 'undefined') return null;
 
   return createPortal(
-    <div className="lp pa" data-theme={theme} style={{ minHeight: 0 }}>
+    <div className="lp pa pa-portal" data-theme={theme}>
       <button className="pa-drawer-scrim" aria-label="Close panel" onClick={onClose} />
       <div
         ref={panelRef}

@@ -59,7 +59,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       {typeof document !== 'undefined' &&
         createPortal(
-          <div className="lp pa pa-toast-region" data-theme={theme} role="status" aria-live="polite">
+          <div className="lp pa pa-portal pa-toast-region" data-theme={theme} role="status" aria-live="polite">
             {items.map((t) => (
               <div key={t.id} className={`pa-toast pa-toast--${t.tone}`}>
                 <span className="pa-toast__icon" aria-hidden="true">

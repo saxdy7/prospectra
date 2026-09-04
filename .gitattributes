@@ -1,0 +1,14 @@
+# Normalise line endings: store LF in the repo and check out LF everywhere,
+# so Windows (core.autocrlf=true) stops warning "LF will be replaced by CRLF"
+# on every touched file and diffs never churn on line endings alone.
+* text=auto eol=lf
+
+# Binary assets — never touch.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import {
   Activity,
@@ -50,6 +50,7 @@ import { BRAND } from '../landing/brand';
 import { Logomark } from '../landing/primitives';
 import { FeatureRequestModal } from '@/components/app/FeatureRequestModal';
 import { ProfileMenu } from '@/components/app/ProfileMenu';
+import { useDismissible } from '@/components/app/useDismissible';
 import { checklistFor } from '@/lib/onboarding/plan';
 import type { OnboardingData } from '@/lib/onboarding/types';
 
@@ -185,6 +186,13 @@ export function AppSidebar({
   const [switcherOpen, setSwitcherOpen] = useState(false);
   const [featureRequestOpen, setFeatureRequestOpen] = useState(false);
 
+  const profileRef = useRef<HTMLDivElement>(null);
+  const switcherRef = useRef<HTMLDivElement>(null);
+  const closeProfile = useCallback(() => setProfileOpen(false), []);
+  const closeSwitcher = useCallback(() => setSwitcherOpen(false), []);
+  useDismissible(profileRef, profileOpen, closeProfile);
+  useDismissible(switcherRef, switcherOpen, closeSwitcher);
+
   const name = onboarding.workspaceName.trim() || 'Your workspace';
   const initial = name.charAt(0).toUpperCase();
 
@@ -319,7 +327,7 @@ export function AppSidebar({
       {/* One workspace exists on Starter — the switcher opens onto that
           fact plainly, plus the real path to more (a paid plan), rather
           than pretending a workspace list is here already. */}
-      <div className="pa-switcher-wrap">
+      <div className="pa-switcher-wrap" ref={switcherRef}>
         <button
           type="button"
           className="pa-switcher"
@@ -474,8 +482,8 @@ export function AppSidebar({
           </div>
         </div>
 
-        <div className="pa-profile">
-          {profileOpen && <ProfileMenu name={name} initial={initial} align="up" onNavigate={() => setProfileOpen(false)} />}
+        <div className="pa-profile" ref={profileRef}>
+          {profileOpen && <ProfileMenu name={name} initial={initial} align="up" onNavigate={closeProfile} />}
           <button
             type="button"
             className="pa-profile__trigger"

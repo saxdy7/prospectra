@@ -104,6 +104,16 @@
   color: var(--lp-text);
 }
 
+/* Portal roots (Toast region, Drawer, dialogs) re-declare `lp pa` so their
+   var() lookups resolve after createPortal moves them out of the .pa tree —
+   but they must NOT inherit the page-root sizing above. Without this reset
+   the always-mounted toast region became an opaque 100dvh column the moment
+   a toast rendered. Sits right after `.pa` so it wins the tie on purpose. */
+.pa.pa-portal {
+  min-height: 0;
+  background: transparent;
+}
+
 /* --- Dark theme — the product default, see the header comment above ----- */
 .pa[data-theme='dark'] {
   --lp-void:          #01030f;
@@ -3329,18 +3339,15 @@
    ========================================================================== */
 
 .pa-ai-max {
-  /* Belt-and-suspenders sizing: `inset: 0` alone should be enough on a
-     `position: fixed` box, but explicit vw/vh plus `!important` on the
-     properties that actually contain it removes any way for something
-     else in this very large stylesheet to accidentally leave a gap the
-     real page shows through. */
-  position: fixed !important;
-  inset: 0 !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100dvh !important;
-  z-index: 999 !important;
+  /* A full-screen takeover: `position: fixed; inset: 0` is the whole of
+     the sizing. The page-bleed this view once suffered was never a sizing
+     gap — it was the portal root missing the `.pa` token scope, so every
+     var() background resolved to transparent (see AiAssistant.tsx). That
+     is fixed at the source; no !important needed here. Sits above every
+     other overlay (drawer 60, dialog 70, toast 80). */
+  position: fixed;
+  inset: 0;
+  z-index: 90;
   isolation: isolate;
   display: flex;
   overflow: hidden;
@@ -3349,7 +3356,7 @@
      with a blur to soften what peeks through); on a full-screen surface
      that 8% was enough for the whole page underneath — sidebar included —
      to bleed through and visually collide with this view's own content. */
-  background: var(--lp-void) !important;
+  background: var(--lp-void);
   animation: pa-ai-max-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -3378,7 +3385,7 @@
   flex-direction: column;
   padding: 20px 14px;
   border-right: 1px solid var(--lp-line-strong);
-  background: var(--pa-surface-solid) !important;
+  background: var(--pa-surface-solid);
   overflow-y: auto;
 }
 
@@ -3479,7 +3486,7 @@
   display: flex;
   flex-direction: column;
   padding: 0 24px 24px;
-  background: var(--lp-void) !important;
+  background: var(--lp-void);
   overflow: hidden;
 }
 

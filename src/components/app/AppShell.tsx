@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useSyncExternalStore } from 'react';
+import { useCallback, useRef, useState, useSyncExternalStore } from 'react';
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -10,6 +10,7 @@ import { AiAssistant } from './AiAssistant';
 import { PageSkeleton } from './Skeleton';
 import { ProfileMenu } from './ProfileMenu';
 import { ToastProvider } from './Toast';
+import { useDismissible } from './useDismissible';
 import { useWorkspace } from './useWorkspace';
 import { preferences } from '@/lib/demo-storage/preferences';
 import '@/components/landing/landing.css';
@@ -25,6 +26,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+  const closeProfile = useCallback(() => setProfileOpen(false), []);
+  useDismissible(profileRef, profileOpen, closeProfile);
   const ctx = useWorkspace();
 
   /* Server and first paint always see 'dark' — the product default;
@@ -107,13 +111,13 @@ export function AppShell({ children }: { children: ReactNode }) {
                 >
                   {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
                 </button>
-                <div className="pa-profile pa-profile--header">
+                <div className="pa-profile pa-profile--header" ref={profileRef}>
                   {profileOpen && (
                     <ProfileMenu
                       name={ctx.firstName}
                       initial={ctx.firstName.charAt(0).toUpperCase()}
                       align="down"
-                      onNavigate={() => setProfileOpen(false)}
+                      onNavigate={closeProfile}
                     />
                   )}
                   <button
